@@ -14,6 +14,7 @@ function DashboardLayout() {
   const { user, logout } = useContext(UserContext);
   const [searchQuery, setSearchQuery] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const logoDropdownRef = useRef();
 
   const isActive = (path) => location.pathname === path;
@@ -26,6 +27,10 @@ function DashboardLayout() {
   };
 
   const handleLogout = () => {
+    setShowLogoutModal(true);
+  };
+
+  const proceedLogout = () => {
     const userId = localStorage.getItem("userId");
     localStorage.removeItem(`activeQuiz_${userId}`);
     logout();
@@ -172,6 +177,23 @@ function DashboardLayout() {
           <Outlet context={{ searchQuery }} />
         </main>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="modal-overlay" onClick={() => setShowLogoutModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: 400, textAlign: 'center', padding: '30px' }}>
+            <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'rgba(66, 85, 255, 0.1)', color: '#4255ff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+              <LogOut size={30} />
+            </div>
+            <h2 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: 10, color: '#0f172a' }}>Sign Out?</h2>
+            <p style={{ color: '#64748b', marginBottom: 30, fontSize: '0.95rem' }}>Are you sure you want to log out from your account?</p>
+            <div style={{ display: 'flex', gap: 12 }}>
+              <button className="admin-btn secondary" style={{ flex: 1, border: '1px solid #e2e8f0', background: 'white' }} onClick={() => setShowLogoutModal(false)}>Cancel</button>
+              <button className="admin-btn primary" style={{ flex: 1, background: '#ef4444', color: 'white', border: 'none' }} onClick={proceedLogout}>Logout</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -34,6 +34,18 @@ export default function AdminMessages() {
     }
   };
 
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this message?")) return;
+    try {
+      await api.delete(`/contact/messages/${id}`);
+      setMessages(messages.filter(m => m._id !== id));
+      if (selectedMessage?._id === id) setSelectedMessage(null);
+    } catch (err) {
+      console.error("Delete failed", err);
+      alert("Failed to delete message");
+    }
+  };
+
   const filtered = messages.filter(m => 
     m.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     m.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -111,7 +123,7 @@ export default function AdminMessages() {
 
               <div className="detail-actions">
                 <a href={`mailto:${selectedMessage.email}`} className="admin-btn primary">Reply via Email</a>
-                <button className="admin-btn secondary text-red" onClick={() => {/* Delete logic */}}>
+                <button className="admin-btn secondary text-red" onClick={() => handleDelete(selectedMessage._id)}>
                    <Trash2 size={16} /> Delete
                 </button>
               </div>

@@ -27,6 +27,8 @@ export default function AdminLayout() {
   const location = useLocation();
   const { user, logout, adminTheme } = useContext(UserContext);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [liveNotif, setLiveNotif] = useState(null);
   const [liveNotif, setLiveNotif] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -77,6 +79,8 @@ export default function AdminLayout() {
   }
 
   const handleLogout = () => { logout(); navigate("/"); };
+  const confirmLogout = () => setShowLogoutModal(true);
+  const proceedLogout = () => { logout(); navigate("/"); };
   const isActive = (path) => path === "/admin"
     ? location.pathname === "/admin"
     : location.pathname.startsWith(path);
@@ -161,7 +165,7 @@ export default function AdminLayout() {
               <div style={{ fontSize: ".7rem", color: "var(--admin-muted)" }}>Administrator</div>
             </div>
           </div>
-          <button className="admin-btn danger" style={{ width: "100%", justifyContent: "center" }} onClick={handleLogout}>
+          <button className="admin-btn danger" style={{ width: "100%", justifyContent: "center" }} onClick={confirmLogout}>
             <LogOut size={15} /> Sign Out
           </button>
         </div>
@@ -234,6 +238,23 @@ export default function AdminLayout() {
         {/* Page content */}
         <Outlet />
       </div>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="modal-overlay" onClick={() => setShowLogoutModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: 400, textAlign: 'center' }}>
+            <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'var(--admin-accent-pale)', color: 'var(--admin-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+              <LogOut size={30} />
+            </div>
+            <h2 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: 10 }}>Sign Out?</h2>
+            <p style={{ color: 'var(--admin-muted)', marginBottom: 30 }}>Are you sure you want to log out of the admin panel?</p>
+            <div style={{ display: 'flex', gap: 12 }}>
+              <button className="admin-btn secondary" style={{ flex: 1 }} onClick={() => setShowLogoutModal(false)}>Cancel</button>
+              <button className="admin-btn primary" style={{ flex: 1, background: '#ef4444' }} onClick={proceedLogout}>Logout</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
