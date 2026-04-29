@@ -37,8 +37,23 @@ export default function AdminQuestions() {
   const fetchQuestions = async () => {
     setLoading(true);
     try {
-      const res = await api.get("admin/questions?limit=1000");
-      setQuestions(Array.isArray(res.data.questions) ? res.data.questions : []);
+      const res = await api.get("admin/questions/?limit=1000");
+      let data = res.data;
+      
+      // Handle different response formats
+      if (data && data.questions && Array.isArray(data.questions)) {
+        setQuestions(data.questions);
+      } else if (Array.isArray(data)) {
+        setQuestions(data);
+      } else {
+        // Final fallback: try the public endpoint if admin one returns unexpected format
+        const fallback = await api.get("questions/all").catch(() => null);
+        if (fallback && Array.isArray(fallback.data)) {
+          setQuestions(fallback.data);
+        } else {
+          setQuestions([]);
+        }
+      }
     } catch (err) {
       console.error("Questions load error:", err);
       setQuestions([]);
