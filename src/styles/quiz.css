@@ -352,29 +352,39 @@
   margin-bottom: 16px;
 }
 .quiz-opt {
-  display: grid;
-  grid-template-columns: 36px 1fr auto;
-  grid-template-rows: auto;
-  align-items: start;
-  gap: 14px;
-  padding: 18px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
   border-radius: 14px;
   border: 2px solid #e2e8f0;
   background: white;
   text-align: left;
   cursor: pointer;
   font-family: 'Inter', sans-serif;
-  font-size: .95rem;
+  font-size: .92rem;
   color: #0f172a;
   transition: all .18s;
   position: relative;
-  height: auto !important;
-  min-height: 64px;
-  width: 100% !important;
+  min-height: 52px;
   box-sizing: border-box;
-  overflow: visible !important;
+  overflow: hidden;
   -webkit-tap-highlight-color: transparent;
-  word-wrap: break-word;
+}
+@media (max-width: 768px) {
+  .quiz-opt {
+    display: grid !important;
+    grid-template-columns: 36px 1fr auto !important;
+    grid-template-rows: auto !important;
+    align-items: start !important;
+    gap: 14px !important;
+    padding: 18px 16px !important;
+    height: auto !important;
+    min-height: 64px !important;
+    width: 100% !important;
+    overflow: visible !important;
+    word-wrap: break-word !important;
+  }
 }
 .quiz-opt:hover:not(:disabled) { border-color: #4255ff; background: rgba(66,85,255,.04); }
 .quiz-opt.selected { border-color: #4255ff; background: rgba(66,85,255,.06); }
@@ -397,16 +407,24 @@
 .quiz-opt.correct  .opt-letter { background: #16a34a; color: white; }
 .quiz-opt.wrong    .opt-letter { background: #dc2626; color: white; }
 .opt-text  { 
-  width: 100% !important;
+  flex: 1;
   font-weight: 500; 
-  white-space: normal !important; 
-  word-break: break-word !important; 
-  overflow-wrap: break-word !important;
-  line-height: 1.5;
-  display: block !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   min-width: 0;
-  text-overflow: clip !important;
-  align-self: start;
+}
+@media (max-width: 768px) {
+  .opt-text {
+    width: 100% !important;
+    white-space: normal !important; 
+    word-break: break-word !important; 
+    overflow-wrap: break-word !important;
+    line-height: 1.5 !important;
+    display: block !important;
+    text-overflow: clip !important;
+    align-self: start !important;
+  }
 }
 .opt-check { color: #16a34a; flex-shrink: 0; margin-top: 4px; }
 
