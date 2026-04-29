@@ -15,7 +15,7 @@ export default function BookViewer() {
   useEffect(() => {
     const fetchBook = async () => {
       try {
-        const res = await api.get("/library/books");
+        const res = await api.get("library/books");
         const found = res.data.find(b => b._id === id);
         setBook(found);
       } catch (err) {

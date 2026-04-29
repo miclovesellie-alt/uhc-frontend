@@ -20,8 +20,8 @@ function Library() {
   const fetchLibrary = async () => {
     try {
       const [booksRes, coursesRes] = await Promise.all([
-        api.get("/library/books"),
-        api.get("/library/courses")
+        api.get("library/books"),
+        api.get("library/courses")
       ]);
       setBooks(booksRes.data);
       setCourses(coursesRes.data);
