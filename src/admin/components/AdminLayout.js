@@ -89,7 +89,7 @@ export default function AdminLayout() {
   return (
     <div className={`admin-wrapper ${adminTheme === "dark" ? "admin-dark" : ""}`}>
       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: '4px', background: 'red', zIndex: 10000 }}></div>
-      <div style={{ position: 'fixed', top: 4, left: '50%', transform: 'translateX(-50%)', background: 'red', color: 'white', padding: '2px 10px', borderRadius: '0 0 10px 10px', fontSize: '12px', fontWeight: 900, zIndex: 10000 }}>ADMIN-DEPLOY-V3.2</div>
+      <div style={{ position: 'fixed', top: 4, left: '50%', transform: 'translateX(-50%)', background: 'red', color: 'white', padding: '2px 10px', borderRadius: '0 0 10px 10px', fontSize: '12px', fontWeight: 900, zIndex: 10000 }}>ADMIN-DEPLOY-V3.3</div>
 
       {/* ===== SIDEBAR ===== */}
       <aside className={`admin-sidebar${sidebarOpen ? " sidebar-open" : ""}`}>
