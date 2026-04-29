@@ -254,7 +254,24 @@ export default function QuizPage() {
 
   return (
     <div className="quiz-page-wrap">
-      <div style={{ position: 'fixed', top: 5, right: 5, fontSize: '10px', color: '#ff0000', zIndex: 9999, background: 'white', padding: '2px 4px', borderRadius: '4px', border: '1px solid red' }}>FORCE-RELOAD-V3</div>
+      <div style={{ position: 'fixed', top: 5, right: 5, fontSize: '10px', color: '#ff0000', zIndex: 9999, background: 'white', padding: '2px 4px', borderRadius: '4px', border: '1px solid red' }}>v3.1-DEFINITIVE-FIX</div>
+      <style>{`
+        .opt-text {
+          white-space: normal !important;
+          word-break: break-word !important;
+          overflow-wrap: anywhere !important;
+          display: block !important;
+          width: 100% !important;
+          line-height: 1.4 !important;
+        }
+        .quiz-opt {
+          height: auto !important;
+          min-height: 64px !important;
+          display: grid !important;
+          grid-template-columns: 36px 1fr auto !important;
+          align-items: start !important;
+        }
+      `}</style>
 
       {/* Watermark */}
       {noSS && stage === "quiz" && (
@@ -436,16 +453,7 @@ export default function QuizPage() {
                     }}
                   >
                     <span className="opt-letter">{String.fromCharCode(65 + i)}</span>
-                    <div className="opt-text" style={{ 
-                      whiteSpace: 'normal !important', 
-                      wordBreak: 'break-word !important', 
-                      overflowWrap: 'anywhere !important',
-                      display: 'block !important', 
-                      width: '100% !important',
-                      lineHeight: '1.4 !important',
-                      fontSize: '0.92rem !important',
-                      minHeight: '1.4em !important'
-                    }}>{opt}</div>
+                    <div className="opt-text">{opt}</div>
                     {locked && i === q.answer && <CheckCircle size={15} className="opt-check" />}
                   </div>
                 );

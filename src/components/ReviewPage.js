@@ -1,5 +1,7 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { AlertTriangle } from "lucide-react";
+import api from "../api/api";
 import "../styles/review.css";
 
 function ReviewPage() {
@@ -59,11 +61,38 @@ function ReviewPage() {
     navigate("/quiz");
   };
 
+  const handleReport = async (q) => {
+    const reason = window.prompt(`Reporting Question: "${q.question}"\n\nWhy is this question faulty?`);
+    if (reason === null) return;
+    if (!reason.trim()) { alert("Please provide a reason."); return; }
+
+    try {
+      await api.post("questions/report", {
+        questionId: q._id || q.id,
+        questionText: q.question,
+        reason: reason
+      });
+      alert("Report sent. Thank you!");
+    } catch (err) { alert("Failed to send report."); }
+  };
+
   const optionLetters = ["A", "B", "C", "D", "E", "F"];
 
   return (
     <div className="review-wrapper">
-      <div style={{ position: 'fixed', top: 5, right: 5, fontSize: '10px', color: '#ff0000', zIndex: 9999, background: 'white', padding: '2px 4px', borderRadius: '4px', border: '1px solid red' }}>FORCE-RELOAD-V3-REVIEW</div>
+      <div style={{ position: 'fixed', top: 5, right: 5, fontSize: '10px', color: '#ff0000', zIndex: 9999, background: 'white', padding: '2px 4px', borderRadius: '4px', border: '1px solid red' }}>v3.1-DEFINITIVE-FIX</div>
+      <style>{`
+        .review-option {
+          display: flex !important;
+          height: auto !important;
+          white-space: normal !important;
+          word-break: break-word !important;
+          overflow-wrap: anywhere !important;
+          padding: 12px 16px !important;
+          align-items: start !important;
+          gap: 12px !important;
+        }
+      `}</style>
       <div className="review-card">
         <div className="review-scroll">
 
@@ -157,8 +186,14 @@ function ReviewPage() {
               return (
                 <div key={index} className="review-question-card">
 
-                  <div className="review-question">
-                    {index + 1}. {q.question}
+                  <div className="review-question" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <span style={{ flex: 1 }}>{index + 1}. {q.question}</span>
+                    <button 
+                      onClick={() => handleReport(q)}
+                      style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#ef4444', borderRadius: 8, padding: '4px 8px', fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}
+                    >
+                      <AlertTriangle size={12} /> Report
+                    </button>
                   </div>
 
                   <div className="review-options">

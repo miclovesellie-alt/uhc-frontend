@@ -133,7 +133,12 @@ export default function AdminLayout() {
               onClick={() => setSidebarOpen(false)}
             >
               {item.icon}
-              {item.label}
+              <span style={{ flex: 1 }}>{item.label}</span>
+              {item.label === "Notifications" && unreadCount > 0 && (
+                <span style={{ background: '#ef4444', color: 'white', fontSize: '0.65rem', fontWeight: 700, padding: '1px 6px', borderRadius: '10px' }}>
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
             </NavLink>
           ))}
 
