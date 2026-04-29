@@ -70,9 +70,21 @@ export default function BulkUpload() {
   return (
     <div className="admin-page">
       <div className="admin-section-header">
-        <div>
-          <h1 className="admin-title">Bulk Question Upload <span style={{ color: 'red', fontSize: '10px' }}>v3.3.6</span></h1>
-          <p className="admin-subtitle">Add hundreds of questions at once via JSON</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+          <div>
+            <h1 className="admin-title">Bulk Question Upload <span style={{ color: 'red', fontSize: '10px' }}>v3.3.7</span></h1>
+            <p className="admin-subtitle">Add hundreds of questions at once via JSON</p>
+          </div>
+          {questions.length > 0 && (
+            <button 
+              className="admin-btn primary mobile-only" 
+              onClick={handleUpload}
+              disabled={loading}
+              style={{ boxShadow: '0 4px 15px rgba(66, 85, 255, 0.4)' }}
+            >
+              {loading ? "..." : "Upload"}
+            </button>
+          )}
         </div>
       </div>
 
@@ -192,31 +204,35 @@ export default function BulkUpload() {
       )}
 
       <style>{`
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
           .mobile-upload-bar {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: var(--admin-card);
-            padding: 16px 20px;
+            background: #ffffff;
+            padding: 18px 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-top: 2px solid var(--admin-accent);
-            z-index: 1000;
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
-            backdrop-filter: blur(10px);
+            border-top: 3px solid #4255ff;
+            z-index: 9999;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.4);
+          }
+          .admin-wrapper.admin-dark .mobile-upload-bar {
+            background: #1e293b;
+            border-top-color: #60a5fa;
           }
           .mobile-bar-info {
-            font-size: 0.9rem;
-            color: var(--admin-text);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: inherit;
           }
           .admin-page {
-            padding-bottom: 100px; /* Space for the bar */
+            padding-bottom: 120px !important;
           }
         }
-        @media (min-width: 769px) {
+        @media (min-width: 1025px) {
           .mobile-upload-bar {
             display: none;
           }
