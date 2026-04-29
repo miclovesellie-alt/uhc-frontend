@@ -8,6 +8,7 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [sendingManual, setSendingManual] = useState(false);
 
   const handleReset = async (e) => {
     e.preventDefault();
@@ -22,6 +23,29 @@ const ForgotPassword = () => {
       setError(
         err.response?.data?.message || "Something went wrong. Please try again later."
       );
+    }
+  };
+
+  const handleManualRequest = async () => {
+    if (!email) {
+      setError("Please enter your email first so we know who you are.");
+      return;
+    }
+    setSendingManual(true);
+    setMessage("");
+    setError("");
+
+    try {
+      await api.post("contact", {
+        name: "Manual Password Reset Request",
+        email: email,
+        message: `Hello Admin, I am having trouble resetting my password via email. Please reset my password manually. My email is: ${email}`
+      });
+      setMessage("Your request has been sent to the Admin. They will contact you shortly.");
+    } catch (err) {
+      setError("Failed to send request. Please try again later.");
+    } finally {
+      setSendingManual(false);
     }
   };
 
@@ -55,6 +79,24 @@ const ForgotPassword = () => {
               Send Reset Link &nbsp;→
             </button>
           </form>
+
+          <div className="auth-divider">
+            <span>OR</span>
+          </div>
+
+          <p style={{ fontSize: "0.85rem", color: "var(--text-sub)", textAlign: "center", marginBottom: "12px" }}>
+            Not receiving the email? Request a manual reset:
+          </p>
+          
+          <button 
+            type="button" 
+            className="auth-button-secondary" 
+            onClick={handleManualRequest}
+            disabled={sendingManual}
+            style={{ marginTop: 0, fontWeight: 700, color: "var(--primary-green)" }}
+          >
+            {sendingManual ? "Sending Request..." : "💬 Message Admin for Manual Reset"}
+          </button>
 
           <p className="auth-link">
             Remember your password?{" "}
