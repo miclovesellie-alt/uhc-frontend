@@ -254,6 +254,7 @@ export default function QuizPage() {
 
   return (
     <div className="quiz-page-wrap">
+      <div style={{ position: 'fixed', top: 5, right: 5, fontSize: '10px', color: '#ff0000', zIndex: 9999, background: 'white', padding: '2px 4px', borderRadius: '4px', border: '1px solid red' }}>FORCE-RELOAD-V3</div>
 
       {/* Watermark */}
       {noSS && stage === "quiz" && (
@@ -372,26 +373,37 @@ export default function QuizPage() {
                   <span><b className="qnd bad" />Wrong</span>
                   <span><b className="qnd flag" />Flagged</span>
                 </div>
-                <button 
-                  className="quiz-flag-btn" 
-                  title="Report Question" 
-                  onClick={handleReport}
-                  style={{ 
-                    marginLeft: '8px', 
-                    color: '#ef4444', 
-                    borderColor: '#fecaca',
-                    background: '#fef2f2'
-                  }}
-                >
-                  <AlertTriangle size={15} />
-                </button>
+
               </div>
             )}
 
             {/* Question */}
-            <div className="quiz-q-wrap">
-              {q.difficulty && <span className={`qdiff qdiff-${(q.difficulty || "medium").toLowerCase()}`}>{q.difficulty}</span>}
-              <h2 className="quiz-question">{q.question}</h2>
+            <div className="quiz-q-wrap" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+              <div style={{ flex: 1 }}>
+                {q.difficulty && <span className={`qdiff qdiff-${(q.difficulty || "medium").toLowerCase()}`}>{q.difficulty}</span>}
+                <h2 className="quiz-question">{q.question}</h2>
+              </div>
+              <button 
+                className="quiz-report-btn-header" 
+                onClick={handleReport}
+                style={{ 
+                  flexShrink: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '8px 12px',
+                  borderRadius: '10px',
+                  border: '1px solid #fecaca',
+                  background: '#fef2f2',
+                  color: '#ef4444',
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  marginTop: '4px',
+                  boxShadow: '0 2px 5px rgba(239, 68, 68, 0.1)'
+                }}
+              >
+                <AlertTriangle size={16} /> Report
+              </button>
             </div>
 
             {/* Options */}
@@ -424,7 +436,16 @@ export default function QuizPage() {
                     }}
                   >
                     <span className="opt-letter">{String.fromCharCode(65 + i)}</span>
-                    <div className="opt-text" style={{ whiteSpace: 'normal', wordBreak: 'break-word', display: 'block', width: '100%' }}>{opt}</div>
+                    <div className="opt-text" style={{ 
+                      whiteSpace: 'normal !important', 
+                      wordBreak: 'break-word !important', 
+                      overflowWrap: 'anywhere !important',
+                      display: 'block !important', 
+                      width: '100% !important',
+                      lineHeight: '1.4 !important',
+                      fontSize: '0.92rem !important',
+                      minHeight: '1.4em !important'
+                    }}>{opt}</div>
                     {locked && i === q.answer && <CheckCircle size={15} className="opt-check" />}
                   </div>
                 );
