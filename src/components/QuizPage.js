@@ -379,7 +379,7 @@ export default function QuizPage() {
                     style={{ cursor: locked ? 'default' : 'pointer' }}
                   >
                     <span className="opt-letter">{String.fromCharCode(65 + i)}</span>
-                    <span className="opt-text">{opt}</span>
+                    <div className="opt-text">{opt}</div>
                     {locked && i === q.answer && <CheckCircle size={15} className="opt-check" />}
                   </div>
                 );
