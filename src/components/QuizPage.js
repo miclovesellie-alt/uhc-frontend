@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Flag, BookOpen, CheckCircle, Clock } from "lucide-react";
+import { ArrowLeft, Flag, BookOpen, CheckCircle, Clock, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 import "../styles/quiz.css";
@@ -217,6 +217,28 @@ export default function QuizPage() {
     }
   };
 
+  const handleReport = async () => {
+    const q = questions[idx];
+    const reason = window.prompt("Why is this question faulty? (e.g., wrong answer, typo, outdated)");
+    
+    if (reason === null) return; // cancelled
+    if (!reason.trim()) {
+      alert("Please provide a reason for the report.");
+      return;
+    }
+
+    try {
+      await api.post("questions/report", {
+        questionId: q._id || q.id || idx,
+        questionText: q.question,
+        reason: reason
+      });
+      alert("Question reported. Thank you for your feedback!");
+    } catch (err) {
+      alert("Failed to send report. Please try again later.");
+    }
+  };
+
   const toggleFlag = () => {
     const f = [...flagged]; f[idx] = !f[idx]; setFlagged(f);
   };
@@ -350,6 +372,19 @@ export default function QuizPage() {
                   <span><b className="qnd bad" />Wrong</span>
                   <span><b className="qnd flag" />Flagged</span>
                 </div>
+                <button 
+                  className="quiz-flag-btn" 
+                  title="Report Question" 
+                  onClick={handleReport}
+                  style={{ 
+                    marginLeft: '8px', 
+                    color: '#ef4444', 
+                    borderColor: '#fecaca',
+                    background: '#fef2f2'
+                  }}
+                >
+                  <AlertTriangle size={15} />
+                </button>
               </div>
             )}
 
