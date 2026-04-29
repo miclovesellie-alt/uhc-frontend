@@ -3,6 +3,7 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 import { getFileUrl } from "../utils/config";
 import api from "../api/api";
+import axios from "axios";
 import "../styles/dashboard.css";
 
 import fbLogo from "../assets/fb.webp";
