@@ -29,7 +29,6 @@ export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [liveNotif, setLiveNotif] = useState(null);
-  const [liveNotif, setLiveNotif] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
 
   // Initialize Socket.io
