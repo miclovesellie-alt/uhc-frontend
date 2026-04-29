@@ -19,7 +19,7 @@ export default function AdminFeed() {
 
   const fetchFeed = async () => {
     try {
-      const res = await api.get("/admin/feed");
+      const res = await api.get("admin/feed");
       setItems(res.data);
     } catch (err) {
       console.error("Failed to fetch feed", err);
@@ -37,7 +37,7 @@ export default function AdminFeed() {
     if (selectedFile) formData.append("image", selectedFile);
 
     try {
-      await api.post("/admin/feed", formData, {
+      await api.post("admin/feed", formData, {
         headers: { 
           "Content-Type": "multipart/form-data"
         },

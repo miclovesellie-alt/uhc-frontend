@@ -16,7 +16,7 @@ export default function AdminRecycleBin() {
 
   const fetchBin = async () => {
     try {
-      const res = await api.get("/admin/recycle-bin");
+      const res = await api.get("admin/recycle-bin");
       setItems(res.data);
     } catch (err) {
       console.error("Failed to fetch bin", err);
@@ -27,7 +27,7 @@ export default function AdminRecycleBin() {
 
   const handleRestore = async (id) => {
     try {
-      await api.post(`/admin/recycle-bin/restore/${id}`);
+      await api.post(`admin/recycle-bin/restore/${id}`);
       fetchBin();
     } catch (err) {
       alert("Restore failed");
@@ -42,7 +42,7 @@ export default function AdminRecycleBin() {
   const confirmPermanentDelete = async () => {
     if (!itemToDelete) return;
     try {
-      await api.delete(`/admin/recycle-bin/${itemToDelete}`);
+      await api.delete(`admin/recycle-bin/${itemToDelete}`);
       setShowDeleteModal(false);
       setItemToDelete(null);
       fetchBin();

@@ -35,7 +35,7 @@ export default function FYP({ refresh }) {
 
   const awardPoints = async (amount, reason) => {
     try {
-      const res = await api.post("/points/add", { amount, reason });
+      const res = await api.post("points/add", { amount, reason });
       // Update local user context so profile shows new points
       if (user) setUser({ ...user, points: res.data.totalPoints });
     } catch (err) {
@@ -51,7 +51,7 @@ export default function FYP({ refresh }) {
     setLoading(true);
     try {
       // 1. Try fetching from Admin Feed first
-      const adminRes = await api.get("/admin/feed");
+      const adminRes = await api.get("admin/feed");
       let allPosts = adminRes.data;
 
       // 2. If admin feed is empty or short, fetch from a public health news source as fallback

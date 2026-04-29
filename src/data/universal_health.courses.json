@@ -1,0 +1,85 @@
+[{
+  "_id": {
+    "$oid": "69e948fe4742f50867ffcc76"
+  },
+  "name": "Surgery and Surgical Nursing",
+  "slug": "surgery-and-surgical-nursing",
+  "description": "",
+  "category": "General",
+  "isActive": true,
+  "createdAt": {
+    "$date": "2026-04-22T22:17:34.788Z"
+  },
+  "updatedAt": {
+    "$date": "2026-04-22T22:17:34.788Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69e948fe4742f50867ffcc77"
+  },
+  "name": "Principles and Practices of PHN",
+  "slug": "principles-and-practices-of-phn",
+  "description": "",
+  "category": "General",
+  "isActive": true,
+  "createdAt": {
+    "$date": "2026-04-22T22:17:34.803Z"
+  },
+  "updatedAt": {
+    "$date": "2026-04-22T22:17:34.803Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69e948fe4742f50867ffcc78"
+  },
+  "name": "Pharmacology",
+  "slug": "pharmacology",
+  "description": "",
+  "category": "General",
+  "isActive": true,
+  "createdAt": {
+    "$date": "2026-04-22T22:17:34.809Z"
+  },
+  "updatedAt": {
+    "$date": "2026-04-22T22:17:34.809Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69e948fe4742f50867ffcc79"
+  },
+  "name": "Medicine and Medical Nursing",
+  "slug": "medicine-and-medical-nursing",
+  "description": "",
+  "category": "General",
+  "isActive": true,
+  "createdAt": {
+    "$date": "2026-04-22T22:17:34.815Z"
+  },
+  "updatedAt": {
+    "$date": "2026-04-22T22:17:34.815Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69ea0dd67db629c1772441a0"
+  },
+  "name": "test",
+  "slug": "test",
+  "description": "",
+  "category": "General",
+  "isActive": true,
+  "createdAt": {
+    "$date": "2026-04-23T12:17:26.632Z"
+  },
+  "updatedAt": {
+    "$date": "2026-04-23T12:17:26.632Z"
+  },
+  "__v": 0
+}]

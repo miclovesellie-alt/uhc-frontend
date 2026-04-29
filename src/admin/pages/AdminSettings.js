@@ -64,16 +64,16 @@ export default function AdminSettings() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const { data: ns } = await api.get("/settings/noScreenshot");
+        const { data: ns } = await api.get("settings/noScreenshot");
         if (ns.value !== null) setNoScreenshot(ns.value);
         
-        const { data: mm } = await api.get("/settings/maintenanceMode");
+        const { data: mm } = await api.get("settings/maintenanceMode");
         if (mm.value !== null) setMaintenanceMode(mm.value);
 
-        const { data: qt } = await api.get("/settings/quizTimer");
+        const { data: qt } = await api.get("settings/quizTimer");
         if (qt.value !== null) setQuizTimer(qt.value);
 
-        const { data: ro } = await api.get("/settings/registrationOpen");
+        const { data: ro } = await api.get("settings/registrationOpen");
         if (ro.value !== null) setRegistrationOpen(ro.value);
       } catch (err) {
         console.error("Error fetching settings:", err);
@@ -101,8 +101,8 @@ export default function AdminSettings() {
   
   const saveSecurity = async () => {
     try {
-      await api.post("/settings", { key: "noScreenshot", value: noScreenshot });
-      await api.post("/settings", { key: "quizTimer", value: quizTimer });
+      await api.post("settings", { key: "noScreenshot", value: noScreenshot });
+      await api.post("settings", { key: "quizTimer", value: quizTimer });
       logAction(`Updated security & quiz controls`);
       showToast("Security settings saved");
     } catch (err) {
@@ -112,8 +112,8 @@ export default function AdminSettings() {
 
   const saveSystem = async () => {
     try {
-      await api.post("/settings", { key: "maintenanceMode", value: maintenanceMode });
-      await api.post("/settings", { key: "registrationOpen", value: registrationOpen });
+      await api.post("settings", { key: "maintenanceMode", value: maintenanceMode });
+      await api.post("settings", { key: "registrationOpen", value: registrationOpen });
       logAction("Updated system settings");
       showToast("System settings saved");
     } catch (err) {

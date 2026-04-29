@@ -15,7 +15,7 @@ export default function AdminMessages() {
 
   const fetchMessages = async () => {
     try {
-      const res = await api.get("/contact/messages");
+      const res = await api.get("contact/messages");
       setMessages(res.data);
     } catch (err) {
       console.error("Fetch messages failed", err);

@@ -50,7 +50,7 @@ export default function AdminDashboard() {
     try {
       // 1. Stats
       try {
-        const statsRes = await api.get("/admin/stats");
+        const statsRes = await api.get("admin/stats");
         console.log("📊 Stats received:", statsRes.data);
         if (statsRes.data) {
           setStats({
@@ -64,14 +64,14 @@ export default function AdminDashboard() {
 
       // 2. Recent Users
       try {
-        const usersRes = await api.get("/users");
+        const usersRes = await api.get("users");
         const sorted = [...(Array.isArray(usersRes.data) ? usersRes.data : [])].reverse().slice(0, 6);
         setRecentUsers(sorted);
       } catch (e) { console.error("Users fetch error", e); }
 
       // 3. Activity Logs
       try {
-        const logsRes = await api.get("/admin/activity/logs");
+        const logsRes = await api.get("admin/activity/logs");
         setAdminLogs(Array.isArray(logsRes.data) ? logsRes.data.slice(0, 8) : []);
       } catch (e) { console.error("Logs fetch error", e); }
 

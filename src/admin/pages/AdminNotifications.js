@@ -11,9 +11,9 @@ export default function AdminNotifications() {
   const load = useCallback(async () => {
     try {
       const [notifsRes, ssRes, mmRes] = await Promise.all([
-        api.get("/admin/activity/notifications"),
-        api.get("/settings/noScreenshot"),
-        api.get("/settings/maintenanceMode")
+        api.get("admin/activity/notifications"),
+        api.get("settings/noScreenshot"),
+        api.get("settings/maintenanceMode")
       ]);
       
       const ssActive = ssRes.data.value === true;

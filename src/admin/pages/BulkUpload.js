@@ -55,7 +55,7 @@ export default function BulkUpload() {
     setStatus(null);
 
     try {
-      const res = await api.post("/upload-questions", { questions });
+      const res = await api.post("upload-questions", { questions });
       
       setStatus({ type: "success", message: res.data.message });
       setQuestions([]);

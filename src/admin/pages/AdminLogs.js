@@ -17,7 +17,7 @@ export default function AdminLogs() {
 
   const loadLogs = async () => {
     try {
-      const res = await api.get("/admin/activity/logs");
+      const res = await api.get("admin/activity/logs");
       setLogs(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Failed to load logs", err);

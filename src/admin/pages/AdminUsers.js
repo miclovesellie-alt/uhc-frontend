@@ -30,7 +30,7 @@ export default function AdminUsers() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await api.get("/users");
+      const res = await api.get("users");
       setUsers(Array.isArray(res.data) ? res.data : []);
     } catch (err) { console.error("Load users failed", err); }
     finally { setLoading(false); }
@@ -38,7 +38,7 @@ export default function AdminUsers() {
 
   const updateUser = async (data, label) => {
     try {
-      await api.patch(`/users/${selectedUser._id}`, data);
+      await api.patch(`users/${selectedUser._id}`, data);
       logAction(`${label}: ${selectedUser.name}`);
       showToast(`${label} successful`);
       setSelectedUser(null);

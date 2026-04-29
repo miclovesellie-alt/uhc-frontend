@@ -1,0 +1,21 @@
+[{
+  "_id": {
+    "$oid": "69f1576aad19725f8a055557"
+  },
+  "title": "Management Theory x, y & z",
+  "author": "admin",
+  "course": "MANAGEMENT & ADMINISTRATION IN NURSING",
+  "description": "",
+  "fileUrl": "/uploads/library/1777424234011.pdf",
+  "isDownloadable": true,
+  "uploadedBy": {
+    "$oid": "69f11a350f9d7b5539bf0ae6"
+  },
+  "createdAt": {
+    "$date": "2026-04-29T00:57:14.186Z"
+  },
+  "updatedAt": {
+    "$date": "2026-04-29T00:57:14.186Z"
+  },
+  "__v": 0
+}]

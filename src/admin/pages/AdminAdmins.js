@@ -26,7 +26,7 @@ export default function AdminAdmins() {
   const fetchAdmins = async () => {
     setLoading(true);
     try {
-      const res = await api.get("/users");
+      const res = await api.get("users");
       const allUsers = Array.isArray(res.data) ? res.data : [];
       setUsers(allUsers.filter(u => u.role === "admin" || u.role === "superadmin"));
     } catch (err) { console.error("Load admins failed", err); }
@@ -35,7 +35,7 @@ export default function AdminAdmins() {
 
   const updateUser = async (data, label) => {
     try {
-      await api.patch(`/users/${selectedUser._id}`, data);
+      await api.patch(`users/${selectedUser._id}`, data);
       logAction(`${label}: ${selectedUser.name}`);
       showToast(`${label} successful`);
       setSelectedUser(null);

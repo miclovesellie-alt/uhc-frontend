@@ -13,7 +13,7 @@ export default function DuplicateQuestions() {
   const fetchDuplicates = async () => {
     setLoading(true);
     try {
-      const res = await api.get("/admin/questions/duplicates/find");
+      const res = await api.get("admin/questions/duplicates/find");
       setDuplicates(res.data);
     } catch (err) {
       console.error("Fetch duplicates failed", err);

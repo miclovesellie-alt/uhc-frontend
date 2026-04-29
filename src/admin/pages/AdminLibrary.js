@@ -25,8 +25,8 @@ export default function AdminLibrary() {
   const fetchData = async () => {
     try {
       const [booksRes, coursesRes] = await Promise.all([
-        api.get("/library/books"),
-        api.get("/library/courses")
+        api.get("library/books"),
+        api.get("library/courses")
       ]);
       setBooks(booksRes.data);
       setCourses(coursesRes.data);
@@ -50,7 +50,7 @@ export default function AdminLibrary() {
     formData.append("isDownloadable", newBook.isDownloadable);
 
     try {
-      await api.post("/library/books", formData, {
+      await api.post("library/books", formData, {
         headers: { 
           "Content-Type": "multipart/form-data"
         },

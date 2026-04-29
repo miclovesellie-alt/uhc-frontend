@@ -84,7 +84,7 @@ export default function QuizPage() {
 
   const awardPoints = async (amount, reason) => {
     try {
-      const res = await api.post("/points/add", { amount, reason });
+      const res = await api.post("points/add", { amount, reason });
       if (user) setUser({ ...user, points: res.data.totalPoints });
     } catch (err) {
       console.error("Failed to award points", err);
@@ -95,13 +95,13 @@ export default function QuizPage() {
 
   /* ── Fetch Global Settings ── */
   useEffect(() => {
-    api.get("/settings/noScreenshot").then(res => {
+    api.get("settings/noScreenshot").then(res => {
       if (res.data.value !== null) setNoSS(res.data.value);
     }).catch(() => {});
   }, []);
 
   /* ── Fetch courses ── */
-  useEffect(() => { api.get("/courses").then(r => setCourses(r.data)).catch(() => {}); }, []);
+  useEffect(() => { api.get("courses").then(r => setCourses(r.data)).catch(() => {}); }, []);
 
   /* ── No-screenshot ── */
   useEffect(() => {
