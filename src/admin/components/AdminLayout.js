@@ -57,7 +57,7 @@ export default function AdminLayout() {
     import("../../api/api").then(({ default: api }) => {
       api.get("admin/activity/notifications").then(res => {
         const userId = localStorage.getItem("userId");
-        const unread = res.data.filter(n => !n.readBy?.includes(userId)).length;
+        const unread = Array.isArray(res.data) ? res.data.filter(n => !n.readBy?.includes(userId)).length : 0;
         setUnreadCount(unread);
       }).catch(() => {});
     });
