@@ -35,7 +35,7 @@ export const UserProvider = ({ children }) => {
 
     // ✅ Validate token in background without immediately logging out
     api
-      .get("/user")
+      .get("user")
       .then((res) => {
         setUser(res.data); // update with fresh data
         localStorage.setItem("user", JSON.stringify(res.data));

@@ -43,7 +43,7 @@ function Signup({ onFlip }) {
 
     try {
       const res = await api.post(
-        "/auth/signup",
+        "auth/signup",
         formData
       );
 
