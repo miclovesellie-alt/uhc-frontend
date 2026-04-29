@@ -71,7 +71,7 @@ export default function BulkUpload() {
     <div className="admin-page">
       <div className="admin-section-header">
         <div>
-          <h1 className="admin-title">Bulk Question Upload <span style={{ color: 'red', fontSize: '10px' }}>v3.3.3</span></h1>
+          <h1 className="admin-title">Bulk Question Upload <span style={{ color: 'red', fontSize: '10px' }}>v3.3.6</span></h1>
           <p className="admin-subtitle">Add hundreds of questions at once via JSON</p>
         </div>
       </div>
@@ -174,6 +174,54 @@ export default function BulkUpload() {
           </div>
         )}
       </div>
+
+      {/* Fixed Mobile Action Bar */}
+      {questions.length > 0 && (
+        <div className="mobile-upload-bar">
+          <div className="mobile-bar-info">
+            <strong>{questions.length}</strong> Questions Ready
+          </div>
+          <button 
+            className="admin-btn primary" 
+            onClick={handleUpload}
+            disabled={loading}
+          >
+            {loading ? "Uploading..." : "Upload All"}
+          </button>
+        </div>
+      )}
+
+      <style>{`
+        @media (max-width: 768px) {
+          .mobile-upload-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--admin-card);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 2px solid var(--admin-accent);
+            z-index: 1000;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+          }
+          .mobile-bar-info {
+            font-size: 0.9rem;
+            color: var(--admin-text);
+          }
+          .admin-page {
+            padding-bottom: 100px; /* Space for the bar */
+          }
+        }
+        @media (min-width: 769px) {
+          .mobile-upload-bar {
+            display: none;
+          }
+        }
+      `}</style>
     </div>
   );
 }
