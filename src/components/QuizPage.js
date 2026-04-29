@@ -254,7 +254,8 @@ export default function QuizPage() {
 
   return (
     <div className="quiz-page-wrap">
-      <div style={{ position: 'fixed', top: 5, right: 5, fontSize: '10px', color: '#ff0000', zIndex: 9999, background: 'white', padding: '2px 4px', borderRadius: '4px', border: '1px solid red' }}>v3.1-DEFINITIVE-FIX</div>
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: '4px', background: 'red', zIndex: 10000 }}></div>
+      <div style={{ position: 'fixed', top: 4, left: '50%', transform: 'translateX(-50%)', background: 'red', color: 'white', padding: '2px 10px', borderRadius: '0 0 10px 10px', fontSize: '12px', fontWeight: 900, zIndex: 10000 }}>QUIZ-DEPLOY-V3.2</div>
       <style>{`
         .opt-text {
           white-space: normal !important;
