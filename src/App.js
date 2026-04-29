@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+console.log("%c UHC DEPLOY V3.3.1 ACTIVE ", "background: red; color: white; font-weight: bold; font-size: 20px;");
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import AuthCard from "./pages/AuthCard";

@@ -67,9 +67,7 @@ export default function AdminLayout() {
   React.useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      import("axios").then(({ default: axios }) => {
-        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      });
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     }
   }, []);
 
