@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { RefreshCw, Check } from "lucide-react";
 import api from "../../api/api";
 
-const NOTIF_TYPES = ["All", "Users", "System", "Quiz", "Security"];
+const NOTIF_TYPES = ["All", "Reports", "Users", "System", "Quiz", "Security"];
 
 export default function AdminNotifications() {
   const [notifications, setNotifications] = useState([]);
