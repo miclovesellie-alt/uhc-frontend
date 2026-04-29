@@ -77,7 +77,6 @@ export default function AdminLayout() {
     navItems.splice(2, 0, { icon: <Shield size={17} />, label: "Admins", path: "/admin/admins" });
   }
 
-  const handleLogout = () => { logout(); navigate("/"); };
   const confirmLogout = () => setShowLogoutModal(true);
   const proceedLogout = () => { logout(); navigate("/"); };
   const isActive = (path) => path === "/admin"

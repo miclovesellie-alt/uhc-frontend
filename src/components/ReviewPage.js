@@ -209,6 +209,7 @@ function ReviewPage() {
                         optionClass += " wrong-option";
                       }
 
+                      return (
                         <div 
                           key={i} 
                           className={optionClass}
