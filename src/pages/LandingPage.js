@@ -166,10 +166,6 @@ function LandingPage() {
       <section className="hero-section">
         <div className="hero-text">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-            <div className="motto-badge">
-              <span className="motto-dot"></span>
-              Your Knowledge • Your Health • Your Community
-            </div>
             <span className="section-label">Empowering Future Healthcare Heroes</span>
             <h1>The Gold Standard in <span className="highlight">Nursing Education</span></h1>
             <p>Join over 5,000 nursing students mastering their exams with interactive quizzes, real-time analytics, and expert-curated resources.</p>
@@ -224,6 +220,23 @@ function LandingPage() {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* MOTTO SECTION */}
+      <section className="middle-motto-section">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          className="motto-container"
+        >
+          <h2 className="motto-text-large">
+            <span className="motto-word">Your Knowledge.</span>
+            <span className="motto-word">Your Health.</span>
+            <span className="motto-word">Your Community.</span>
+          </h2>
+          <div className="motto-underline"></div>
+        </motion.div>
       </section>
 
       {/* AI ASSISTANT SECTION */}
@@ -417,7 +430,6 @@ function LandingPage() {
           </div>
         </div>
         <div className="footer-bottom">
-          <div className="footer-motto">Your Knowledge • Your Health • Your Community</div>
           <span>&copy; {new Date().getFullYear()} Universal Healthcare Community. All rights reserved.</span>
           <div style={{ display: 'flex', gap: '24px' }}>
              <a href="#privacy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy</a>

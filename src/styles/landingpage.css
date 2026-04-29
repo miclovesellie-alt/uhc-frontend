@@ -237,35 +237,58 @@ html,body,#root{height:auto!important;min-height:100%;overflow-x:hidden!importan
   gap: 6px;
 }
 
-.motto-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(8px);
-  padding: 6px 16px;
-  border-radius: 50px;
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  color: var(--primary-dark);
-  font-size: 0.85rem;
-  font-weight: 700;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+/* MIDDLE MOTTO SECTION */
+.middle-motto-section {
+  padding: 140px 8%;
+  background: white;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
-.motto-dot {
-  width: 8px;
-  height: 8px;
+.motto-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.motto-text-large {
+  font-size: 5rem;
+  font-weight: 900;
+  color: #0f172a;
+  line-height: 1.1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.3em;
+  letter-spacing: -0.04em;
+  margin-bottom: 32px;
+}
+
+.motto-word {
+  position: relative;
+  display: inline-block;
+}
+
+.motto-word:nth-child(1) { color: #0f172a; }
+.motto-word:nth-child(2) { 
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.motto-word:nth-child(3) { color: #0f172a; }
+
+.motto-underline {
+  width: 120px;
+  height: 6px;
   background: var(--primary);
-  border-radius: 50%;
-  box-shadow: 0 0 8px var(--primary);
-  animation: pulse 2s infinite;
+  margin: 0 auto;
+  border-radius: 3px;
+  box-shadow: var(--glow-primary);
 }
 
-@keyframes pulse {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-  70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+@media (max-width: 768px) {
+  .motto-text-large { font-size: 2.8rem; }
+  .middle-motto-section { padding: 100px 8%; }
 }
 .section-title{font-size:3rem;font-weight:900;letter-spacing:-.03em;margin-bottom:16px;line-height:1.1;color:#0f172a}
 .section-subtitle{font-size:1.15rem;color:var(--text-secondary);max-width:600px;margin:0 auto 64px;line-height:1.6}
@@ -502,16 +525,6 @@ html,body,#root{height:auto!important;min-height:100%;overflow-x:hidden!importan
   max-width:1200px;margin:80px auto 0;padding-top:32px;
   border-top:1px solid var(--glass-border);display:flex;justify-content:space-between;
   align-items:center;font-size:.9rem;color:var(--text-muted);
-  flex-direction: column; gap: 16px;
-}
-
-.footer-motto {
-  font-size: 1.1rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: -0.02em;
 }
 
 /* ===== AI ASSISTANT PHONE STYLE ===== */
