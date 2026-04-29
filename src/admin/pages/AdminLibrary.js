@@ -122,14 +122,14 @@ export default function AdminLibrary() {
         </div>
       </div>
 
-      <div className="admin-table-wrapper">
+      <div className="admin-table-wrap">
         <table className="admin-table">
           <thead>
             <tr>
               <th>Title / Filename</th>
               <th>Course</th>
-              <th>Permissions</th>
-              <th>Added On</th>
+              <th className="desktop-only">Permissions</th>
+              <th className="desktop-only">Added On</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -151,7 +151,7 @@ export default function AdminLibrary() {
                     </div>
                   </td>
                   <td><span className="admin-badge blue">{book.course}</span></td>
-                  <td>
+                  <td className="desktop-only">
                     {book.isDownloadable ? (
                       <span className="admin-badge green" title="Users can download this file">
                         <Download size={12} /> Downloadable
@@ -162,7 +162,7 @@ export default function AdminLibrary() {
                       </span>
                     )}
                   </td>
-                  <td>{new Date(book.createdAt).toLocaleDateString()}</td>
+                  <td className="desktop-only">{new Date(book.createdAt).toLocaleDateString()}</td>
                   <td>
                     <div className="table-actions">
                       <button className="action-btn delete" onClick={() => handleDelete(book._id)}>

@@ -467,6 +467,15 @@
   .admin-section-title { font-size: 0.9rem; }
 }
 
+/* Utility Classes */
+@media (max-width: 768px) {
+  .desktop-only { display: none !important; }
+  .mobile-only { display: block !important; }
+}
+@media (min-width: 769px) {
+  .mobile-only { display: none !important; }
+}
+
 /* ===== ADMIN DARK MODE (Scoped to .admin-dark) ===== */
 .admin-wrapper.admin-dark {
   background: #0f172a;

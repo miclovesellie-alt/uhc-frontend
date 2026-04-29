@@ -129,6 +129,23 @@ export default function AdminQuestions() {
     } catch (err) { showToast("Course add failed", "error"); }
   };
 
+  /* ── Delete course ── */
+  const handleDeleteCourse = async (id, name) => {
+    const qCount = questions.filter(q => q.course === name).length;
+    if (qCount > 0) {
+      if (!window.confirm(`There are ${qCount} questions in this course. Deleting the course category will leave these questions without a course. Continue?`)) return;
+    } else {
+      if (!window.confirm(`Delete course "${name}"?`)) return;
+    }
+
+    try {
+      await api.delete(`courses/${id}`);
+      setCoursesFromDB(prev => prev.filter(c => c._id !== id));
+      logAction(`Deleted course: "${name}"`);
+      showToast("Course deleted");
+    } catch (err) { showToast("Course delete failed", "error"); }
+  };
+
   /* ── Book loader ── */
   const BookLoader = () => (
     <div style={{ display:"flex", flexDirection:"column", alignItems:"center", padding:"60px 20px", gap:16 }}>
@@ -513,10 +530,19 @@ export default function AdminQuestions() {
                   padding: "10px 14px", borderRadius: 10,
                   background: "#f8fafc", border: "1px solid var(--admin-border)",
                 }}>
-                  <span style={{ fontSize: ".875rem", color: "var(--admin-text)" }}>{c.name}</span>
-                  <span className="admin-badge blue" style={{ fontSize: ".72rem" }}>
-                    {questions.filter(q => q.course === c.name).length} Qs
-                  </span>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ fontSize: ".875rem", color: "var(--admin-text)", fontWeight: 600 }}>{c.name}</span>
+                    <span style={{ fontSize: ".72rem", color: 'var(--admin-muted)' }}>
+                      {questions.filter(q => q.course === c.name).length} Questions
+                    </span>
+                  </div>
+                  <button 
+                    className="admin-btn danger sm" 
+                    style={{ padding: '6px', borderRadius: '8px' }}
+                    onClick={() => handleDeleteCourse(c._id, c.name)}
+                  >
+                    <Trash2 size={14} />
+                  </button>
                 </div>
               ))}
             </div>
