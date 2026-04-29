@@ -68,7 +68,13 @@ export default function AdminLayout() {
 
         <nav className="admin-nav">
           <div className="admin-nav-section">Main</div>
-          {navItems.filter(item => item.path !== "/admin/logs" && item.path !== "/admin/notifications" && item.path !== "/admin/settings" && item.path !== "/admin/messages").map(item => (
+          {navItems.filter(item => 
+            item.path !== "/admin/logs" && 
+            item.path !== "/admin/notifications" && 
+            item.path !== "/admin/settings" && 
+            item.path !== "/admin/messages" &&
+            item.path !== "/admin/recycle-bin"
+          ).map(item => (
             <NavLink
               key={item.path}
               to={item.path}
