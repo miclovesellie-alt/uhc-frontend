@@ -52,13 +52,11 @@
   to { opacity: 1; }
 }
 
-/* Medical pattern overlay (same as landing page) */
+/* Medical pattern overlay removed per user request */
 .auth-bg::before {
   content: "";
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background-image: url('../assets/medical_pattern.png');
-  background-size: 600px;
   opacity: 0.05;
   pointer-events: none;
   z-index: 0;
