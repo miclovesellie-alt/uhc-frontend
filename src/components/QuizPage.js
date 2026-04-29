@@ -255,7 +255,7 @@ export default function QuizPage() {
   return (
     <div className="quiz-page-wrap">
       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: '4px', background: 'red', zIndex: 10000 }}></div>
-      <div style={{ position: 'fixed', top: 4, left: '50%', transform: 'translateX(-50%)', background: 'red', color: 'white', padding: '2px 10px', borderRadius: '0 0 10px 10px', fontSize: '12px', fontWeight: 900, zIndex: 10000 }}>QUIZ-DEPLOY-V3.3</div>
+      <div style={{ position: 'fixed', top: 4, left: '50%', transform: 'translateX(-50%)', background: 'red', color: 'white', padding: '2px 10px', borderRadius: '0 0 10px 10px', fontSize: '12px', fontWeight: 900, zIndex: 10000 }}>QUIZ-DEPLOY-V3.3.8</div>
       <style>{`
         .opt-text {
           white-space: normal !important;
@@ -263,19 +263,17 @@ export default function QuizPage() {
           overflow-wrap: anywhere !important;
           display: block !important;
           width: 100% !important;
-          line-height: 1.4 !important;
+          line-height: 1.5 !important;
+          overflow: visible !important;
         }
         .quiz-opt {
           height: auto !important;
-          min-height: 64px !important;
-          display: block !important;
-          padding: 18px 16px !important;
-          margin-bottom: 8px !important;
-        }
-        .opt-letter {
-          float: left !important;
-          margin-right: 12px !important;
-          margin-bottom: 4px !important;
+          min-height: 70px !important;
+          display: grid !important;
+          grid-template-columns: 36px 1fr auto !important;
+          align-items: start !important;
+          padding: 20px 16px !important;
+          margin-bottom: 12px !important;
         }
       `}</style>
 

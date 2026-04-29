@@ -411,23 +411,21 @@
 .opt-text { 
   width: 100%;
   font-weight: 500; 
-  white-space: normal; 
-  word-break: break-word; 
-  overflow-wrap: break-word;
+  white-space: normal !important; 
+  word-break: break-word !important; 
+  overflow-wrap: break-word !important;
   line-height: 1.5;
   display: block;
   min-width: 0;
-  text-overflow: clip;
   align-self: start;
 }
 
 @media (min-width: 769px) {
   .opt-text {
     flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: inline-block;
+    white-space: normal;
+    overflow: visible;
+    display: block;
   }
 }
 .opt-check { color: #16a34a; flex-shrink: 0; margin-top: 4px; }
