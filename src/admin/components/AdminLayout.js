@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import { useNavigate, useLocation, Outlet, NavLink } from "react-router-dom";
 import { UserContext } from "../../context/UserContext";
+import { io } from "socket.io-client";
 import "../admin_styles/AdminLayout.css";
 import {
   LayoutDashboard, Users, HelpCircle, Upload,
@@ -26,6 +27,39 @@ export default function AdminLayout() {
   const location = useLocation();
   const { user, logout, adminTheme } = useContext(UserContext);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [liveNotif, setLiveNotif] = useState(null);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Initialize Socket.io
+  React.useEffect(() => {
+    const SOCKET_URL = window.location.hostname === 'localhost' 
+      ? 'http://localhost:5000' 
+      : 'https://uhc-backend.onrender.com';
+      
+    const socket = io(SOCKET_URL);
+
+    socket.on('ADMIN_NOTIFICATION', (data) => {
+      console.log("⚡ Live Notif:", data);
+      setLiveNotif(data);
+      setUnreadCount(prev => prev + 1);
+      
+      // Auto-hide toast after 6 seconds
+      setTimeout(() => setLiveNotif(prev => prev?._id === data._id ? null : prev), 6000);
+    });
+
+    return () => socket.disconnect();
+  }, []);
+
+  // Fetch initial unread count
+  React.useEffect(() => {
+    import("../../api/api").then(({ default: api }) => {
+      api.get("admin/activity/notifications").then(res => {
+        const userId = localStorage.getItem("userId");
+        const unread = res.data.filter(n => !n.readBy?.includes(userId)).length;
+        setUnreadCount(unread);
+      }).catch(() => {});
+    });
+  }, [location.pathname]);
 
   // Set axios default header for admin requests
   React.useEffect(() => {
@@ -158,8 +192,44 @@ export default function AdminLayout() {
             <span style={{ fontSize: ".78rem", color: "var(--admin-muted)" }}>
               {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
             </span>
+            <div 
+              style={{ position: 'relative', cursor: 'pointer', marginLeft: 12 }}
+              onClick={() => navigate('/admin/notifications')}
+            >
+              <Bell size={19} color="var(--admin-text)" />
+              {unreadCount > 0 && (
+                <span style={{ 
+                  position: 'absolute', top: -5, right: -5, 
+                  background: '#ef4444', color: 'white', 
+                  fontSize: '0.65rem', fontWeight: 700, 
+                  width: 16, height: 16, borderRadius: '50%', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  border: '2px solid var(--admin-card)'
+                }}>
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </div>
           </div>
         </div>
+
+        {/* Live Toast Notification */}
+        {liveNotif && (
+          <div className="live-toast-container">
+            <div className={`live-toast ${liveNotif.type}`}>
+              <div className="live-toast-icon">
+                {liveNotif.type === 'SUCCESS' ? '✅' : liveNotif.type === 'DANGER' ? '🚫' : '🔔'}
+              </div>
+              <div className="live-toast-content">
+                <div className="live-toast-title">{liveNotif.senderName || 'System Update'}</div>
+                <div className="live-toast-msg">{liveNotif.message}</div>
+              </div>
+              <button className="live-toast-close" onClick={() => setLiveNotif(null)}>
+                <X size={14} />
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Page content */}
         <Outlet />

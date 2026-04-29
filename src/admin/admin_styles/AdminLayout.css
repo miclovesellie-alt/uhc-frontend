@@ -567,3 +567,76 @@
 .admin-nav a.active {
   border-left: 3px solid transparent;
 }
+
+/* ===== LIVE TOAST NOTIFICATIONS ===== */
+.live-toast-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+  animation: slideInNotif 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slideInNotif {
+  from { transform: translateX(100%) scale(0.9); opacity: 0; }
+  to { transform: translateX(0) scale(1); opacity: 1; }
+}
+
+.live-toast {
+  pointer-events: auto;
+  width: 320px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--admin-border);
+  position: relative;
+  overflow: hidden;
+}
+
+.live-toast::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--admin-accent);
+}
+
+.live-toast.SUCCESS::before { background: #22c55e; }
+.live-toast.DANGER::before { background: #ef4444; }
+
+.live-toast-icon {
+  width: 42px; height: 42px;
+  border-radius: 12px;
+  background: var(--admin-accent-pale);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.live-toast-content { flex: 1; min-width: 0; }
+.live-toast-title { font-size: 0.82rem; font-weight: 800; color: var(--admin-text); margin-bottom: 2px; }
+.live-toast-msg { font-size: 0.78rem; color: var(--admin-muted); line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.live-toast-close {
+  background: transparent; border: none;
+  color: var(--admin-muted); cursor: pointer;
+  padding: 4px; border-radius: 6px;
+}
+.live-toast-close:hover { background: #f1f5f9; color: var(--admin-text); }
+
+/* Dark mode for live toast */
+.admin-wrapper.admin-dark .live-toast {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+.admin-wrapper.admin-dark .live-toast-title { color: #f1f5f9; }
+.admin-wrapper.admin-dark .live-toast-close:hover { background: #334155; }
