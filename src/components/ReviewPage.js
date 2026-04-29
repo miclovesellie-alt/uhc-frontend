@@ -53,8 +53,8 @@ export default function ReviewPage() {
 
   if (loading) return null;
 
-  const score = questions.reduce((acc, q, idx) => {
-    return q.answer === q.options[userAnswers[idx]] ? acc + 1 : acc;
+  const score = questions.reduce((acc, q, qIdx) => {
+    return q.answer === userAnswers[qIdx] ? acc + 1 : acc;
   }, 0);
 
   const accuracy = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
