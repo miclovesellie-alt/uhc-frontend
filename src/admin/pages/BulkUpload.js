@@ -159,8 +159,8 @@ export default function BulkUpload() {
                     <tr key={i}>
                       <td>{i + 1}</td>
                       <td><span className="admin-badge blue">{q.course}</span></td>
-                      <td className="q-text">{q.question}</td>
-                      <td className="opt-text">{q.options?.join(" | ")}</td>
+                      <td className="bulk-q-text">{q.question}</td>
+                      <td className="bulk-opt-text">{q.options?.join(" | ")}</td>
                       <td><span className="admin-badge green">Index {q.answer}</span></td>
                     </tr>
                   ))}

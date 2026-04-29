@@ -152,14 +152,14 @@
   color: var(--admin-text);
 }
 
-.q-text {
+.bulk-q-text {
   max-width: 300px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.opt-text {
+.bulk-opt-text {
   max-width: 200px;
   overflow: hidden;
   text-overflow: ellipsis;
