@@ -13,7 +13,7 @@
   padding: 20px;
   font-family: 'Inter', sans-serif;
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 /* ── Watermark ── */
@@ -366,6 +366,9 @@
   color: #0f172a;
   transition: all .18s;
   position: relative;
+  height: auto;
+  min-height: 54px;
+  overflow: visible;
 }
 .quiz-opt:hover:not(:disabled) { border-color: #4255ff; background: rgba(66,85,255,.04); }
 .quiz-opt.selected { border-color: #4255ff; background: rgba(66,85,255,.06); }
