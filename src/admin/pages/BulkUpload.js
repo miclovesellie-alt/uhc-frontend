@@ -71,7 +71,7 @@ export default function BulkUpload() {
     <div className="admin-page">
       <div className="admin-section-header">
         <div>
-          <h1 className="admin-title">Bulk Question Upload</h1>
+          <h1 className="admin-title">Bulk Question Upload <span style={{ color: 'red', fontSize: '10px' }}>v3.3.3</span></h1>
           <p className="admin-subtitle">Add hundreds of questions at once via JSON</p>
         </div>
       </div>
@@ -132,12 +132,13 @@ export default function BulkUpload() {
 
         {questions.length > 0 && (
           <div className="preview-section">
-            <div className="preview-header">
+            <div className="preview-header" style={{ position: 'sticky', top: '0', zIndex: 10, background: 'var(--admin-bg)', padding: '10px 0' }}>
               <h3>Preview ({questions.length} questions)</h3>
               <button 
                 className="admin-btn primary" 
                 onClick={handleUpload}
                 disabled={loading}
+                style={{ boxShadow: '0 4px 15px rgba(66, 85, 255, 0.4)' }}
               >
                 {loading ? "Uploading..." : "Confirm & Upload All"}
               </button>

@@ -179,4 +179,15 @@
   .upload-options {
     grid-template-columns: 1fr;
   }
+  .preview-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .preview-header button {
+    width: 100%;
+  }
+  .preview-table th:nth-child(4), .preview-table td:nth-child(4) {
+    display: none; /* Hide options on mobile preview to save space */
+  }
 }
