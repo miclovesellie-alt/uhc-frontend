@@ -295,18 +295,19 @@ export default function AdminQuestions() {
             width:"min(540px, 100vw)", background:"white", height:"100%", overflowY:"auto",
             boxShadow:"-8px 0 40px rgba(0,0,0,0.12)", display:"flex", flexDirection:"column",
             animation:"slideInR .25s ease",
+            padding: window.innerWidth < 600 ? "0" : "0" // Ensuring no weird overflow
           }}>
             {/* Panel header */}
-            <div style={{ padding:"20px 24px", borderBottom:"1px solid #e2e8f0", display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0, background:"#f8fafc" }}>
+            <div style={{ padding: window.innerWidth < 600 ? "16px 20px" : "20px 24px", borderBottom:"1px solid #e2e8f0", display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0, background:"#f8fafc" }}>
               <div>
-                <h2 style={{ margin:0, fontSize:"1.1rem", fontWeight:800, color:"#0f172a" }}>➕ Add New Question</h2>
+                <h2 style={{ margin:0, fontSize: window.innerWidth < 600 ? "1rem" : "1.1rem", fontWeight:800, color:"#0f172a" }}>➕ Add New Question</h2>
                 <p style={{ margin:"2px 0 0", fontSize:".78rem", color:"#64748b" }}>Fill all fields and pick the correct option</p>
               </div>
-              <button className="admin-btn secondary sm" onClick={() => setShowAddModal(false)}>✕ Close</button>
+              <button className="admin-btn secondary sm" onClick={() => setShowAddModal(false)}>✕</button>
             </div>
 
             {/* Panel body */}
-            <div style={{ padding:"24px", display:"flex", flexDirection:"column", gap:18, flex:1 }}>
+            <div style={{ padding: window.innerWidth < 600 ? "16px" : "24px", display:"flex", flexDirection:"column", gap:18, flex:1 }}>
 
               {/* Course */}
               <div>

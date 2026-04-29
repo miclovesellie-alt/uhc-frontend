@@ -70,6 +70,10 @@
   max-width: 640px;
   position: relative;
 }
+@media (max-width: 480px) {
+  .quiz-card { padding: 24px 16px; border-radius: 16px; }
+  .quiz-active-card { padding: 20px 14px; }
+}
 .scrollable-card { max-height: 90vh; overflow-y: auto; }
 
 /* ── Back button ── */
@@ -489,8 +493,9 @@
 /* ── Responsive ── */
 @media (max-width: 600px) {
   .quiz-card { padding: 24px 18px; border-radius: 20px; }
-  .quiz-course-grid { grid-template-columns: 1fr 1fr; }
-  .quiz-num-grid { grid-template-columns: repeat(3, 1fr); }
+  .quiz-course-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .quiz-num-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .quiz-act-row { flex-direction: column; }
 }
 
 /* ===== DARK MODE ENHANCEMENTS FOR QUIZ ===== */

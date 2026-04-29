@@ -449,7 +449,7 @@
   .admin-hamburger { display: flex; }
   .admin-page { padding: 16px; }
   .admin-charts-grid { grid-template-columns: 1fr; }
-  .admin-stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .admin-stats-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
   .admin-topbar { padding: 0 16px; }
   .admin-section-header { flex-direction: column; align-items: flex-start; gap: 12px; }
   .admin-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; }
@@ -462,7 +462,8 @@
   .admin-stat-value { font-size: 1.4rem; }
   .admin-topbar-title { font-size: 0.82rem; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .admin-topbar-actions { display: none; }
-  .admin-btn { padding: 6px 12px; font-size: 0.78rem; width: 100%; justify-content: center; }
+  .admin-btn { padding: 8px 14px; font-size: 0.8rem; }
+  .admin-btn.primary, .admin-btn.secondary { flex: 1; justify-content: center; }
   .admin-section-title { font-size: 0.9rem; }
 }
 

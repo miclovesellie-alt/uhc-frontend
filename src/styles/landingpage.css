@@ -660,6 +660,7 @@ html,body,#root{height:auto!important;min-height:100%;overflow-x:hidden!importan
   }
   
   .features-grid { grid-template-columns: repeat(2, 1fr); }
+  .flipping-cards-grid { grid-template-columns: repeat(2, 1fr); }
   .footer-content { grid-template-columns: repeat(2, 1fr); gap: 40px; }
 }
 
@@ -706,6 +707,7 @@ html,body,#root{height:auto!important;min-height:100%;overflow-x:hidden!importan
   
   .features-section { padding: 80px 5%; }
   .features-grid { grid-template-columns: 1fr; }
+  .flipping-cards-grid { grid-template-columns: 1fr; }
   
   .stats-section { padding: 60px 5%; }
   .stats-grid { gap: 40px; }
@@ -734,4 +736,7 @@ html,body,#root{height:auto!important;min-height:100%;overflow-x:hidden!importan
   .ai-q-btn { padding: 16px 20px; font-size: 0.95rem; }
   
   .section-title { font-size: 1.8rem; }
+  .hero-text h1 { font-size: 2rem; }
+  .cta-box { padding: 32px 20px; }
+  .ai-model-card { transform: scale(0.9); transform-origin: top center; }
 }
