@@ -352,25 +352,26 @@
   margin-bottom: 16px;
 }
 .quiz-opt {
-  display: flex;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  align-items: start;
   gap: 12px;
-  padding: 14px 16px;
+  padding: 16px;
   border-radius: 14px;
   border: 2px solid #e2e8f0;
   background: white;
   text-align: left;
   cursor: pointer;
   font-family: 'Inter', sans-serif;
-  font-size: .9rem;
+  font-size: .95rem;
   color: #0f172a;
   transition: all .18s;
   position: relative;
-  height: auto;
-  min-height: 54px;
-  overflow: visible;
-  width: 100%;
+  height: auto !important;
+  min-height: 60px;
+  width: 100% !important;
   box-sizing: border-box;
+  overflow: visible !important;
   -webkit-tap-highlight-color: transparent;
 }
 .quiz-opt:hover:not(:disabled) { border-color: #4255ff; background: rgba(66,85,255,.04); }
@@ -381,12 +382,12 @@
 .quiz-opt:disabled { cursor: default; }
 
 .opt-letter {
-  width: 28px; height: 28px;
-  border-radius: 8px;
+  width: 32px; height: 32px;
+  border-radius: 10px;
   background: #f1f5f9;
   display: flex; align-items: center; justify-content: center;
-  font-size: .75rem;
-  font-weight: 700;
+  font-size: .8rem;
+  font-weight: 800;
   color: #64748b;
   flex-shrink: 0;
 }
@@ -394,13 +395,15 @@
 .quiz-opt.correct  .opt-letter { background: #16a34a; color: white; }
 .quiz-opt.wrong    .opt-letter { background: #dc2626; color: white; }
 .opt-text  { 
-  flex: 1; 
+  width: 100% !important;
   font-weight: 500; 
   white-space: normal !important; 
-  word-break: break-word; 
-  overflow-wrap: break-word;
-  line-height: 1.4;
+  word-break: break-word !important; 
+  overflow-wrap: break-word !important;
+  line-height: 1.5;
+  display: block !important;
   min-width: 0;
+  text-overflow: clip !important;
 }
 .opt-check { color: #16a34a; flex-shrink: 0; margin-top: 4px; }
 
