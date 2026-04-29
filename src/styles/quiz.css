@@ -369,6 +369,9 @@
   height: auto;
   min-height: 54px;
   overflow: visible;
+  width: 100%;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 .quiz-opt:hover:not(:disabled) { border-color: #4255ff; background: rgba(66,85,255,.04); }
 .quiz-opt.selected { border-color: #4255ff; background: rgba(66,85,255,.06); }
@@ -393,9 +396,11 @@
 .opt-text  { 
   flex: 1; 
   font-weight: 500; 
-  white-space: normal; 
+  white-space: normal !important; 
   word-break: break-word; 
+  overflow-wrap: break-word;
   line-height: 1.4;
+  min-width: 0;
 }
 .opt-check { color: #16a34a; flex-shrink: 0; margin-top: 4px; }
 

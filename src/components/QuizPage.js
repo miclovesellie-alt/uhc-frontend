@@ -369,11 +369,19 @@ export default function QuizPage() {
                   else cls += " dimmed";
                 } else if (selAns === i) cls += " selected";
                 return (
-                  <button key={i} className={cls} onClick={() => !locked && setSelAns(i)} disabled={locked}>
+                  <div 
+                    key={i} 
+                    className={cls} 
+                    onClick={() => !locked && setSelAns(i)} 
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if(!locked && (e.key === 'Enter' || e.key === ' ')) setSelAns(i); }}
+                    style={{ cursor: locked ? 'default' : 'pointer' }}
+                  >
                     <span className="opt-letter">{String.fromCharCode(65 + i)}</span>
                     <span className="opt-text">{opt}</span>
                     {locked && i === q.answer && <CheckCircle size={15} className="opt-check" />}
-                  </button>
+                  </div>
                 );
               })}
             </div>
