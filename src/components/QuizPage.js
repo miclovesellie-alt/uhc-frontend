@@ -376,10 +376,20 @@ export default function QuizPage() {
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => { if(!locked && (e.key === 'Enter' || e.key === ' ')) setSelAns(i); }}
-                    style={{ cursor: locked ? 'default' : 'pointer' }}
+                    style={{ 
+                      cursor: locked ? 'default' : 'pointer',
+                      display: 'grid',
+                      gridTemplateColumns: '36px 1fr auto',
+                      alignItems: 'start',
+                      height: 'auto',
+                      minHeight: '64px',
+                      whiteSpace: 'normal',
+                      wordBreak: 'break-word',
+                      padding: '18px 16px'
+                    }}
                   >
                     <span className="opt-letter">{String.fromCharCode(65 + i)}</span>
-                    <div className="opt-text">{opt}</div>
+                    <div className="opt-text" style={{ whiteSpace: 'normal', wordBreak: 'break-word', display: 'block', width: '100%' }}>{opt}</div>
                     {locked && i === q.answer && <CheckCircle size={15} className="opt-check" />}
                   </div>
                 );

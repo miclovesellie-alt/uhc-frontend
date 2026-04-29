@@ -173,11 +173,21 @@ function ReviewPage() {
                         optionClass += " wrong-option";
                       }
 
-                      return (
-                        <div key={i} className={optionClass}>
+                        <div 
+                          key={i} 
+                          className={optionClass}
+                          style={{ 
+                            display: 'block', 
+                            height: 'auto', 
+                            whiteSpace: 'normal', 
+                            wordBreak: 'break-word',
+                            padding: '12px 10px',
+                            marginBottom: '6px',
+                            lineHeight: '1.4'
+                          }}
+                        >
                           {optionLetters[i]}. {option}
                         </div>
-                      );
                     })}
                   </div>
 
