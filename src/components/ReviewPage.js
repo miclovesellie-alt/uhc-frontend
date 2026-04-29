@@ -63,6 +63,7 @@ function ReviewPage() {
 
   return (
     <div className="review-wrapper">
+      <div style={{ position: 'fixed', top: 5, right: 5, fontSize: '10px', color: '#ff0000', zIndex: 9999, background: 'white', padding: '2px 4px', borderRadius: '4px', border: '1px solid red' }}>FORCE-RELOAD-V3-REVIEW</div>
       <div className="review-card">
         <div className="review-scroll">
 
