@@ -90,6 +90,12 @@
   color: white;
 }
 
+.library-topics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
 /* ===== CLASSIC COURSE CARDS ===== */
 .course-card-classic {
   background: white;
@@ -271,8 +277,13 @@
 
 @media (max-width: 768px) {
   .library-wrapper { padding: 20px; }
-  .library-header { gap: 16px; }
+  .library-header { gap: 16px; margin-bottom: 24px; }
+  .library-title { font-size: 1.6rem; }
   .library-controls { flex-direction: column; align-items: flex-start; }
+  .library-topics-grid, .library-books-grid { grid-template-columns: 1fr; gap: 16px; }
+  .course-card-classic { padding: 16px; gap: 14px; }
+  .course-card-icon { width: 48px; height: 48px; }
+  .course-card-info h3 { font-size: 1rem; }
 }
 
 /* ===== DARK MODE ENHANCEMENTS FOR LIBRARY ===== */
