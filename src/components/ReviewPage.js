@@ -142,7 +142,13 @@ export default function ReviewPage() {
 
         {/* Actions */}
         <div className="review-actions">
-          <button className="action-btn primary-btn" onClick={() => navigate("/quiz")}>
+          <button className="action-btn primary-btn" onClick={() => {
+            const userId = localStorage.getItem("userId");
+            if (userId) {
+              localStorage.removeItem(`activeQuiz_${userId}`);
+            }
+            navigate("/quiz");
+          }}>
             Take Quiz
           </button>
         </div>
