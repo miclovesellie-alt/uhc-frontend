@@ -6,49 +6,23 @@ import "../styles/auth.css";
 const ForgotPassword = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
-  const [step, setStep] = useState(1);
-  const [otp, setOtp] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [sendingManual, setSendingManual] = useState(false);
 
-  const handleRequestCode = async (e) => {
+  const handleReset = async (e) => {
     e.preventDefault();
     setMessage("");
     setError("");
 
     try {
       const response = await api.post("auth/forgot-password", { email });
-      setMessage(response.data.message || "If this email exists, a reset code has been sent.");
-      setStep(2);
+      setMessage(response.data.message || "If this email exists, a reset link has been sent.");
+      setEmail("");
     } catch (err) {
       setError(
         err.response?.data?.message || "Something went wrong. Please try again later."
       );
-    }
-  };
-
-  const handleVerifyAndReset = async (e) => {
-    e.preventDefault();
-    setMessage("");
-    setError("");
-
-    if (newPassword !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    try {
-      const response = await api.post("auth/reset-password", { email, otp, newPassword });
-      setMessage(response.data.message || "Password reset successful! Redirecting to login...");
-      setStep(3); // success state
-      setTimeout(() => navigate("/auth"), 2000);
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to reset password. Please check your code.");
     }
   };
 
@@ -85,77 +59,26 @@ const ForgotPassword = () => {
           </button>
 
           <h1 className="auth-title">Forgot Password</h1>
-          <p className="auth-subtitle">
-            {step === 1 ? "Enter your email and we'll send you a 6-digit reset code" : "Enter the 6-digit code and your new password"}
-          </p>
+          <p className="auth-subtitle">Enter your email and we'll send you a reset link</p>
 
           {message && <p className="success-text">{message}</p>}
           {error && <p className="error-text">{error}</p>}
 
-          {step === 1 && (
-            <form onSubmit={handleRequestCode}>
-              <label className="input-label">Email Address</label>
-              <input
-                type="email"
-                name="email"
-                placeholder="user@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+          <form onSubmit={handleReset}>
+            <label className="input-label">Email Address</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="user@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
 
-              <button type="submit" className="auth-button">
-                Send Reset Code &nbsp;→
-              </button>
-            </form>
-          )}
-
-          {step === 2 && (
-            <form onSubmit={handleVerifyAndReset}>
-              <label className="input-label">6-Digit Code</label>
-              <input
-                type="text"
-                name="otp"
-                placeholder="123456"
-                maxLength="6"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                required
-                style={{ fontSize: "24px", letterSpacing: "12px", textAlign: "center", fontWeight: "bold", padding: "12px" }}
-              />
-
-              <label className="input-label">New Password</label>
-              <div className="password-wrapper">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="newPassword"
-                  placeholder="Create new password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  required
-                />
-                <span className="eye-icon" onClick={() => setShowPassword(!showPassword)}>
-                  {showPassword ? "🙈" : "👁️"}
-                </span>
-              </div>
-
-              <label className="input-label">Confirm New Password</label>
-              <div className="password-wrapper">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="confirmPassword"
-                  placeholder="Confirm new password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                />
-              </div>
-
-              <button type="submit" className="auth-button" style={{ marginTop: "16px" }}>
-                Reset Password &nbsp;→
-              </button>
-            </form>
-          )}
+            <button type="submit" className="auth-button">
+              Send Reset Link &nbsp;→
+            </button>
+          </form>
 
           <div className="auth-divider">
             <span>OR</span>
