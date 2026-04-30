@@ -23,12 +23,6 @@ function AuthCard() {
   const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [serverStatus, setServerStatus] = useState("checking");
-
-  React.useEffect(() => {
-    // Ping a public setting to check connectivity
-    api.get("settings/registrationOpen").then(() => setServerStatus("online")).catch(() => setServerStatus("offline"));
-  }, []);
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });

@@ -43,6 +43,7 @@ export default function FYP({ refresh }) {
 
   useEffect(() => {
     fetchFeed();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refresh]);
 
   const fetchFeed = async () => {
