@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../../api/api";
-import { Plus, Trash2, Send, Layout, AlertTriangle } from "lucide-react";
+import { Plus, Trash2, Send, Layout, AlertTriangle, Edit } from "lucide-react";
 import "../../admin_styles/AdminLibrary.css";
 
 export default function AdminFeed() {
@@ -12,6 +12,11 @@ export default function AdminFeed() {
   const [newItem, setNewItem] = useState({ title: "", content: "", category: "Health" });
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [itemToEdit, setItemToEdit] = useState(null);
+  const [editFile, setEditFile] = useState(null);
+  const [editUploadProgress, setEditUploadProgress] = useState(0);
 
   useEffect(() => {
     fetchFeed();
@@ -72,6 +77,40 @@ export default function AdminFeed() {
     }
   };
 
+  const handleEditClick = (item) => {
+    setItemToEdit({ ...item });
+    setEditFile(null);
+    setEditUploadProgress(0);
+    setShowEditModal(true);
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("title", itemToEdit.title);
+    formData.append("content", itemToEdit.content);
+    formData.append("category", itemToEdit.category);
+    if (editFile) formData.append("image", editFile);
+
+    try {
+      await api.put(`admin/feed/${itemToEdit._id}`, formData, {
+        headers: { 
+          "Content-Type": "multipart/form-data"
+        },
+        onUploadProgress: (progressEvent) => {
+          setEditUploadProgress(Math.round((progressEvent.loaded * 100) / progressEvent.total));
+        }
+      });
+      setShowEditModal(false);
+      setItemToEdit(null);
+      setEditFile(null);
+      setEditUploadProgress(0);
+      fetchFeed();
+    } catch (err) {
+      alert("Failed to update post");
+    }
+  };
+
   return (
     <div className="admin-page">
       <div className="admin-section-header">
@@ -115,6 +154,9 @@ export default function AdminFeed() {
                   <td>{new Date(item.createdAt).toLocaleDateString()}</td>
                   <td>
                     <div className="table-actions">
+                      <button className="action-btn edit" style={{ marginRight: 8, color: 'var(--admin-primary)' }} onClick={() => handleEditClick(item)}>
+                        <Edit size={16} />
+                      </button>
                       <button className="action-btn delete" onClick={() => handleDeleteClick(item)}>
                         <Trash2 size={16} />
                       </button>
@@ -152,6 +194,38 @@ export default function AdminFeed() {
               <div className="modal-actions">
                 <button type="button" className="admin-btn secondary" onClick={() => setShowAddModal(false)}>Cancel</button>
                 <button type="submit" className="admin-btn primary">Post Announcement</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showEditModal && itemToEdit && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: 600 }}>
+            <h3><Edit size={20} style={{ verticalAlign: 'middle', marginRight: 8 }}/> Edit Announcement</h3>
+            <form onSubmit={handleEditSubmit}>
+              <div className="form-group">
+                <label>Title</label>
+                <input required type="text" value={itemToEdit.title} onChange={e => setItemToEdit({...itemToEdit, title: e.target.value})} />
+              </div>
+              <div className="form-group">
+                <label>Category</label>
+                <input type="text" value={itemToEdit.category} onChange={e => setItemToEdit({...itemToEdit, category: e.target.value})} />
+              </div>
+              <div className="form-group">
+                <label>Content</label>
+                <textarea required rows="4" value={itemToEdit.content} onChange={e => setItemToEdit({...itemToEdit, content: e.target.value})} style={{ width: '100%', borderRadius: 8, border: '1px solid var(--admin-border)', padding: 12 }} />
+              </div>
+              <div className="form-group">
+                <label>Replace Image (Optional)</label>
+                <input type="file" accept="image/*" onChange={e => setEditFile(e.target.files[0])} />
+                <small style={{display: 'block', marginTop: 4, color: 'var(--admin-muted)'}}>Leave empty to keep the current image.</small>
+              </div>
+              {editUploadProgress > 0 && <div className="upload-progress-bar"><div className="progress-fill" style={{ width: `${editUploadProgress}%` }}></div></div>}
+              <div className="modal-actions">
+                <button type="button" className="admin-btn secondary" onClick={() => setShowEditModal(false)}>Cancel</button>
+                <button type="submit" className="admin-btn primary">Save Changes</button>
               </div>
             </form>
           </div>

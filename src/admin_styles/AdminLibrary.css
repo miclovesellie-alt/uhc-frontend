@@ -231,18 +231,18 @@
 }
 
 .action-btn {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  background: rgba(255, 255, 255, 0.5);
-  color: #64748b;
+  border: 1px solid #cbd5e1; /* Darker border for visibility */
+  background: #f1f5f9; /* Solid background */
+  color: #334155; /* Darker text */
   display: flex;
   align-items: center; 
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(4px);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Slight shadow to lift them */
 }
 
 .action-btn:hover {
