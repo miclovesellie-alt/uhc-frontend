@@ -71,6 +71,7 @@ export default function FYP({ refresh }) {
         } catch (newsErr) {
           console.warn("External news fetch failed", newsErr);
         }
+      }
       // Initialize likedPosts based on post.likedBy
       if (user) {
         const initialLikes = {};
