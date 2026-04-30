@@ -15,11 +15,7 @@ import gmailLogo from "../assets/gmail.webp";
 const healthEmojis = ["🫀","🧠","🩺","💊","🩻","🩹","🏥","🔬","🧬","💉"];
 function rnd(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
-const STATS = [
-  { icon: "📝", label: "Practice Questions", value: "10,000+", colorClass: "blue" },
-  { icon: "🩺", label: "Nursing Topics",     value: "50+",     colorClass: "green" },
-  { icon: "🎓", label: "Students Enrolled",  value: "5,000+",  colorClass: "orange" },
-];
+
 
 export default function FYP({ refresh }) {
   const { user, setUser } = useContext(UserContext);
@@ -148,16 +144,7 @@ export default function FYP({ refresh }) {
         </div>
       </div>
 
-      {/* ── Quick stats ── */}
-      <div className="dash-stats-row">
-        {STATS.map((s, i) => (
-          <div className="dash-stat-card" key={i}>
-            <div className={`dash-stat-icon ${s.colorClass}`}>{s.icon}</div>
-            <div className="dash-stat-value">{s.value}</div>
-            <div className="dash-stat-label">{s.label}</div>
-          </div>
-        ))}
-      </div>
+
 
       {/* ── Feed header ── */}
       <div className="dash-section-header">
@@ -190,77 +177,114 @@ export default function FYP({ refresh }) {
         </div>
       </div>
 
-      {/* ── Post cards ── */}
-      <div className="dash-card-grid">
+      {/* ── Post Feed ── */}
+      <div className="dash-feed-column" style={{ display: 'flex', flexDirection: 'column', gap: '28px', maxWidth: '640px', margin: '0 auto 40px auto' }}>
         {posts.filter(p => 
           p.title?.toLowerCase().includes(searchQuery?.toLowerCase() || "") ||
           p.content?.toLowerCase().includes(searchQuery?.toLowerCase() || "")
         ).map(post => (
-          <div key={post._id} className="dash-post-card">
-            {post.image
-              ? <img 
-                  src={post.isExternal ? post.image : getFileUrl(post.image)} 
-                  alt={post.title} 
-                  className="dash-post-img"
-                  onError={e => { e.target.style.display = "none"; }} 
-                />
-              : <div className="dash-post-img-placeholder">{rnd(healthEmojis)}</div>
-            }
-            <div className="dash-post-body">
-              <span className="dash-post-badge">🏥 {post.category || "Health"}</span>
-              <div className="dash-post-title">{post.title}</div>
-              <div className="dash-post-desc">
-                {post.content?.length > 120 ? post.content.slice(0, 120) + "..." : post.content}
+          <div key={post._id} className="dash-post-card" style={{ cursor: 'default', borderRadius: '16px', border: '1px solid var(--border)', background: 'white', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
+            
+            {/* Header: Author & Meta */}
+            <div className="dash-post-header" style={{ display: 'flex', alignItems: 'center', padding: '16px 20px', gap: '12px' }}>
+              <div className="dash-post-avatar" style={{ width: 44, height: 44, borderRadius: '50%', background: "linear-gradient(135deg, var(--accent), #8b5cf6)", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.2rem", fontWeight: 700, flexShrink: 0 }}>
+                {post.author?.[0] || "A"}
               </div>
-              
-              <div className="dash-post-footer" style={{ marginTop: 12 }}>
-                <div className="dash-post-author">
-                  <div className="dash-post-avatar" style={{ background: "var(--accent-pale)", color: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: ".75rem", fontWeight: 700 }}>
-                    {post.author?.[0] || "A"}
-                  </div>
-                  <span className="dash-post-author-name">{post.author}</span>
-                </div>
-                <div className="dash-post-actions">
-                  <button
-                    className={`dash-post-action-btn${likedPosts[post._id] ? " liked" : ""}`}
-                    onClick={() => toggleLike(post._id)}
-                  >
-                    {post.likes}
-                  </button>
-                  <button className="dash-post-action-btn" onClick={() => setSelectedArticle(post)}>
-                    📖 Read More
-                  </button>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-heading)' }}>{post.author || "Global Health News"}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 2 }}>
+                  {new Date(post.createdAt).toLocaleDateString()} • <span style={{ color: 'var(--accent)', fontWeight: 600 }}>{post.category || "Health"}</span>
                 </div>
               </div>
-              <div className="dash-post-comments-section" style={{ marginTop: 12, borderTop: '1px solid var(--border)', paddingTop: 12 }}>
-                <div style={{ display: 'flex', gap: 8 }}>
+            </div>
+            
+            {/* Body: Title & Content */}
+            <div className="dash-post-content" style={{ padding: '0 20px 16px' }}>
+              <div style={{ fontWeight: 800, fontSize: '1.1rem', marginBottom: 8, color: 'var(--text-heading)', lineHeight: 1.3 }}>{post.title}</div>
+              <div style={{ fontSize: '0.9rem', color: 'var(--text-body)', lineHeight: 1.6 }}>
+                {post.content?.length > 250 ? post.content.slice(0, 250) + "..." : post.content}
+                {post.content?.length > 250 && (
+                  <span style={{ color: 'var(--accent)', cursor: 'pointer', fontWeight: 600, marginLeft: 6 }} onClick={() => setSelectedArticle(post)}>Read more</span>
+                )}
+              </div>
+            </div>
+
+            {/* Media */}
+            {post.image ? (
+              <img 
+                src={post.isExternal ? post.image : getFileUrl(post.image)} 
+                alt={post.title} 
+                style={{ width: '100%', maxHeight: '450px', objectFit: 'cover', display: 'block', backgroundColor: 'var(--bg-input)' }}
+                onError={e => { e.target.style.display = "none"; }} 
+              />
+            ) : (
+              <div style={{ width: '100%', height: '180px', background: 'linear-gradient(135deg, var(--accent-pale), #e8f4ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3.5rem' }}>
+                {rnd(healthEmojis)}
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="dash-post-actions-bar" style={{ padding: '12px 20px', display: 'flex', gap: '8px', borderTop: '1px solid var(--border)' }}>
+              <button
+                className={`dash-post-action-btn${likedPosts[post._id] ? " liked" : ""}`}
+                onClick={() => toggleLike(post._id)}
+                style={{ background: 'transparent', padding: '8px 16px', fontSize: '0.9rem', flex: 1, justifyContent: 'center', borderRadius: '8px' }}
+              >
+                {likedPosts[post._id] ? "❤️" : "🤍"} {post.likes} Likes
+              </button>
+              <button 
+                className="dash-post-action-btn" 
+                onClick={() => setSelectedArticle(post)}
+                style={{ background: 'transparent', padding: '8px 16px', fontSize: '0.9rem', flex: 1, justifyContent: 'center', borderRadius: '8px' }}
+              >
+                💬 {post.comments?.length || 0} Comments
+              </button>
+            </div>
+
+            {/* Interactive Comments Section */}
+            <div className="dash-post-comments-section" style={{ padding: '16px 20px', background: 'var(--bg-page)', borderTop: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--accent-pale)', color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.9rem', flexShrink: 0 }}>
+                  {user?.name?.[0] || "U"}
+                </div>
+                <div style={{ display: 'flex', flex: 1, background: 'white', border: '1px solid var(--border)', borderRadius: '24px', padding: '4px 8px 4px 16px', transition: 'border-color 0.2s' }}>
                   <input 
                     type="text" 
-                    className="comment-input" 
-                    placeholder="Add a comment..." 
+                    placeholder="Write a comment..." 
                     value={commentInputs[post._id] || ""}
                     onChange={e => setCommentInputs(prev => ({ ...prev, [post._id]: e.target.value }))}
                     onKeyDown={e => e.key === 'Enter' && handleComment(post._id)}
-                    style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)', fontSize: '0.85rem' }}
+                    style={{ flex: 1, border: 'none', fontSize: '0.85rem', outline: 'none', background: 'transparent' }}
                   />
                   <button 
                     onClick={() => handleComment(post._id)}
-                    style={{ background: 'none', border: 'none', color: 'var(--accent)', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer' }}
+                    style={{ background: 'var(--accent)', border: 'none', color: 'white', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer', padding: '6px 14px', borderRadius: '20px', marginLeft: '8px' }}
                   >
                     Post
                   </button>
                 </div>
-                {post.comments && post.comments.length > 0 && (
-                  <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {post.comments.map((c, i) => (
-                      <div key={i} style={{ fontSize: '0.85rem', background: 'rgba(0,0,0,0.03)', padding: '8px 12px', borderRadius: 8 }}>
-                        <span style={{ fontWeight: 600, color: 'var(--accent)', marginRight: 6 }}>{c.name}:</span>
-                        <span>{c.text}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
+              
+              {post.comments && post.comments.length > 0 && (
+                <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  {post.comments.slice(0, 3).map((c, i) => (
+                    <div key={i} style={{ display: 'flex', gap: 10 }}>
+                      <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-heading)', flexShrink: 0 }}>
+                        {c.name?.[0] || "A"}
+                      </div>
+                      <div style={{ background: 'white', padding: '10px 14px', borderRadius: '0 16px 16px 16px', border: '1px solid var(--border)', fontSize: '0.85rem', flex: 1 }}>
+                        <div style={{ fontWeight: 700, color: 'var(--text-heading)', marginBottom: 4 }}>{c.name}</div>
+                        <div style={{ color: 'var(--text-body)', lineHeight: 1.5 }}>{c.text}</div>
+                      </div>
+                    </div>
+                  ))}
+                  {post.comments.length > 3 && (
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', cursor: 'pointer', marginLeft: 42, fontWeight: 500, transition: 'color 0.2s' }} onClick={() => setSelectedArticle(post)} onMouseOver={e => e.target.style.color = 'var(--accent)'} onMouseOut={e => e.target.style.color = 'var(--text-muted)'}>
+                      View all {post.comments.length} comments
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         ))}
