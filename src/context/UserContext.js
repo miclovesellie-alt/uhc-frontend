@@ -13,6 +13,8 @@ export const UserProvider = ({ children }) => {
 
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const [adminTheme, setAdminTheme] = useState(localStorage.getItem("adminTheme") || "light");
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   // User-side theme: applies to document.body for user dashboard pages
   useEffect(() => {
@@ -51,6 +53,14 @@ export const UserProvider = ({ children }) => {
         }
       })
       .finally(() => setLoading(false));
+
+    // Fetch notifications if logged in
+    api.get("user/notifications")
+      .then(res => {
+        setNotifications(res.data);
+        setUnreadCount(res.data.filter(n => !n.read).length);
+      })
+      .catch(err => console.error("Failed to fetch notifs:", err));
   }, []);
 
   const updateUser = (updatedUser) => {
@@ -62,12 +72,21 @@ export const UserProvider = ({ children }) => {
     if (!user || !user._id) return;
     
     // Connect to socket and register presence
-    // In production we can rely on the same origin or proxy
-    const socketUrl = process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL.replace('/api', '') : '/';
+    const socketUrl = window.location.hostname === 'localhost' 
+      ? 'http://localhost:5000' 
+      : 'https://uhc-backend.onrender.com';
     const socket = io(socketUrl);
     
     socket.on("connect", () => {
       socket.emit("register_presence", user._id);
+    });
+
+    socket.on("USER_NOTIFICATION", (notif) => {
+      // Check if broadcast or targeted to me
+      if (notif.broadcast || notif.recipientId === user._id) {
+        setNotifications(prev => [notif, ...prev]);
+        setUnreadCount(prev => prev + 1);
+      }
     });
 
     return () => {
@@ -80,10 +99,26 @@ export const UserProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    setNotifications([]);
+    setUnreadCount(0);
+  };
+
+  const markNotificationsRead = async () => {
+    try {
+      await api.put("user/notifications/read-all");
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      setUnreadCount(0);
+    } catch (err) {
+      console.error("Failed to mark notifications read", err);
+    }
   };
 
   return (
-    <UserContext.Provider value={{ user, setUser: updateUser, loading, logout, theme, setTheme, adminTheme, setAdminTheme }}>
+    <UserContext.Provider value={{ 
+      user, setUser: updateUser, loading, logout, 
+      theme, setTheme, adminTheme, setAdminTheme,
+      notifications, unreadCount, markNotificationsRead
+    }}>
       {children}
     </UserContext.Provider>
   );
