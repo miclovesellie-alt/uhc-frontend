@@ -73,6 +73,7 @@ export const UserProvider = ({ children }) => {
     return () => {
       socket.disconnect();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?._id]);
 
   const logout = () => {
