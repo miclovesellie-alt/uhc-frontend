@@ -11,6 +11,13 @@ export default function BookViewer() {
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -81,9 +88,10 @@ export default function BookViewer() {
         {book.fileUrl.toLowerCase().split('?')[0].endsWith(".pdf") ? (
             <iframe 
               id="pdf-viewer-frame"
-              src={`${getFileUrl(book.fileUrl)}#toolbar=0`} 
+              src={isMobile ? `https://docs.google.com/viewer?url=${encodeURIComponent(getFileUrl(book.fileUrl))}&embedded=true` : `${getFileUrl(book.fileUrl)}#toolbar=0`} 
               title={book.title}
               className="pdf-iframe"
+              sandbox="allow-scripts allow-same-origin allow-popups"
             />
           ) : (
             <div className="unsupported-viewer">
