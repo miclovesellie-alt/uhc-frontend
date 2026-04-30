@@ -134,7 +134,7 @@ export default function AdminLayout() {
               <span style={{ flex: 1 }}>{item.label}</span>
               {item.label === "Notifications" && unreadCount > 0 && (
                 <span style={{ background: '#ef4444', color: 'white', fontSize: '0.65rem', fontWeight: 700, padding: '1px 6px', borderRadius: '10px' }}>
-                  {unreadCount > 9 ? '9+' : unreadCount}
+                  {unreadCount}
                 </span>
               )}
             </NavLink>
@@ -205,14 +205,14 @@ export default function AdminLayout() {
               <Bell size={19} color="var(--admin-text)" />
               {unreadCount > 0 && (
                 <span style={{ 
-                  position: 'absolute', top: -5, right: -5, 
+                  position: 'absolute', top: -6, right: -8, 
                   background: '#ef4444', color: 'white', 
                   fontSize: '0.65rem', fontWeight: 700, 
-                  width: 16, height: 16, borderRadius: '50%', 
+                  padding: '0 5px', minWidth: 18, height: 18, borderRadius: '9px', 
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   border: '2px solid var(--admin-card)'
                 }}>
-                  {unreadCount > 9 ? '9+' : unreadCount}
+                  {unreadCount}
                 </span>
               )}
             </div>
@@ -253,15 +253,15 @@ export default function AdminLayout() {
       {/* Logout Confirmation Modal */}
       {showLogoutModal && (
         <div className="modal-overlay" onClick={() => setShowLogoutModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: 400, textAlign: 'center' }}>
-            <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'var(--admin-accent-pale)', color: 'var(--admin-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-              <LogOut size={30} />
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: 320, textAlign: 'center', padding: '32px 24px', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>
+            <div style={{ width: 56, height: 56, borderRadius: '18px', background: 'var(--admin-accent-pale)', color: 'var(--admin-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', transform: 'rotate(-5deg)' }}>
+              <LogOut size={26} style={{ transform: 'rotate(5deg)' }} />
             </div>
-            <h2 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: 10 }}>Sign Out?</h2>
-            <p style={{ color: 'var(--admin-muted)', marginBottom: 30 }}>Are you sure you want to log out of the admin panel?</p>
-            <div style={{ display: 'flex', gap: 12 }}>
-              <button className="admin-btn secondary" style={{ flex: 1 }} onClick={() => setShowLogoutModal(false)}>Cancel</button>
-              <button className="admin-btn primary" style={{ flex: 1, background: '#ef4444' }} onClick={proceedLogout}>Logout</button>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: 8, color: 'var(--admin-text)' }}>Ready to leave?</h2>
+            <p style={{ color: 'var(--admin-muted)', fontSize: '0.88rem', marginBottom: 28, lineHeight: 1.4 }}>Are you sure you want to log out of your admin session?</p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button className="admin-btn secondary" style={{ flex: 1, borderRadius: '12px', fontWeight: 600 }} onClick={() => setShowLogoutModal(false)}>Cancel</button>
+              <button className="admin-btn primary" style={{ flex: 1, background: '#ef4444', borderRadius: '12px', fontWeight: 600, border: 'none' }} onClick={proceedLogout}>Log Out</button>
             </div>
           </div>
         </div>

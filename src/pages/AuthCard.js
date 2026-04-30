@@ -137,10 +137,7 @@ function AuthCard() {
               <h1 className="auth-title">Welcome Back</h1>
               <p className="auth-subtitle">Sign in to access your UHC dashboard</p>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center', margin: '10px 0', fontSize: '0.75rem', color: serverStatus === 'online' ? '#10b981' : '#ef4444' }}>
-                <div style={{ width: 8, height: 8, borderRadius: '50%', background: serverStatus === 'online' ? '#10b981' : (serverStatus === 'offline' ? '#ef4444' : '#ccc'), boxShadow: serverStatus === 'online' ? '0 0 8px #10b981' : 'none' }}></div>
-                {serverStatus === 'online' ? 'Server Connection: Online' : (serverStatus === 'offline' ? 'Server Offline (Check Network/WiFi)' : 'Checking Connection...')}
-              </div>
+
 
               {error && <p className="error-text">{error}</p>}
               {success && <p className="success-text">{success}</p>}

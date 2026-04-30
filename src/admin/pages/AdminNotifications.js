@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { RefreshCw, Check } from "lucide-react";
 import api from "../../api/api";
+import { io } from "socket.io-client";
 
 const NOTIF_TYPES = ["All", "Reports", "Users", "System", "Quiz", "Security"];
 
@@ -53,6 +54,20 @@ export default function AdminNotifications() {
 
 
   useEffect(() => { load(); }, [load]);
+
+  useEffect(() => {
+    const SOCKET_URL = window.location.hostname === 'localhost' 
+      ? 'http://localhost:5000' 
+      : 'https://uhc-backend.onrender.com';
+      
+    const socket = io(SOCKET_URL);
+
+    socket.on('ADMIN_NOTIFICATION', () => {
+      load(); // Real-time reload when a new notification arrives
+    });
+
+    return () => socket.disconnect();
+  }, [load]);
 
   const filtered = notifications.filter(n => filter === "All" || n.type === filter);
   const unread = notifications.filter(n => !n.read).length;
