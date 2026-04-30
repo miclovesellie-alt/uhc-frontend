@@ -69,7 +69,17 @@ export default function FYP({ refresh }) {
         } catch (newsErr) {
           console.warn("External news fetch failed", newsErr);
         }
+      // Initialize likedPosts based on post.likedBy
+      if (user) {
+        const initialLikes = {};
+        allPosts.forEach(post => {
+          if (post.likedBy && post.likedBy.includes(user._id)) {
+            initialLikes[post._id] = true;
+          }
+        });
+        setLikedPosts(prev => ({...prev, ...initialLikes}));
       }
+
       setPosts(allPosts);
     } catch (err) {
       console.error("Failed to fetch feed", err);
