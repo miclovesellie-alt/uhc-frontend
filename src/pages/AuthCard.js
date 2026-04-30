@@ -16,7 +16,7 @@ function AuthCard() {
 
   const [formData, setFormData] = useState({
     name: "", email: "", phone: "", phonePrefix: "+233",
-    password: "", confirmPassword: "", category: "", country: "",
+    password: "", confirmPassword: "", category: "", country: "", otp: ""
   });
 
   const [error, setError] = useState("");
@@ -52,7 +52,13 @@ function AuthCard() {
         setTimeout(() => navigate("/dashboard"), 600);
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Invalid credentials");
+      if (err.response?.data?.requiresVerification) {
+        setFormData(prev => ({ ...prev, email: err.response.data.email || prev.email }));
+        setSuccess(err.response.data.message);
+        setTimeout(() => { setActivePage("otp"); setSuccess(""); }, 2000);
+      } else {
+        setError(err.response?.data?.message || "Invalid credentials");
+      }
     }
   };
 
@@ -67,7 +73,7 @@ function AuthCard() {
     if (!formData.category) { setError("Please select a category!"); return; }
 
     try {
-      await api.post("auth/signup", {
+      const res = await api.post("auth/signup", {
         name: formData.name,
         email: formData.email,
         phone: formData.phonePrefix + formData.phone,
@@ -75,11 +81,36 @@ function AuthCard() {
         category: formData.category,
         country: formData.country,
       });
-      setSuccess("Account created! Redirecting to login...");
-      setFormData({ name:"", email:"", phone:"", phonePrefix:"+233", password:"", confirmPassword:"", category:"", country:"" });
-      setTimeout(() => { setActivePage("login"); setSignupStep(1); }, 2000);
+      setSuccess(res.data.message || "Account created! Please verify your email.");
+      setTimeout(() => { 
+        setActivePage("otp"); 
+        setSignupStep(1); 
+        setSuccess("");
+      }, 2000);
     } catch (err) {
       setError(err.response?.data?.message || "Signup failed");
+    }
+  };
+
+  // ===== VERIFY OTP =====
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    setError(""); setSuccess("");
+    try {
+      const res = await api.post("auth/verify-email", { email: formData.email, otp: formData.otp });
+      const { token, user } = res.data;
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("userId", user._id);
+      setUser(user);
+      setSuccess("Email verified successfully! Redirecting...");
+      if (user.role === "admin" || user.role === "superadmin") {
+        setTimeout(() => navigate("/admin"), 600);
+      } else {
+        setTimeout(() => navigate("/dashboard"), 600);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Verification failed");
     }
   };
 
@@ -400,6 +431,48 @@ function AuthCard() {
                   </button>
                 </form>
               )}
+            </>
+          )}
+
+          {/* ===== OTP VERIFICATION ===== */}
+          {activePage === "otp" && (
+            <>
+              <button className="auth-back-btn" onClick={() => { setActivePage("login"); setError(""); setSuccess(""); }}>
+                <span className="back-circle">←</span>
+                <span className="back-label">Back to Login</span>
+              </button>
+
+              <h1 className="auth-title">Verify Email</h1>
+              <p className="auth-subtitle">
+                We sent a 6-digit code to <strong>{formData.email}</strong>. Please enter it below to activate your account.
+              </p>
+
+              {error && <p className="error-text">{error}</p>}
+              {success && <p className="success-text">{success}</p>}
+
+              <form onSubmit={handleVerifyOtp}>
+                <label className="input-label">Verification Code</label>
+                <input
+                  type="text"
+                  name="otp"
+                  placeholder="123456"
+                  maxLength="6"
+                  value={formData.otp}
+                  onChange={handleChange}
+                  required
+                  style={{ 
+                    fontSize: "24px", 
+                    letterSpacing: "12px", 
+                    textAlign: "center", 
+                    fontWeight: "bold",
+                    padding: "16px"
+                  }}
+                />
+
+                <button type="submit" className="auth-button" style={{ marginTop: "24px" }}>
+                  Verify Account &nbsp;→
+                </button>
+              </form>
             </>
           )}
 
