@@ -154,10 +154,10 @@ export default function AdminFeed() {
                   <td>{new Date(item.createdAt).toLocaleDateString()}</td>
                   <td>
                     <div className="table-actions">
-                      <button className="action-btn edit" onClick={() => handleEditClick(item)}>
+                      <button className="action-btn edit" onClick={() => handleEditClick(item)} style={{ width: 36, height: 36, background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: 8, color: '#334155', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginRight: 8 }}>
                         <Edit size={16} />
                       </button>
-                      <button className="action-btn delete" onClick={() => handleDeleteClick(item)}>
+                      <button className="action-btn delete" onClick={() => handleDeleteClick(item)} style={{ width: 36, height: 36, background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 8, color: '#ef4444', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Trash2 size={16} />
                       </button>
                     </div>
