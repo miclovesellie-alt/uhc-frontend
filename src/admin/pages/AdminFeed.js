@@ -154,7 +154,7 @@ export default function AdminFeed() {
                   <td>{new Date(item.createdAt).toLocaleDateString()}</td>
                   <td>
                     <div className="table-actions">
-                      <button className="action-btn edit" style={{ marginRight: 8, color: 'var(--admin-primary)' }} onClick={() => handleEditClick(item)}>
+                      <button className="action-btn edit" onClick={() => handleEditClick(item)}>
                         <Edit size={16} />
                       </button>
                       <button className="action-btn delete" onClick={() => handleDeleteClick(item)}>
