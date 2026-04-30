@@ -160,7 +160,7 @@ export default function AdminQuestions() {
   };
 
   /* ── Delete course ── */
-  const handleDeleteCourse = async (id, name) => {
+  const handleDeleteCourse = async (name) => {
     const qCount = questions.filter(q => q.course === name).length;
     if (qCount > 0) {
       if (!window.confirm(`There are ${qCount} questions in this course. Deleting the course category will leave these questions without a course. Continue?`)) return;
@@ -169,8 +169,9 @@ export default function AdminQuestions() {
     }
 
     try {
-      await api.delete(`courses/${id}`);
-      setCoursesFromDB(prev => prev.filter(c => c._id !== id));
+      await api.delete(`courses/${encodeURIComponent(name)}`);
+      setCoursesFromDB(prev => prev.filter(c => c.name !== name));
+      setQuestions(prev => prev.map(q => q.course === name ? { ...q, course: "" } : q));
       logAction(`Deleted course: "${name}"`);
       showToast("Course deleted");
     } catch (err) { showToast("Course delete failed", "error"); }
@@ -376,7 +377,7 @@ export default function AdminQuestions() {
                 <select className="admin-select" style={{ width:"100%" }}
                   value={newQ.course} onChange={e => setNewQ(p => ({ ...p, course: e.target.value }))}>
                   <option value="">— Select a course —</option>
-                  {coursesFromDB.map(c => <option key={c._id} value={c.name}>{c.name}</option>)}
+                  {coursesFromDB.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
                 </select>
               </div>
 
@@ -503,7 +504,7 @@ export default function AdminQuestions() {
                   value={editData.course || ""}
                   onChange={e => setEditData(p => ({ ...p, course: e.target.value }))}>
                   <option value="">— Select a course —</option>
-                  {coursesFromDB.map(c => <option key={c._id} value={c.name}>{c.name}</option>)}
+                  {coursesFromDB.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
                 </select>
               </div>
               <div>
@@ -569,7 +570,7 @@ export default function AdminQuestions() {
               onChange={e => setCourseSearch(e.target.value)} />
             <div style={{ maxHeight: 240, overflowY: "auto", display: "flex", flexDirection: "column", gap: 6, marginBottom: 12 }}>
               {coursesFromDB.filter(c => c.name?.toLowerCase().includes(courseSearch.toLowerCase())).map(c => (
-                <div key={c._id} style={{
+                <div key={c.name} style={{
                   display: "flex", alignItems: "center", justifyContent: "space-between",
                   padding: "10px 14px", borderRadius: 10,
                   background: "#f8fafc", border: "1px solid var(--admin-border)",
@@ -583,7 +584,7 @@ export default function AdminQuestions() {
                   <button 
                     className="admin-btn danger sm" 
                     style={{ padding: '6px', borderRadius: '8px' }}
-                    onClick={() => handleDeleteCourse(c._id, c.name)}
+                    onClick={() => handleDeleteCourse(c.name)}
                   >
                     <Trash2 size={14} />
                   </button>
