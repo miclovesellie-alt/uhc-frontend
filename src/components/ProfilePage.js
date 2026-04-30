@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { UserContext } from "../context/UserContext";
 import { 
   FaPencilAlt, FaMedal, FaStar, FaTrophy, FaCog, FaMoon, FaSun, FaGlobe, 
@@ -24,6 +24,11 @@ function ProfilePage({ user, setUser }) {
   const [showSettings, setShowSettings] = useState(false);
   const [language, setLanguage] = useState(localStorage.getItem("language") || "English");
   const [resetSent, setResetSent] = useState(false);
+  const [leaderboard, setLeaderboard] = useState([]);
+
+  useEffect(() => {
+    api.get("/user/leaderboard").then(res => setLeaderboard(res.data)).catch(err => console.error("Leaderboard error", err));
+  }, []);
 
   if (!user) return null;
 
@@ -207,6 +212,32 @@ function ProfilePage({ user, setUser }) {
                   <span className="pill-lab">Ranking</span>
                 </div>
               </div>
+            </div>
+          </section>
+
+          {/* ===== TOP 5 LEADERBOARD ===== */}
+          <section className="profile-section" style={{ marginTop: '30px' }}>
+            <h3 className="section-title"><FaTrophy style={{ color: '#f59e0b', marginRight: '8px' }} /> Top 5 Leaderboard</h3>
+            <div className="leaderboard-container">
+              {leaderboard.map((u, i) => (
+                <div key={u._id} className={`leaderboard-row ${u._id === user._id ? 'highlight' : ''}`}>
+                  <div style={{ width: '30px', fontWeight: '800', color: i < 3 ? '#f59e0b' : 'var(--text-muted)' }}>#{i + 1}</div>
+                  <div style={{ 
+                    width: '40px', height: '40px', borderRadius: '50%', 
+                    background: avatarGradient(u.name), color: 'white', 
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                    fontWeight: 'bold', marginRight: '16px'
+                  }}>
+                    {u.name[0]?.toUpperCase()}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: '700', color: 'var(--text-heading)' }}>{u.name} {u._id === user._id && "(You)"}</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{u.category}</div>
+                  </div>
+                  <div style={{ fontWeight: '800', color: 'var(--accent)' }}>{u.points} pts</div>
+                </div>
+              ))}
+              {leaderboard.length === 0 && <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted)' }}>No top users yet.</div>}
             </div>
           </section>
 

@@ -208,10 +208,13 @@ export default function QuizPage() {
       goTo(idx + 1);
     } else {
       // Calculate Quiz Points
-      const correctAnswers = answers.filter((a, i) => a === questions[i]?.answer).length;
-      const setsOfFive = Math.floor(questions.length / 5);
+      // 1 point for completing the quiz
+      // 3 points for every 10 questions answered
+      const completedQuizPoints = 1;
+      const questionsAnsweredPoints = Math.floor(questions.length / 10) * 3;
       
-      const totalPoints = correctAnswers + (setsOfFive * 3);
+      const totalPoints = completedQuizPoints + questionsAnsweredPoints;
+      
       if (totalPoints > 0) {
         awardPoints(totalPoints, "Quiz Completion");
       }

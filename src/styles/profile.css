@@ -792,3 +792,27 @@
   background: #ef4444;
   color: white;
 }
+/* ===== LEADERBOARD ===== */
+.leaderboard-container {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+.leaderboard-row {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+}
+.leaderboard-row:last-child {
+  border-bottom: none;
+}
+.leaderboard-row.highlight {
+  background: var(--accent-pale);
+}
+.dark-theme .leaderboard-container { background: #1e293b; border-color: #334155; }
+.dark-theme .leaderboard-row { border-color: #334155; }
+.dark-theme .leaderboard-row.highlight { background: rgba(66, 85, 255, 0.15); }
