@@ -180,16 +180,20 @@ function DashboardLayout() {
 
       {/* Logout Confirmation Modal */}
       {showLogoutModal && (
-        <div className="modal-overlay" onClick={() => setShowLogoutModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: 400, textAlign: 'center', padding: '30px' }}>
-            <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'rgba(66, 85, 255, 0.1)', color: '#4255ff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-              <LogOut size={30} />
+        <div className="modal-overlay" onClick={() => setShowLogoutModal(false)} style={{ backdropFilter: "blur(4px)" }}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ 
+            maxWidth: 320, padding: '24px', borderRadius: '16px', 
+            boxShadow: '0 10px 25px rgba(0,0,0,0.1)', textAlign: 'center',
+            animation: 'fadeInUp 0.3s ease'
+          }}>
+            <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#fff1f2', color: '#e11d48', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              <LogOut size={24} />
             </div>
-            <h2 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: 10, color: '#0f172a' }}>Sign Out?</h2>
-            <p style={{ color: '#64748b', marginBottom: 30, fontSize: '0.95rem' }}>Are you sure you want to log out from your account?</p>
-            <div style={{ display: 'flex', gap: 12 }}>
-              <button className="admin-btn secondary" style={{ flex: 1, border: '1px solid #e2e8f0', background: 'white' }} onClick={() => setShowLogoutModal(false)}>Cancel</button>
-              <button className="admin-btn primary" style={{ flex: 1, background: '#ef4444', color: 'white', border: 'none' }} onClick={proceedLogout}>Logout</button>
+            <h2 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: 8, color: '#0f172a' }}>Sign Out</h2>
+            <p style={{ color: '#64748b', marginBottom: 24, fontSize: '0.9rem', lineHeight: 1.4 }}>Are you sure you want to log out of your account?</p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', color: '#475569', fontWeight: 600, cursor: 'pointer' }} onClick={() => setShowLogoutModal(false)}>Cancel</button>
+              <button style={{ flex: 1, padding: '10px', borderRadius: '8px', background: '#e11d48', color: 'white', border: 'none', fontWeight: 600, cursor: 'pointer' }} onClick={proceedLogout}>Logout</button>
             </div>
           </div>
         </div>

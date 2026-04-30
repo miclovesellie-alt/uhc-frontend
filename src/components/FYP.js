@@ -30,6 +30,11 @@ export default function FYP({ refresh }) {
   const [replyInputs, setReplyInputs] = useState({});
   const [replyingTo, setReplyingTo] = useState(null);
   const [selectedArticle, setSelectedArticle] = useState(null);
+  const [expandedPosts, setExpandedPosts] = useState({});
+
+  const toggleExpand = (postId) => {
+    setExpandedPosts(prev => ({ ...prev, [postId]: !prev[postId] }));
+  };
 
   const awardPoints = async (amount, reason) => {
     try {
@@ -225,10 +230,29 @@ export default function FYP({ refresh }) {
             {/* Body: Title & Content */}
             <div className="dash-post-content" style={{ padding: '0 20px 16px' }}>
               <div style={{ fontWeight: 800, fontSize: '1.1rem', marginBottom: 8, color: 'var(--text-heading)', lineHeight: 1.3 }}>{post.title}</div>
-              <div style={{ fontSize: '0.9rem', color: 'var(--text-body)', lineHeight: 1.6 }}>
-                {post.content?.length > 250 ? post.content.slice(0, 250) + "..." : post.content}
-                {post.content?.length > 250 && (
-                  <span style={{ color: 'var(--accent)', cursor: 'pointer', fontWeight: 600, marginLeft: 6 }} onClick={() => setSelectedArticle(post)}>Read more</span>
+              <div style={{ fontSize: '0.95rem', color: 'var(--text-body)', lineHeight: 1.6 }}>
+                {post.content?.length > 250 && !expandedPosts[post._id] ? (
+                  <>
+                    {post.content.slice(0, 250)}...
+                    <span 
+                      style={{ color: 'var(--accent)', cursor: 'pointer', fontWeight: 600, marginLeft: 6 }} 
+                      onClick={() => toggleExpand(post._id)}
+                    >
+                      Read more
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span style={{ whiteSpace: 'pre-wrap' }}>{post.content}</span>
+                    {post.content?.length > 250 && (
+                      <span 
+                        style={{ color: 'var(--accent)', cursor: 'pointer', fontWeight: 600, marginLeft: 6, display: 'block', marginTop: 4 }} 
+                        onClick={() => toggleExpand(post._id)}
+                      >
+                        Show less
+                      </span>
+                    )}
+                  </>
                 )}
               </div>
             </div>
