@@ -5,47 +5,28 @@ import "../styles/auth.css";
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [formData, setFormData] = useState({ name: "", email: "", username: "" });
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [sendingManual, setSendingManual] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
-  const handleReset = async (e) => {
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const handleManualRequest = async (e) => {
     e.preventDefault();
+    setLoading(true);
     setMessage("");
     setError("");
 
     try {
-      const response = await api.post("auth/forgot-password", { email });
-      setMessage(response.data.message || "If this email exists, a reset link has been sent.");
-      setEmail("");
+      const response = await api.post("auth/manual-reset-request", formData);
+      setMessage(response.data.message || "Your request has been sent to the Admin.");
+      setSubmitted(true);
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Something went wrong. Please try again later."
-      );
-    }
-  };
-
-  const handleManualRequest = async () => {
-    if (!email) {
-      setError("Please enter your email first so we know who you are.");
-      return;
-    }
-    setSendingManual(true);
-    setMessage("");
-    setError("");
-
-    try {
-      await api.post("contact", {
-        name: "Manual Password Reset Request",
-        email: email,
-        message: `Hello Admin, I am having trouble resetting my password via email. Please reset my password manually. My email is: ${email}`
-      });
-      setMessage("Your request has been sent to the Admin. They will contact you shortly.");
-    } catch (err) {
-      setError("Failed to send request. Please try again later.");
+      setError(err.response?.data?.message || "Failed to send request. Please try again later.");
     } finally {
-      setSendingManual(false);
+      setLoading(false);
     }
   };
 
@@ -58,50 +39,58 @@ const ForgotPassword = () => {
             <span className="back-label">Back to Login</span>
           </button>
 
-          <h1 className="auth-title">Forgot Password</h1>
-          <p className="auth-subtitle">Enter your email and we'll send you a reset link</p>
+          <h1 className="auth-title">Password Reset Request</h1>
+          <p className="auth-subtitle">
+            {submitted 
+              ? "Your request has been received." 
+              : "Please fill out this form to request a manual password reset from the administrators."}
+          </p>
 
           {message && <p className="success-text">{message}</p>}
           {error && <p className="error-text">{error}</p>}
 
-          <form onSubmit={handleReset}>
-            <label className="input-label">Email Address</label>
-            <input
-              type="email"
-              name="email"
-              placeholder="user@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+          {!submitted ? (
+            <form onSubmit={handleManualRequest}>
+              <label className="input-label">Full Name</label>
+              <input
+                type="text"
+                name="name"
+                placeholder="John Doe"
+                value={formData.name}
+                onChange={handleChange}
+                required
+              />
 
-            <button type="submit" className="auth-button">
-              Send Reset Link &nbsp;→
+              <label className="input-label">Email Address</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="user@example.com"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+
+              <label className="input-label">Username / Phone Number</label>
+              <input
+                type="text"
+                name="username"
+                placeholder="Enter your username or phone number"
+                value={formData.username}
+                onChange={handleChange}
+                required
+              />
+
+              <button type="submit" className="auth-button" disabled={loading} style={{ marginTop: "16px" }}>
+                {loading ? "Sending Request..." : "Submit Reset Request \u00a0\u2192"}
+              </button>
+            </form>
+          ) : (
+            <button className="auth-button-secondary" onClick={() => navigate("/auth")} style={{ marginTop: "24px" }}>
+              Return to Login
             </button>
-          </form>
+          )}
 
-          <div className="auth-divider">
-            <span>OR</span>
-          </div>
-
-          <p style={{ fontSize: "0.85rem", color: "var(--text-sub)", textAlign: "center", marginBottom: "12px" }}>
-            Not receiving the email? Request a manual reset:
-          </p>
-          
-          <button 
-            type="button" 
-            className="auth-button-secondary" 
-            onClick={handleManualRequest}
-            disabled={sendingManual}
-            style={{ marginTop: 0, fontWeight: 700, color: "var(--primary-green)" }}
-          >
-            {sendingManual ? "Sending Request..." : "💬 Message Admin for Manual Reset"}
-          </button>
-
-          <p className="auth-link">
-            Remember your password?{" "}
-            <span onClick={() => navigate("/auth")}>Login</span>
-          </p>
         </div>
       </div>
     </div>
