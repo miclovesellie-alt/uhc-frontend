@@ -247,7 +247,7 @@ export default function AdminLayout() {
         )}
 
         {/* Page content */}
-        <Outlet />
+        <Outlet context={{ setUnreadCount }} />
       </div>
 
       {/* Logout Confirmation Modal */}

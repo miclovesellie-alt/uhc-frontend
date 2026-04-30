@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { RefreshCw, Check } from "lucide-react";
+import { useOutletContext } from "react-router-dom";
 import api from "../../api/api";
 import { io } from "socket.io-client";
 
@@ -8,6 +9,7 @@ const NOTIF_TYPES = ["All", "Reports", "Users", "System", "Quiz", "Security"];
 export default function AdminNotifications() {
   const [notifications, setNotifications] = useState([]);
   const [filter, setFilter] = useState("All");
+  const { setUnreadCount } = useOutletContext() || {};
 
   const load = useCallback(async () => {
     try {
@@ -72,7 +74,15 @@ export default function AdminNotifications() {
   const filtered = notifications.filter(n => filter === "All" || n.type === filter);
   const unread = notifications.filter(n => !n.read).length;
 
-  const markAllRead = () => setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  const markAllRead = async () => {
+    try {
+      await api.patch('/admin/activity/notifications/read-all');
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      if (setUnreadCount) setUnreadCount(0);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const colorMap = { blue: "#4255ff", green: "#22c55e", orange: "#f59e0b", red: "#ef4444" };
 
@@ -122,6 +132,7 @@ export default function AdminNotifications() {
                 try {
                   await api.patch(`/admin/activity/notifications/${n.id}/read`);
                   setNotifications(prev => prev.map(x => x.id === n.id ? { ...x, read: true } : x));
+                  if (setUnreadCount) setUnreadCount(prev => Math.max(0, prev - 1));
                 } catch (err) { console.error(err); }
               } else {
                 setNotifications(prev => prev.map(x => x.id === n.id ? { ...x, read: true } : x));
