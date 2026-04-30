@@ -16,8 +16,11 @@ function AuthCard() {
 
   const [formData, setFormData] = useState({
     name: "", email: "", phone: "", phonePrefix: "+233",
-    password: "", confirmPassword: "", category: "", country: "",
+    password: "", confirmPassword: "", category: "", country: "", username: ""
   });
+  
+  const [resetSubmitted, setResetSubmitted] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -86,13 +89,22 @@ function AuthCard() {
   // ===== RESET (User) =====
   const handleReset = async (e) => {
     e.preventDefault();
+    setResetLoading(true);
     setError(""); setSuccess("");
     try {
-      await api.post("auth/forgot-password", { email: formData.email });
-      setSuccess("Reset email sent! Check your inbox.");
-      setTimeout(() => setActivePage("login"), 3000);
+      const payload = {
+        name: formData.name || "Unknown (from modal)",
+        email: formData.email,
+        username: formData.username
+      };
+      
+      const response = await api.post("auth/manual-reset-request", payload);
+      setSuccess(response.data.message || "Your request has been sent to the Admin.");
+      setResetSubmitted(true);
     } catch (err) {
-      setError(err.response?.data?.message || "Reset failed");
+      setError(err.response?.data?.message || "Failed to send request. Please try again later.");
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -406,38 +418,62 @@ function AuthCard() {
           {/* ===== RESET PASSWORD ===== */}
           {activePage === "reset" && (
             <>
-              <button className="auth-back-btn" onClick={() => setActivePage("login")}>
+              <button className="auth-back-btn" onClick={() => { setActivePage("login"); setResetSubmitted(false); setError(""); setSuccess(""); }}>
                 <span className="back-circle">←</span>
                 <span className="back-label">Back to Login</span>
               </button>
 
-              <h1 className="auth-title">Reset Password</h1>
+              <h1 className="auth-title">Password Reset Request</h1>
               <p className="auth-subtitle">
-                Enter your email and we'll send you a reset link
+                {resetSubmitted 
+                  ? "Your request has been received." 
+                  : "Please fill out this form to request a manual password reset from the administrators."}
               </p>
 
               {error && <p className="error-text">{error}</p>}
               {success && <p className="success-text">{success}</p>}
 
-              <form onSubmit={handleReset}>
-                <label className="input-label">Email Address</label>
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="user@example.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
-                <button type="submit" className="auth-button">
-                  Send Reset Link &nbsp;→
-                </button>
-              </form>
+              {!resetSubmitted ? (
+                <form onSubmit={handleReset}>
+                  <label className="input-label">Full Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="John Doe"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                  />
 
-              <p className="auth-link">
-                Remember your password?{" "}
-                <span onClick={() => setActivePage("login")}>Login</span>
-              </p>
+                  <label className="input-label">Email Address</label>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="user@example.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                  />
+
+                  <label className="input-label">Username / Phone Number</label>
+                  <input
+                    type="text"
+                    name="username"
+                    placeholder="Enter your username or phone number"
+                    value={formData.username}
+                    onChange={handleChange}
+                    required
+                  />
+
+                  <button type="submit" className="auth-button" disabled={resetLoading} style={{ marginTop: "16px" }}>
+                    {resetLoading ? "Sending Request..." : "Submit Reset Request \u00a0\u2192"}
+                  </button>
+                </form>
+              ) : (
+                <button className="auth-button-secondary" onClick={() => { setActivePage("login"); setResetSubmitted(false); setSuccess(""); }} style={{ marginTop: "24px" }}>
+                  Return to Login
+                </button>
+              )}
             </>
           )}
 
