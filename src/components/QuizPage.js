@@ -255,7 +255,7 @@ export default function QuizPage() {
   return (
     <div className="quiz-page-wrap">
       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: '4px', background: 'red', zIndex: 10000 }}></div>
-      <div style={{ position: 'fixed', top: 4, left: '50%', transform: 'translateX(-50%)', background: 'red', color: 'white', padding: '2px 10px', borderRadius: '0 0 10px 10px', fontSize: '12px', fontWeight: 900, zIndex: 10000 }}>QUIZ-DEPLOY-V3.4.0</div>
+      <div style={{ position: 'fixed', top: 4, left: '50%', transform: 'translateX(-50%)', background: 'red', color: 'white', padding: '2px 10px', borderRadius: '0 0 10px 10px', fontSize: '12px', fontWeight: 900, zIndex: 10000 }}>QUIZ-V3.4.1-BUILD-{new Date().getTime().toString().slice(-6)}</div>
       <style>{`
         .quiz-opts {
           display: flex !important;
@@ -480,7 +480,17 @@ export default function QuizPage() {
                     }}
                   >
                     <span className="opt-letter">{String.fromCharCode(65 + i)}</span>
-                    <div className="opt-text">{opt}</div>
+                    <div className="opt-text" style={{ 
+                      whiteSpace: 'normal', 
+                      wordBreak: 'break-word', 
+                      overflowWrap: 'anywhere', 
+                      display: 'block', 
+                      width: '100%', 
+                      lineHeight: '1.6', 
+                      overflow: 'visible',
+                      textOverflow: 'clip',
+                      background: 'rgba(255, 255, 0, 0.1)' 
+                    }}>{opt}</div>
                     {locked && i === q.answer && <CheckCircle size={15} className="opt-check" />}
                   </div>
                 );
