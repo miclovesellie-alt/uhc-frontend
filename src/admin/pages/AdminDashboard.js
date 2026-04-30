@@ -38,7 +38,7 @@ const LiveDot = () => (
 );
 
 export default function AdminDashboard() {
-  const [stats, setStats]             = useState({ totalUsers:0, totalQuestions:0, totalCourses:0, activeUsers:0 });
+  const [stats, setStats]             = useState({ totalUsers:0, totalQuestions:0, totalCourses:0, activeUsers:0, liveUsers:0 });
   const [recentUsers, setRecentUsers] = useState([]);
   const [adminLogs, setAdminLogs] = useState([]);
   const [chartType, setChartType]     = useState("bar");
@@ -57,7 +57,8 @@ export default function AdminDashboard() {
             totalUsers: statsRes.data.totalUsers || 0,
             totalQuestions: statsRes.data.totalQuestions || 0,
             totalCourses: statsRes.data.totalCourses || 0,
-            activeUsers: statsRes.data.activeUsers || 0
+            activeUsers: statsRes.data.activeUsers || 0,
+            liveUsers: statsRes.data.liveUsers || 0
           });
         }
       } catch (e) { console.error("Stats fetch error", e); }
@@ -90,10 +91,10 @@ export default function AdminDashboard() {
   }, []);
 
   const kpi = [
+    { label:"Online Now",        value:stats.liveUsers,      icon:<Zap size={18}/>,      color:"green",  trend:"Live"           },
     { label:"Total Users",       value:stats.totalUsers,     icon:<Users size={18}/>,    color:"blue",   trend:"+12% this week" },
-    { label:"Total Questions",   value:stats.totalQuestions, icon:<BookOpen size={18}/>, color:"green",  trend:"+5% this week"  },
-    { label:"Total Courses",     value:stats.totalCourses,   icon:<Activity size={18}/>, color:"orange", trend:"Active"         },
-    { label:"Active (24h)",      value:stats.activeUsers,    icon:<Zap size={18}/>,      color:"blue",   trend:"Live"           },
+    { label:"Total Questions",   value:stats.totalQuestions, icon:<BookOpen size={18}/>, color:"purple", trend:"+5% this week"  },
+    { label:"Active (24h)",      value:stats.activeUsers,    icon:<Activity size={18}/>, color:"orange", trend:"Active"         },
   ];
 
   const chartData = [

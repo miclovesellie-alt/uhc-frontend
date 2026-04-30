@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import api from "../api/api";
+import { io } from "socket.io-client";
 
 export const UserContext = createContext();
 
@@ -56,6 +57,23 @@ export const UserProvider = ({ children }) => {
     setUser(updatedUser);
     localStorage.setItem("user", JSON.stringify(updatedUser));
   };
+
+  useEffect(() => {
+    if (!user || !user._id) return;
+    
+    // Connect to socket and register presence
+    // In production we can rely on the same origin or proxy
+    const socketUrl = process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL.replace('/api', '') : '/';
+    const socket = io(socketUrl);
+    
+    socket.on("connect", () => {
+      socket.emit("register_presence", user._id);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [user?._id]);
 
   const logout = () => {
     setUser(null);

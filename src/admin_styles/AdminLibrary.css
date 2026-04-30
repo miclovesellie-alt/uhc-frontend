@@ -213,6 +213,23 @@
   gap: 8px;
 }
 
+@media (max-width: 768px) {
+  /* Make the actions column sticky on mobile so it's always visible */
+  .admin-table th:last-child,
+  .admin-table td:last-child {
+    position: sticky;
+    right: 0;
+    background: inherit;
+    z-index: 2;
+  }
+  .admin-table td:last-child {
+    background: #ffffff; /* Fallback for light mode */
+  }
+  .admin-wrapper.admin-dark .admin-table td:last-child {
+    background: #1e293b; /* Fallback for dark mode */
+  }
+}
+
 .action-btn {
   width: 34px;
   height: 34px;
