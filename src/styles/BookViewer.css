@@ -97,7 +97,8 @@
   background: #525659; /* Classic PDF viewer background */
   display: flex;
   justify-content: center;
-  overflow: hidden;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .pdf-iframe {
@@ -169,4 +170,49 @@
 
 .dark-theme .viewer-container {
   background: #0f172a;
+}
+
+/* ===== MOBILE RESPONSIVENESS ===== */
+@media (max-width: 768px) {
+  .viewer-header {
+    padding: 0 12px;
+    height: 60px;
+  }
+  
+  .viewer-header-left {
+    gap: 12px;
+  }
+  
+  .viewer-back-btn {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .viewer-title-info h1 {
+    font-size: 0.95rem;
+    max-width: 150px; /* Truncate earlier on mobile */
+  }
+  
+  .viewer-title-info span {
+    font-size: 0.65rem;
+  }
+  
+  .viewer-header-right {
+    gap: 8px;
+  }
+  
+  .viewer-action-btn {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    gap: 4px;
+  }
+  
+  .viewer-action-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .pdf-iframe {
+    box-shadow: none; /* Better performance and look on mobile */
+  }
 }
