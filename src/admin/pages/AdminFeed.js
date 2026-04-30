@@ -123,7 +123,7 @@ export default function AdminFeed() {
         </button>
       </div>
 
-      <div className="admin-table-wrapper">
+      <div className="admin-table-wrap">
         <table className="admin-table">
           <thead>
             <tr>
@@ -153,12 +153,12 @@ export default function AdminFeed() {
                   <td><span className="admin-badge blue">{item.category}</span></td>
                   <td>{new Date(item.createdAt).toLocaleDateString()}</td>
                   <td>
-                    <div className="table-actions">
-                      <button className="action-btn edit" onClick={() => handleEditClick(item)} style={{ width: 36, height: 36, background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: 8, color: '#334155', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginRight: 8 }}>
-                        <Edit size={16} color="#334155" />
+                    <div className="table-actions" style={{ display: 'flex', gap: '8px' }}>
+                      <button className="admin-btn secondary sm" onClick={() => handleEditClick(item)} title="Edit Post">
+                        <Edit size={16} />
                       </button>
-                      <button className="action-btn delete" onClick={() => handleDeleteClick(item)} style={{ width: 36, height: 36, background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 8, color: '#ef4444', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <Trash2 size={16} color="#ef4444" />
+                      <button className="admin-btn danger sm" onClick={() => handleDeleteClick(item)} title="Delete Post">
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   </td>

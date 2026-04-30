@@ -80,7 +80,7 @@ export default function AdminRecycleBin() {
         </div>
       </div>
 
-      <div className="admin-table-wrapper">
+      <div className="admin-table-wrap">
         <table className="admin-table">
           <thead>
             <tr>
