@@ -336,8 +336,11 @@ export default function QuizPage() {
 
             {/* Top bar */}
             <div className="quiz-top-bar">
-              <div className="quiz-tb-left" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className="quiz-tb-left">
                 <span className="quiz-q-counter">{idx + 1} / {questions.length}</span>
+                {streak >= 3 && <span className="quiz-streak-badge">🔥 {streak}</span>}
+              </div>
+              <div className="quiz-tb-right">
                 <button 
                   className="quiz-report-btn-header" 
                   onClick={() => setShowReportModal(true)}
@@ -357,9 +360,6 @@ export default function QuizPage() {
                 >
                   <AlertTriangle size={12} /> Report
                 </button>
-                {streak >= 3 && <span className="quiz-streak-badge">🔥 {streak}</span>}
-              </div>
-              <div className="quiz-tb-right">
                 <button className={`quiz-flag-btn${flagged[idx] ? " flagged" : ""}`} onClick={toggleFlag}><Flag size={14} /></button>
                 <button className="quiz-nav-toggle-btn" onClick={() => setShowNav(s => !s)}>⊞</button>
                 <CircleTimer timeLeft={timeLeft} total={45} />
@@ -516,7 +516,7 @@ export default function QuizPage() {
             </p>
             
             <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "20px" }}>
-              {["Typo / Grammar", "Correct answer is wrong", "Content is outdated", "Other"].map(reason => (
+              {["Typo", "Wrong Answer"].map(reason => (
                 <label key={reason} style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "0.9rem", color: "#334155" }}>
                   <input 
                     type="radio" 
