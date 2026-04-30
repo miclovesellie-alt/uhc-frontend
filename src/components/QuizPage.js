@@ -254,52 +254,6 @@ export default function QuizPage() {
 
   return (
     <div className="quiz-page-wrap">
-      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: '4px', background: 'red', zIndex: 10000 }}></div>
-      <div style={{ position: 'fixed', top: 4, left: '50%', transform: 'translateX(-50%)', background: 'red', color: 'white', padding: '2px 10px', borderRadius: '0 0 10px 10px', fontSize: '12px', fontWeight: 900, zIndex: 10000 }}>QUIZ-V3.4.1-BUILD-{new Date().getTime().toString().slice(-6)}</div>
-      <style>{`
-        .quiz-opts {
-          display: flex !important;
-          flex-direction: column !important;
-          gap: 15px !important;
-        }
-        .quiz-opt {
-          display: flex !important;
-          flex-direction: column !important; /* Stack vertically for safety */
-          align-items: flex-start !important;
-          padding: 20px !important;
-          height: auto !important;
-          min-height: 80px !important;
-          background: #ffffff !important;
-          border: 2px solid #e2e8f0 !important;
-          border-radius: 16px !important;
-          overflow: visible !important;
-        }
-        .opt-text {
-          margin-top: 10px !important; /* Space below the letter */
-          width: 100% !important;
-          white-space: normal !important;
-          word-break: break-word !important;
-          overflow-wrap: break-word !important;
-          line-height: 1.6 !important;
-          display: block !important;
-          background: #ffff0022 !important; /* Diagnostic Yellow */
-          text-overflow: clip !important;
-        }
-        .opt-letter {
-          width: 32px !important;
-          height: 32px !important;
-          background: #f1f5f9 !important;
-          border-radius: 8px !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          font-weight: 800 !important;
-        }
-        .quiz-opt.selected { border-color: #4255ff !important; background: rgba(66,85,255,0.05) !important; }
-        .quiz-opt.correct { border-color: #16a34a !important; background: rgba(22,163,74,0.1) !important; }
-        .quiz-opt.wrong { border-color: #dc2626 !important; background: rgba(220,38,38,0.1) !important; }
-      `}</style>
-
       {/* Watermark */}
       {noSS && stage === "quiz" && (
         <div className="quiz-watermark-overlay">
@@ -467,30 +421,10 @@ export default function QuizPage() {
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => { if(!locked && (e.key === 'Enter' || e.key === ' ')) setSelAns(i); }}
-                    style={{ 
-                      cursor: locked ? 'default' : 'pointer',
-                      display: 'grid',
-                      gridTemplateColumns: '36px 1fr auto',
-                      alignItems: 'start',
-                      height: 'auto',
-                      minHeight: '64px',
-                      whiteSpace: 'normal',
-                      wordBreak: 'break-word',
-                      padding: '18px 16px'
-                    }}
+                    style={{ cursor: locked ? 'default' : 'pointer' }}
                   >
                     <span className="opt-letter">{String.fromCharCode(65 + i)}</span>
-                    <div className="opt-text" style={{ 
-                      whiteSpace: 'normal', 
-                      wordBreak: 'break-word', 
-                      overflowWrap: 'anywhere', 
-                      display: 'block', 
-                      width: '100%', 
-                      lineHeight: '1.6', 
-                      overflow: 'visible',
-                      textOverflow: 'clip',
-                      background: 'rgba(255, 255, 0, 0.1)' 
-                    }}>{opt}</div>
+                    <div className="opt-text">{opt}</div>
                     {locked && i === q.answer && <CheckCircle size={15} className="opt-check" />}
                   </div>
                 );
