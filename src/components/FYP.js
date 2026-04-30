@@ -82,21 +82,48 @@ export default function FYP({ refresh }) {
     }
   };
 
-  const toggleLike = (id) => {
+  const toggleLike = async (id) => {
+    if (String(id).startsWith("news-")) {
+      const isLiking = !likedPosts[id];
+      setLikedPosts(prev => ({ ...prev, [id]: isLiking }));
+      if (isLiking) awardPoints(1, "Reaction");
+      return;
+    }
+
     const isLiking = !likedPosts[id];
     setLikedPosts(prev => ({ ...prev, [id]: isLiking }));
+    
+    // Optimistic UI update
+    setPosts(prev => prev.map(p => p._id === id ? { ...p, likes: isLiking ? p.likes + 1 : Math.max(0, p.likes - 1) } : p));
     if (isLiking) awardPoints(1, "Reaction");
+
+    try {
+      await api.post(`admin/feed/${id}/like`);
+    } catch (err) {
+      console.error("Failed to like post");
+    }
   };
 
-  const handleComment = (id) => {
+  const handleComment = async (id) => {
     const text = (commentInputs[id] || "").trim();
     if (!text) return;
     
-    // In a real app, we'd send this to the server
-    // For now, we award points and clear input
-    awardPoints(1, "Comment");
-    setCommentInputs(prev => ({ ...prev, [id]: "" }));
-    alert("Comment posted! +1 point");
+    if (String(id).startsWith("news-")) {
+      awardPoints(1, "Comment");
+      setCommentInputs(prev => ({ ...prev, [id]: "" }));
+      alert("Comment posted! +1 point");
+      return;
+    }
+
+    try {
+      const res = await api.post(`admin/feed/${id}/comment`, { text });
+      setPosts(prev => prev.map(p => p._id === id ? { ...p, comments: res.data } : p));
+      awardPoints(1, "Comment");
+      setCommentInputs(prev => ({ ...prev, [id]: "" }));
+    } catch (err) {
+      console.error("Failed to post comment");
+      alert("Failed to post comment");
+    }
   };
 
   const toggleLogoMenu = () => logoDropdownRef.current?.classList.toggle("active");
@@ -198,7 +225,7 @@ export default function FYP({ refresh }) {
                     className={`dash-post-action-btn${likedPosts[post._id] ? " liked" : ""}`}
                     onClick={() => toggleLike(post._id)}
                   >
-                    {likedPosts[post._id] ? "❤️" : "🤍"} {post.likes + (likedPosts[post._id] ? 1 : 0)}
+                    {post.likes}
                   </button>
                   <button className="dash-post-action-btn" onClick={() => setSelectedArticle(post)}>
                     📖 Read More
@@ -223,6 +250,16 @@ export default function FYP({ refresh }) {
                     Post
                   </button>
                 </div>
+                {post.comments && post.comments.length > 0 && (
+                  <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {post.comments.map((c, i) => (
+                      <div key={i} style={{ fontSize: '0.85rem', background: 'rgba(0,0,0,0.03)', padding: '8px 12px', borderRadius: 8 }}>
+                        <span style={{ fontWeight: 600, color: 'var(--accent)', marginRight: 6 }}>{c.name}:</span>
+                        <span>{c.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
