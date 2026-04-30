@@ -82,6 +82,9 @@ export default function QuizPage() {
   const { user, setUser } = React.useContext(UserContext);
   const timerRef = useRef(null);
 
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState("Typo");
+
   const awardPoints = async (amount, reason) => {
     try {
       const res = await api.post("points/add", { amount, reason });
@@ -217,23 +220,18 @@ export default function QuizPage() {
     }
   };
 
-  const handleReport = async () => {
-    const q = questions[idx];
-    const reason = window.prompt("Why is this question faulty? (e.g., wrong answer, typo, outdated)");
+  const submitReport = async () => {
+    if (!reportReason) return;
     
-    if (reason === null) return; // cancelled
-    if (!reason.trim()) {
-      alert("Please provide a reason for the report.");
-      return;
-    }
-
+    const q = questions[idx];
     try {
       await api.post("questions/report", {
         questionId: q._id || q.id || idx,
         questionText: q.question,
-        reason: reason
+        reason: reportReason
       });
       alert("Question reported. Thank you for your feedback!");
+      setShowReportModal(false);
     } catch (err) {
       alert("Failed to send report. Please try again later.");
     }
@@ -338,8 +336,27 @@ export default function QuizPage() {
 
             {/* Top bar */}
             <div className="quiz-top-bar">
-              <div className="quiz-tb-left">
+              <div className="quiz-tb-left" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span className="quiz-q-counter">{idx + 1} / {questions.length}</span>
+                <button 
+                  className="quiz-report-btn-header" 
+                  onClick={() => setShowReportModal(true)}
+                  style={{ 
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '4px 8px',
+                    borderRadius: '6px',
+                    border: '1px solid #fecaca',
+                    background: '#fef2f2',
+                    color: '#ef4444',
+                    fontSize: '0.65rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  <AlertTriangle size={12} /> Report
+                </button>
                 {streak >= 3 && <span className="quiz-streak-badge">🔥 {streak}</span>}
               </div>
               <div className="quiz-tb-right">
@@ -381,27 +398,6 @@ export default function QuizPage() {
                 {q.difficulty && <span className={`qdiff qdiff-${(q.difficulty || "medium").toLowerCase()}`}>{q.difficulty}</span>}
                 <h2 className="quiz-question">{q.question}</h2>
               </div>
-              <button 
-                className="quiz-report-btn-header" 
-                onClick={handleReport}
-                style={{ 
-                  flexShrink: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  padding: '8px 12px',
-                  borderRadius: '10px',
-                  border: '1px solid #fecaca',
-                  background: '#fef2f2',
-                  color: '#ef4444',
-                  fontSize: '0.75rem',
-                  fontWeight: 700,
-                  marginTop: '4px',
-                  boxShadow: '0 2px 5px rgba(239, 68, 68, 0.1)'
-                }}
-              >
-                <AlertTriangle size={16} /> Report
-              </button>
             </div>
 
             {/* Options */}
@@ -500,6 +496,58 @@ export default function QuizPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ══ REPORT MODAL ══ */}
+      {showReportModal && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          background: "rgba(0,0,0,0.5)", zIndex: 1000,
+          display: "flex", alignItems: "center", justifyContent: "center"
+        }}>
+          <div style={{
+            background: "#fff", padding: "24px", borderRadius: "16px",
+            width: "90%", maxWidth: "400px", boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
+          }}>
+            <h3 style={{ margin: "0 0 16px 0", display: "flex", alignItems: "center", gap: "8px", color: "#0f172a" }}>
+              <AlertTriangle size={20} color="#ef4444" /> Report Question
+            </h3>
+            <p style={{ fontSize: "0.85rem", color: "#64748b", marginBottom: "16px" }}>
+              Please select the reason for reporting this question.
+            </p>
+            
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "20px" }}>
+              {["Typo / Grammar", "Correct answer is wrong", "Content is outdated", "Other"].map(reason => (
+                <label key={reason} style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "0.9rem", color: "#334155" }}>
+                  <input 
+                    type="radio" 
+                    name="reportReason" 
+                    value={reason}
+                    checked={reportReason === reason}
+                    onChange={(e) => setReportReason(e.target.value)}
+                    style={{ cursor: "pointer" }}
+                  />
+                  {reason}
+                </label>
+              ))}
+            </div>
+
+            <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
+              <button 
+                onClick={() => setShowReportModal(false)}
+                style={{ padding: "8px 16px", borderRadius: "8px", border: "1px solid #e2e8f0", background: "#f8fafc", cursor: "pointer", fontWeight: 600, color: "#64748b" }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={submitReport}
+                style={{ padding: "8px 16px", borderRadius: "8px", border: "none", background: "#ef4444", cursor: "pointer", fontWeight: 600, color: "white" }}
+              >
+                Submit Report
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

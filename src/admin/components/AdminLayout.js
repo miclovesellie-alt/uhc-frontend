@@ -226,7 +226,16 @@ export default function AdminLayout() {
               <div className="live-toast-icon">
                 {liveNotif.type === 'SUCCESS' ? '✅' : liveNotif.type === 'DANGER' ? '🚫' : '🔔'}
               </div>
-              <div className="live-toast-content">
+              <div 
+                className="live-toast-content" 
+                style={{ cursor: liveNotif.message?.includes("Question Reported") ? 'pointer' : 'default' }}
+                onClick={() => {
+                  if (liveNotif.message?.includes("Question Reported")) {
+                    navigate("/admin/questions?filter=reported");
+                    setLiveNotif(null);
+                  }
+                }}
+              >
                 <div className="live-toast-title">{liveNotif.senderName || 'System Update'}</div>
                 <div className="live-toast-msg">{liveNotif.message}</div>
               </div>

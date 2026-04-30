@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Plus, Search, Edit2, Trash2, BookOpen, ChevronDown, ChevronUp, Copy } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Plus, Search, Edit2, Trash2, BookOpen, ChevronDown, ChevronUp, Copy, AlertTriangle } from "lucide-react";
 import api from "../../api/api";
 
 const logAction = (action) => {
@@ -9,10 +10,19 @@ const logAction = (action) => {
 };
 
 export default function AdminQuestions() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("All");
+  
+  // Parse initial filter from URL
+  const queryParams = new URLSearchParams(location.search);
+  const initialFilterReported = queryParams.get("filter") === "reported";
+  const [filterReported, setFilterReported] = useState(initialFilterReported);
+
   const [expanded, setExpanded] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [editModal, setEditModal] = useState(false);
@@ -33,6 +43,25 @@ export default function AdminQuestions() {
   };
 
   useEffect(() => { fetchQuestions(); fetchCourses(); }, []);
+
+  // Sync URL changes to state (in case user clicks notification while already on page)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get("filter") === "reported") {
+      setFilterReported(true);
+    }
+  }, [location.search]);
+
+  // Update URL when filter changes manually
+  const toggleReportedFilter = () => {
+    const newVal = !filterReported;
+    setFilterReported(newVal);
+    if (newVal) {
+      navigate("/admin/questions?filter=reported", { replace: true });
+    } else {
+      navigate("/admin/questions", { replace: true });
+    }
+  };
 
   const fetchQuestions = async () => {
     setLoading(true);
@@ -77,7 +106,8 @@ export default function AdminQuestions() {
     const matchSearch = q.question?.toLowerCase().includes(txt) ||
       q.options?.some(o => o?.toLowerCase().includes(txt));
     const matchCourse = selectedCourse === "All" || q.course === selectedCourse;
-    return matchSearch && matchCourse;
+    const matchReported = filterReported ? q.isReported === true : true;
+    return matchSearch && matchCourse && matchReported;
   });
 
   /* ── Delete ── */
@@ -222,6 +252,14 @@ export default function AdminQuestions() {
         >
           {courses.map((c, i) => <option key={i} value={c}>{c}</option>)}
         </select>
+        <button 
+          className={`admin-btn ${filterReported ? 'danger' : 'secondary'}`} 
+          onClick={toggleReportedFilter}
+          style={{ padding: "8px 12px", border: filterReported ? "none" : "" }}
+        >
+          <AlertTriangle size={15} /> 
+          {filterReported ? "Clear Reported Filter" : "Reported Questions"}
+        </button>
       </div>
 
       {/* Questions list */}
@@ -253,6 +291,7 @@ export default function AdminQuestions() {
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         {expanded === q._id ? <ChevronUp size={13} style={{ color: "var(--admin-muted)", flexShrink: 0 }} /> : <ChevronDown size={13} style={{ color: "var(--admin-muted)", flexShrink: 0 }} />}
                         <span style={{ fontSize: ".87rem", lineHeight: 1.4 }}>{q.question}</span>
+                        {q.isReported && <span className="admin-badge red" title={`Reported: ${q.reportReason}`} style={{ padding: "2px 6px", fontSize: "0.65rem", flexShrink: 0 }}><AlertTriangle size={10} style={{ marginRight: 3 }}/> Reported</span>}
                       </div>
                     </td>
                     <td><span className="admin-badge blue">{q.course || "—"}</span></td>
@@ -290,6 +329,11 @@ export default function AdminQuestions() {
                         {q.explanation && (
                           <div style={{ marginTop:10, padding:"8px 12px", background:"rgba(66,85,255,0.05)", borderRadius:8, fontSize:".8rem", color:"#4255ff" }}>
                             💡 {q.explanation}
+                          </div>
+                        )}
+                        {q.isReported && (
+                          <div style={{ marginTop:10, padding:"8px 12px", background:"#fef2f2", border:"1px solid #fecaca", borderRadius:8, fontSize:".8rem", color:"#ef4444", display:"flex", alignItems:"center", gap:8 }}>
+                            <AlertTriangle size={14} /> <strong>Report Reason:</strong> {q.reportReason || "Not specified"}
                           </div>
                         )}
                       </td>

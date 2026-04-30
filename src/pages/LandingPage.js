@@ -167,7 +167,7 @@ function LandingPage() {
         <div className="hero-text">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
             <span className="section-label">Empowering Future Healthcare Heroes</span>
-            <h1>The Gold Standard in <span className="highlight">Nursing Education</span> <span style={{ color: 'red', fontSize: '10px' }}>v3.3-VERIFIED</span></h1>
+            <h1>The Gold Standard in <span className="highlight">Nursing Education</span></h1>
             <p>Join over 5,000 nursing students mastering their exams with interactive quizzes, real-time analytics, and expert-curated resources.</p>
             <div className="hero-actions">
               <button className="hero-btn" onClick={() => navigate("/auth")}>Join the Community</button>
