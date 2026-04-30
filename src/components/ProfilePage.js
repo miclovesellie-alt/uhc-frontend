@@ -231,8 +231,9 @@ function ProfilePage({ user, setUser }) {
                     {u.name[0]?.toUpperCase()}
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: '700', color: 'var(--text-heading)' }}>{u.name} {u._id === user._id && "(You)"}</div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{u.category}</div>
+                    <div style={{ fontWeight: '700', color: 'var(--text-heading)' }}>
+                      {u.name} <span style={{ fontWeight: '500', color: 'var(--text-muted)' }}>({u.category})</span> {u._id === user._id && <span style={{ color: 'var(--accent)' }}>(You)</span>}
+                    </div>
                   </div>
                   <div style={{ fontWeight: '800', color: 'var(--accent)' }}>{u.points} pts</div>
                 </div>
