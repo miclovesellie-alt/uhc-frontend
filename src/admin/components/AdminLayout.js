@@ -31,6 +31,7 @@ export default function AdminLayout() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [liveNotif, setLiveNotif] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [presence, setPresence] = useState({ onlineIds: [], recentIds: [] });
 
   // Initialize Socket.io
   React.useEffect(() => {
@@ -47,6 +48,10 @@ export default function AdminLayout() {
       
       // Auto-hide toast after 6 seconds
       setTimeout(() => setLiveNotif(prev => prev?._id === data._id ? null : prev), 6000);
+    });
+
+    socket.on('PRESENCE_UPDATE', (data) => {
+      setPresence(data);
     });
 
     return () => socket.disconnect();
@@ -247,7 +252,7 @@ export default function AdminLayout() {
         )}
 
         {/* Page content */}
-        <Outlet context={{ setUnreadCount }} />
+        <Outlet context={{ setUnreadCount, presence }} />
       </div>
 
       {/* Logout Confirmation Modal */}

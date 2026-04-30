@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import api from "../../api/api";
 import { Search, Shield, RefreshCw } from "lucide-react";
 
@@ -9,6 +10,7 @@ const logAction = (action) => {
 };
 
 export default function AdminAdmins() {
+  const { presence } = useOutletContext() || {};
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -106,6 +108,7 @@ export default function AdminAdmins() {
                 <th>Admin Name</th>
                 <th>Email</th>
                 <th>Role</th>
+                <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -126,6 +129,11 @@ export default function AdminAdmins() {
                   </td>
                   <td style={{ color: "var(--admin-muted)", fontSize: ".82rem" }}>{u.email}</td>
                   <td><span className={`admin-badge ${roleColor(u.role)}`}>{u.role || "admin"}</span></td>
+                  <td>
+                    <span className={`admin-badge ${presence?.onlineIds?.includes(u._id) ? "green" : "gray"}`}>
+                      {presence?.onlineIds?.includes(u._id) ? "Active (Live)" : "Offline"}
+                    </span>
+                  </td>
                   <td>
                     <button className="admin-btn secondary sm" onClick={() => setSelectedUser(u)}>
                       Manage

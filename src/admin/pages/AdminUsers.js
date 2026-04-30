@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
+import { useOutletContext } from "react-router-dom";
 import api from "../../api/api";
 import { Search, Shield, Ban, Key, Trash2, RefreshCw, Eye, EyeOff } from "lucide-react";
 import { UserContext } from "../../context/UserContext";
@@ -10,6 +11,7 @@ const logAction = (action) => {
 };
 
 export default function AdminUsers() {
+  const { presence } = useOutletContext() || {};
   const { user: currentUser } = useContext(UserContext);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -186,8 +188,8 @@ export default function AdminUsers() {
                   <td style={{ color: "var(--admin-muted)", fontSize: ".82rem" }}>{u.email}</td>
                   <td><span className={`admin-badge ${roleColor(u.role)}`}>{u.role || "user"}</span></td>
                   <td>
-                    <span className={`admin-badge ${u.status === "banned" ? "red" : "green"}`}>
-                      {u.status === "banned" ? "Banned" : "Active"}
+                    <span className={`admin-badge ${presence?.onlineIds?.includes(u._id) ? "green" : u.status === "banned" ? "red" : "gray"}`}>
+                      {presence?.onlineIds?.includes(u._id) ? "Active (Live)" : u.status === "banned" ? "Banned" : "Offline"}
                     </span>
                   </td>
                   <td style={{ color: "var(--admin-muted)", fontSize: ".82rem" }}>{u.country || "—"}</td>

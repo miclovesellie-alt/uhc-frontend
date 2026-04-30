@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import {
   BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -38,6 +39,7 @@ const LiveDot = () => (
 );
 
 export default function AdminDashboard() {
+  const { presence } = useOutletContext() || {};
   const [stats, setStats]             = useState({ totalUsers:0, totalQuestions:0, totalCourses:0, activeUsers:0, liveUsers:0 });
   const [recentUsers, setRecentUsers] = useState([]);
   const [adminLogs, setAdminLogs] = useState([]);
@@ -91,10 +93,10 @@ export default function AdminDashboard() {
   }, []);
 
   const kpi = [
-    { label:"Online Now",        value:stats.liveUsers,      icon:<Zap size={18}/>,      color:"green",  trend:"Live"           },
+    { label:"Online Now",        value:presence?.onlineIds?.length || 0,      icon:<Zap size={18}/>,      color:"green",  trend:"Live"           },
     { label:"Total Users",       value:stats.totalUsers,     icon:<Users size={18}/>,    color:"blue",   trend:"+12% this week" },
     { label:"Total Questions",   value:stats.totalQuestions, icon:<BookOpen size={18}/>, color:"purple", trend:"+5% this week"  },
-    { label:"Active (24h)",      value:stats.activeUsers,    icon:<Activity size={18}/>, color:"orange", trend:"Active"         },
+    { label:"Recently Active",   value:presence?.recentIds?.length || 0,    icon:<Activity size={18}/>, color:"orange", trend:"Last 3 mins"         },
   ];
 
   const chartData = [
@@ -261,8 +263,8 @@ export default function AdminDashboard() {
                     </span>
                   </td>
                   <td>
-                    <span className={`admin-badge ${u.status==="banned"?"red":"green"}`}>
-                      {u.status==="banned"?"Banned":"Active"}
+                    <span className={`admin-badge ${presence?.onlineIds?.includes(u._id) ? "green" : u.status==="banned" ? "red" : "gray"}`}>
+                      {presence?.onlineIds?.includes(u._id) ? "Active (Live)" : u.status==="banned" ? "Banned" : "Offline"}
                     </span>
                   </td>
                   <td style={{ color:"var(--admin-muted)", fontSize:".82rem" }}>{u.country||"—"}</td>
