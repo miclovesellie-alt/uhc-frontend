@@ -142,8 +142,8 @@ export default function ReviewPage() {
 
         {/* Actions */}
         <div className="review-actions">
-          <button className="action-btn primary-btn" onClick={() => navigate("/")}>
-            Back to Dashboard
+          <button className="action-btn primary-btn" onClick={() => navigate("/quiz")}>
+            Take Quiz
           </button>
         </div>
 
