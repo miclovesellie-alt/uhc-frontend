@@ -31,7 +31,7 @@ function ProfilePage({ user, setUser }) {
 
   const handleSaveChanges = async () => {
     try {
-      const res = await api.put(`/users/${user._id}`, user);
+      const res = await api.put(`/user`, user);
       setUser(res.data);
       setIsEditing(false);
     } catch (err) {
