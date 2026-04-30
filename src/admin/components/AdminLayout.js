@@ -57,13 +57,17 @@ export default function AdminLayout() {
     return () => socket.disconnect();
   }, []);
 
-  // Fetch initial unread count
+  // Fetch initial unread count and guaranteed initial presence
   React.useEffect(() => {
     import("../../api/api").then(({ default: api }) => {
       api.get("admin/activity/notifications").then(res => {
         const userId = localStorage.getItem("userId");
         const unread = Array.isArray(res.data) ? res.data.filter(n => !n.readBy?.includes(userId)).length : 0;
         setUnreadCount(unread);
+      }).catch(() => {});
+
+      api.get("admin/presence").then(res => {
+        if (res.data) setPresence(res.data);
       }).catch(() => {});
     });
   }, [location.pathname]);
