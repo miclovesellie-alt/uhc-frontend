@@ -27,6 +27,8 @@ export default function FYP({ refresh }) {
   const [loading, setLoading] = useState(true);
   const [likedPosts, setLikedPosts] = useState({});
   const [commentInputs, setCommentInputs] = useState({});
+  const [replyInputs, setReplyInputs] = useState({});
+  const [replyingTo, setReplyingTo] = useState(null);
   const [selectedArticle, setSelectedArticle] = useState(null);
 
   const awardPoints = async (amount, reason) => {
@@ -110,25 +112,35 @@ export default function FYP({ refresh }) {
     }
   };
 
-  const handleComment = async (id) => {
-    const text = (commentInputs[id] || "").trim();
+  const handleComment = async (id, commentId = null) => {
+    const text = commentId ? (replyInputs[commentId] || "").trim() : (commentInputs[id] || "").trim();
     if (!text) return;
     
     if (String(id).startsWith("news-")) {
       awardPoints(1, "Comment");
-      setCommentInputs(prev => ({ ...prev, [id]: "" }));
+      if (commentId) {
+        setReplyInputs(prev => ({ ...prev, [commentId]: "" }));
+        setReplyingTo(null);
+      } else {
+        setCommentInputs(prev => ({ ...prev, [id]: "" }));
+      }
       alert("Comment posted! +1 point");
       return;
     }
 
     try {
-      const res = await api.post(`admin/feed/${id}/comment`, { text });
+      const res = await api.post(`admin/feed/${id}/comment`, { text, commentId });
       setPosts(prev => prev.map(p => p._id === id ? { ...p, comments: res.data } : p));
       awardPoints(1, "Comment");
-      setCommentInputs(prev => ({ ...prev, [id]: "" }));
+      if (commentId) {
+        setReplyInputs(prev => ({ ...prev, [commentId]: "" }));
+        setReplyingTo(null);
+      } else {
+        setCommentInputs(prev => ({ ...prev, [id]: "" }));
+      }
     } catch (err) {
       console.error("Failed to post comment");
-      alert("Failed to post comment");
+      alert(err.response?.data?.message || "Failed to post comment");
     }
   };
 
@@ -278,14 +290,59 @@ export default function FYP({ refresh }) {
               {post.comments && post.comments.length > 0 && (
                 <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
                   {post.comments.slice(0, 3).map((c, i) => (
-                    <div key={i} style={{ display: 'flex', gap: 10 }}>
-                      <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-heading)', flexShrink: 0 }}>
-                        {c.name?.[0] || "A"}
+                    <div key={c._id || i} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <div style={{ display: 'flex', gap: 10 }}>
+                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-heading)', flexShrink: 0 }}>
+                          {c.name?.[0] || "A"}
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ background: 'white', padding: '10px 14px', borderRadius: '0 16px 16px 16px', border: '1px solid var(--border)', fontSize: '0.85rem' }}>
+                            <div style={{ fontWeight: 700, color: 'var(--text-heading)', marginBottom: 4 }}>{c.name}</div>
+                            <div style={{ color: 'var(--text-body)', lineHeight: 1.5 }}>{c.text}</div>
+                          </div>
+                          <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginTop: 4, marginLeft: 8, cursor: 'pointer', display: 'inline-block' }} onClick={() => setReplyingTo(replyingTo === c._id ? null : c._id)}>
+                            Reply
+                          </div>
+                        </div>
                       </div>
-                      <div style={{ background: 'white', padding: '10px 14px', borderRadius: '0 16px 16px 16px', border: '1px solid var(--border)', fontSize: '0.85rem', flex: 1 }}>
-                        <div style={{ fontWeight: 700, color: 'var(--text-heading)', marginBottom: 4 }}>{c.name}</div>
-                        <div style={{ color: 'var(--text-body)', lineHeight: 1.5 }}>{c.text}</div>
-                      </div>
+
+                      {/* Replies */}
+                      {c.replies && c.replies.length > 0 && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginLeft: 42, marginTop: 4 }}>
+                          {c.replies.map((r, ri) => (
+                            <div key={ri} style={{ display: 'flex', gap: 8 }}>
+                              <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-heading)', flexShrink: 0 }}>
+                                {r.name?.[0] || "A"}
+                              </div>
+                              <div style={{ background: 'var(--bg-input)', padding: '8px 12px', borderRadius: '0 12px 12px 12px', fontSize: '0.8rem', flex: 1 }}>
+                                <div style={{ fontWeight: 700, color: 'var(--text-heading)', marginBottom: 2 }}>{r.name}</div>
+                                <div style={{ color: 'var(--text-body)', lineHeight: 1.4 }}>{r.text}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Reply Input */}
+                      {replyingTo === c._id && (
+                        <div style={{ display: 'flex', gap: 8, marginLeft: 42, marginTop: 4 }}>
+                           <input 
+                              type="text" 
+                              placeholder="Write a reply..." 
+                              value={replyInputs[c._id] || ""}
+                              onChange={e => setReplyInputs(prev => ({ ...prev, [c._id]: e.target.value }))}
+                              onKeyDown={e => e.key === 'Enter' && handleComment(post._id, c._id)}
+                              style={{ flex: 1, border: '1px solid var(--border)', borderRadius: '20px', padding: '6px 12px', fontSize: '0.8rem', outline: 'none' }}
+                              autoFocus
+                            />
+                            <button 
+                              onClick={() => handleComment(post._id, c._id)}
+                              style={{ background: 'var(--accent)', border: 'none', color: 'white', fontWeight: 600, fontSize: '0.75rem', cursor: 'pointer', padding: '4px 10px', borderRadius: '16px' }}
+                            >
+                              Post
+                            </button>
+                        </div>
+                      )}
                     </div>
                   ))}
                   {post.comments.length > 3 && (

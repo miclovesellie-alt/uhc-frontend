@@ -129,6 +129,7 @@ export default function AdminFeed() {
             <tr>
               <th>Post Content</th>
               <th>Category</th>
+              <th>Engagement</th>
               <th>Created On</th>
               <th>Actions</th>
             </tr>
@@ -151,6 +152,12 @@ export default function AdminFeed() {
                     </div>
                   </td>
                   <td><span className="admin-badge blue">{item.category}</span></td>
+                  <td>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <span className="admin-badge" style={{ background: '#fff1f2', color: '#e11d48' }} title="Likes">❤️ {item.likes || 0}</span>
+                      <span className="admin-badge" style={{ background: '#f0fdf4', color: '#16a34a' }} title="Comments">💬 {item.comments ? item.comments.length + item.comments.reduce((acc, c) => acc + (c.replies ? c.replies.length : 0), 0) : 0}</span>
+                    </div>
+                  </td>
                   <td>{new Date(item.createdAt).toLocaleDateString()}</td>
                   <td>
                     <div className="table-actions" style={{ display: 'flex', gap: '8px' }}>
