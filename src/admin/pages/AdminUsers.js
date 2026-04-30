@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import api from "../../api/api";
 import { Search, Shield, Ban, Key, Trash2, RefreshCw, Eye, EyeOff } from "lucide-react";
+import { UserContext } from "../../context/UserContext";
 
 const logAction = (action) => {
   const logs = JSON.parse(localStorage.getItem("adminLogs") || "[]");
@@ -9,6 +10,7 @@ const logAction = (action) => {
 };
 
 export default function AdminUsers() {
+  const { user: currentUser } = useContext(UserContext);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -44,7 +46,9 @@ export default function AdminUsers() {
       setSelectedUser(null);
       setConfirmAction(null);
       fetchUsers();
-    } catch (err) { showToast("Action failed", "error"); }
+    } catch (err) { 
+      showToast(err.response?.data?.message || "Action failed", "error"); 
+    }
   };
 
   const deleteUser = async () => {
@@ -55,7 +59,9 @@ export default function AdminUsers() {
       setSelectedUser(null);
       setConfirmAction(null);
       fetchUsers();
-    } catch (err) { showToast("Delete failed", "error"); }
+    } catch (err) { 
+      showToast(err.response?.data?.message || "Delete failed", "error"); 
+    }
   };
 
   const doResetPassword = async () => {
@@ -69,10 +75,19 @@ export default function AdminUsers() {
       setResetPasswordModal(false);
       setNewPassword("");
       setSelectedUser(null);
-    } catch (err) { showToast("Reset failed", "error"); }
+    } catch (err) { 
+      showToast(err.response?.data?.message || "Reset failed", "error"); 
+    }
   };
 
   const filteredUsers = users
+    .filter(u => {
+      // Hide admins and superadmins if current user is not a superadmin
+      if (currentUser?.role !== "superadmin" && (u.role === "admin" || u.role === "superadmin")) {
+        return false;
+      }
+      return true;
+    })
     .filter(u => {
       if (filter === "admins")  return u.role === "admin";
       if (filter === "banned")  return u.status === "banned";

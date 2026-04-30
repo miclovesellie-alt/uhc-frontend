@@ -164,8 +164,8 @@ export default function AdminLibrary() {
                   </td>
                   <td className="desktop-only">{new Date(book.createdAt).toLocaleDateString()}</td>
                   <td>
-                    <div className="table-actions">
-                      <button className="action-btn delete" onClick={() => handleDelete(book._id)}>
+                    <div className="table-actions" style={{ display: 'flex', gap: '8px' }}>
+                      <button className="admin-btn danger sm" onClick={() => handleDelete(book._id)} title="Delete Resource">
                         <Trash2 size={16} />
                       </button>
                     </div>

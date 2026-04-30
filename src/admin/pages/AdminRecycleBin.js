@@ -114,11 +114,11 @@ export default function AdminRecycleBin() {
                       </span>
                     </td>
                     <td>
-                      <div className="table-actions">
-                        <button className="action-btn" title="Restore" onClick={() => handleRestore(item._id)}>
+                      <div className="table-actions" style={{ display: 'flex', gap: '8px' }}>
+                        <button className="admin-btn secondary sm" title="Restore" onClick={() => handleRestore(item._id)}>
                           <RotateCcw size={16} />
                         </button>
-                        <button className="action-btn delete" title="Delete Permanently" onClick={() => handlePermanentDelete(item._id)}>
+                        <button className="admin-btn danger sm" title="Delete Permanently" onClick={() => handlePermanentDelete(item._id)}>
                           <Trash2 size={16} />
                         </button>
                       </div>
