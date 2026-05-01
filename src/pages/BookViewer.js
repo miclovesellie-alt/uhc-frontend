@@ -59,31 +59,6 @@ export default function BookViewer() {
   if (loading) return <div className="viewer-loading">Opening your book...</div>;
   if (!book) return <div className="viewer-error">Book not found. <button onClick={() => navigate("/library")}>Back to Library</button></div>;
 
-  return (
-    <div className="book-viewer-page">
-      <div className="viewer-header">
-        <div className="viewer-header-left">
-          <button className="viewer-back-btn" onClick={() => navigate("/library")}>
-            <ArrowLeft size={20} />
-          </button>
-          <div className="viewer-title-info">
-            <h1>{book.title}</h1>
-            <span>{book.course} • By {book.author || "Unknown Author"}</span>
-          </div>
-        </div>
-        <div className="viewer-header-right">
-          {book.isDownloadable && (
-            <button className="viewer-action-btn" onClick={() => window.open(getFileUrl(book.fileUrl), "_blank")}>
-              <Download size={18} /> Download
-            </button>
-          )}
-          {book?.fileUrl?.toLowerCase().split('?')[0].endsWith(".pdf") && (
-            <button className="viewer-action-btn" onClick={toggleFullscreen}>
-              {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
-            </button>
-          )}
-        </div>
-      </div>
 
   const getViewerContent = () => {
     const url = getFileUrl(book.fileUrl);
