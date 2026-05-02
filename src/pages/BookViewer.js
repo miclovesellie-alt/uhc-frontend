@@ -62,53 +62,55 @@ export default function BookViewer() {
 
   const getViewerContent = () => {
     const url = getFileUrl(book.fileUrl);
-    const cleanUrl = url.split('?')[0].toLowerCase();
     const isLocal = url.includes("localhost") || url.includes("127.0.0.1");
-    const isCloudinary = url.includes("cloudinary.com");
-
-    // Extract extension — check the URL itself, then fall back to the stored fileUrl path
+    
+    // Improved Extension Detection
     const getExt = (u) => {
-      const match = u.split('?')[0].match(/\.([a-z0-9]{2,5})$/i);
-      return match ? match[1].toLowerCase() : null;
+      if (!u) return null;
+      // Remove query params
+      const cleanPath = u.split('?')[0];
+      // Get everything after the last dot
+      const extMatch = cleanPath.match(/\.([a-z0-9]+)$/i);
+      return extMatch ? extMatch[1].toLowerCase() : null;
     };
-    const ext = getExt(cleanUrl) || getExt(book.fileUrl || "") || (isCloudinary ? "pdf" : null);
+
+    const ext = getExt(url) || getExt(book.fileUrl) || "pdf";
 
     // 1. PDF Handling
     if (ext === "pdf") {
-      // Use native viewer for desktop or local environments to prevent "No preview available"
+      // DESKTOP: Use direct iframe
       if (!isMobile || isLocal) {
         return (
-          <iframe 
-            id="pdf-viewer-frame"
-            src={`${url}#toolbar=0`} 
-            title={book.title}
-            className="pdf-iframe"
-            sandbox="allow-scripts allow-same-origin allow-popups"
-          />
-        );
-      }
-      // For mobile production, use Google Viewer with a fallback option
-      return (
-        <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-          {!viewerError ? (
+          <div style={{ width: '100%', height: '100%', position: 'relative' }}>
             <iframe 
               id="pdf-viewer-frame"
-              src={`https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`} 
+              src={`${url}#toolbar=0`} 
               title={book.title}
               className="pdf-iframe"
-              sandbox="allow-scripts allow-same-origin allow-popups"
-              onError={() => setViewerError(true)}
             />
-          ) : (
-            <div className="unsupported-viewer">
-              <BookOpen size={64} />
-              <h2>Preview Unavailable</h2>
-              <p>The document could not be previewed automatically on this device.</p>
-              <button className="viewer-action-btn primary" onClick={() => window.open(url, "_blank")}>
-                Open PDF Directly ↗
-              </button>
+            <div className="viewer-mobile-fallback" style={{ position: 'absolute', bottom: 20, right: 20, zIndex: 10 }}>
+               <button className="viewer-action-btn primary" onClick={() => window.open(url, "_blank")}>
+                 Open in New Tab ↗
+               </button>
             </div>
-          )}
+          </div>
+        );
+      }
+      
+      // MOBILE: Splash screen for better reliability
+      return (
+        <div className="unsupported-viewer">
+          <div className="viewer-splash-icon">
+             <BookOpen size={80} color="var(--accent)" />
+          </div>
+          <h2>Document Ready</h2>
+          <p>This PDF is ready for viewing. Tap below to open it in your device's native reader for the best experience.</p>
+          <button className="viewer-action-btn primary large" style={{ padding: '16px 32px', fontSize: '1.1rem' }} onClick={() => window.open(url, "_blank")}>
+            Start Reading 📖
+          </button>
+          <p style={{ marginTop: 20, fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            Cloud-optimized reader powered by UHC
+          </p>
         </div>
       );
     } 
@@ -120,23 +122,27 @@ export default function BookViewer() {
           <div className="unsupported-viewer">
             <BookOpen size={64} />
             <h2>Local Development</h2>
-            <p>Office documents cannot be previewed in a local environment. Please download to view.</p>
-            {book.isDownloadable && (
-              <button className="viewer-action-btn primary" onClick={() => window.open(url, "_blank")}>
-                Download Document ↗
-              </button>
-            )}
+            <p>Office documents cannot be previewed locally. Please download to view.</p>
+            <button className="viewer-action-btn primary" onClick={() => window.open(url, "_blank")}>
+              Download Document ↗
+            </button>
           </div>
         );
       }
       return (
-        <iframe 
-          id="office-viewer-frame"
-          src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`} 
-          title={book.title}
-          className="pdf-iframe"
-          sandbox="allow-scripts allow-same-origin allow-popups"
-        />
+        <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+          <iframe 
+            id="office-viewer-frame"
+            src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`} 
+            title={book.title}
+            className="pdf-iframe"
+          />
+          <div className="viewer-mobile-fallback" style={{ position: 'absolute', bottom: 20, right: 20, zIndex: 10 }}>
+             <button className="viewer-action-btn primary" onClick={() => window.open(url, "_blank")}>
+               View Direct ↗
+             </button>
+          </div>
+        </div>
       );
     }
     
@@ -155,19 +161,15 @@ export default function BookViewer() {
       );
     }
 
-    // 4. Unsupported Formats
+    // 4. Default Fallback
     return (
       <div className="unsupported-viewer">
         <BookOpen size={64} />
-        <h2>Digital Reader</h2>
-        <p>This document is in a format that requires a specialized viewer. You can download it to read it on your device.</p>
-        {book.isDownloadable ? (
-          <button className="viewer-action-btn primary" onClick={() => window.open(url, "_blank")}>
-            Download & Read ↗
-          </button>
-        ) : (
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Contact admin for access to this non-downloadable resource.</p>
-        )}
+        <h2>Document Reader</h2>
+        <p>This file format is supported for download. Click below to view the resource.</p>
+        <button className="viewer-action-btn primary" onClick={() => window.open(url, "_blank")}>
+          Open Resource ↗
+        </button>
       </div>
     );
   };
@@ -185,14 +187,16 @@ export default function BookViewer() {
           </div>
         </div>
         <div className="viewer-header-right">
-          {book.isDownloadable && (
-            <button className="viewer-action-btn" onClick={() => window.open(getFileUrl(book.fileUrl), "_blank")}>
-              <Download size={18} /> Download
-            </button>
-          )}
-          {book?.fileUrl?.toLowerCase().split('?')[0].endsWith(".pdf") && (
+          <button className="viewer-action-btn primary" onClick={() => window.open(getFileUrl(book.fileUrl), "_blank")}>
+            <Download size={18} /> Open Direct
+          </button>
+          {isFullscreen ? (
             <button className="viewer-action-btn" onClick={toggleFullscreen}>
-              {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+               <Minimize2 size={18} />
+            </button>
+          ) : (
+            <button className="viewer-action-btn" onClick={toggleFullscreen}>
+               <Maximize2 size={18} />
             </button>
           )}
         </div>
