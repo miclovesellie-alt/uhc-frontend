@@ -32,6 +32,45 @@ export default function DuplicateQuestions() {
     }
   };
 
+  const resolveGroup = async (group) => {
+    if (group.docs.length <= 1) return;
+    if (!window.confirm("This will keep the first question and delete the rest in this group. Proceed?")) return;
+    
+    setLoading(true);
+    try {
+      // Skip the first document (index 0), delete the rest
+      const docsToDelete = group.docs.slice(1);
+      for (const doc of docsToDelete) {
+        await api.delete(`/admin/questions/${doc._id}`);
+      }
+      fetchDuplicates();
+    } catch (err) {
+      alert("Failed to resolve group duplicates");
+      setLoading(false);
+    }
+  };
+
+  const resolveAllGroups = async () => {
+    if (duplicates.length === 0) return;
+    if (!window.confirm(`This will automatically keep the first question and delete all duplicates across ALL ${duplicates.length} groups. Proceed?`)) return;
+    
+    setLoading(true);
+    try {
+      for (const group of duplicates) {
+        if (group.docs.length > 1) {
+          const docsToDelete = group.docs.slice(1);
+          for (const doc of docsToDelete) {
+            await api.delete(`/admin/questions/${doc._id}`);
+          }
+        }
+      }
+      fetchDuplicates();
+    } catch (err) {
+      alert("Failed to resolve all duplicates");
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="admin-page">
       <div className="admin-section-header">
@@ -39,9 +78,16 @@ export default function DuplicateQuestions() {
           <h1 className="admin-title">Duplicate Question Finder</h1>
           <p className="admin-subtitle">Find and remove identical questions across your database</p>
         </div>
-        <button className="admin-btn secondary" onClick={fetchDuplicates}>
-          <RefreshCw size={18} /> Refresh List
-        </button>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button className="admin-btn secondary" onClick={fetchDuplicates}>
+            <RefreshCw size={18} /> Refresh List
+          </button>
+          {duplicates.length > 0 && (
+            <button className="admin-btn primary" onClick={resolveAllGroups}>
+              <Trash2 size={18} /> Resolve All Duplicates
+            </button>
+          )}
+        </div>
       </div>
 
       {duplicates.length > 0 && (
@@ -63,7 +109,12 @@ export default function DuplicateQuestions() {
                 <div style={{ fontWeight: 700, color: 'var(--admin-text)' }}>
                   Question Text: "{group._id}"
                 </div>
-                <span className="admin-badge red">{group.count} occurrences</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span className="admin-badge red">{group.count} occurrences</span>
+                  <button className="admin-btn secondary sm" onClick={() => resolveGroup(group)}>
+                    Keep 1, Delete Rest
+                  </button>
+                </div>
               </div>
               <div className="group-docs" style={{ padding: 20 }}>
                 {group.docs.map(doc => (

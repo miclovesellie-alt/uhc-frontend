@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom";
 import {
   BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -39,6 +39,7 @@ const LiveDot = () => (
 );
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const { presence } = useOutletContext() || {};
   const [stats, setStats]             = useState({ totalUsers:0, totalQuestions:0, totalCourses:0, activeUsers:0, liveUsers:0 });
   const [recentUsers, setRecentUsers] = useState([]);
@@ -93,10 +94,10 @@ export default function AdminDashboard() {
   }, []);
 
   const kpi = [
-    { label:"Online Now",        value:presence?.onlineIds?.length || 0,      icon:<Zap size={18}/>,      color:"green",  trend:"Live"           },
-    { label:"Total Users",       value:stats.totalUsers,     icon:<Users size={18}/>,    color:"blue",   trend:"+12% this week" },
-    { label:"Total Questions",   value:stats.totalQuestions, icon:<BookOpen size={18}/>, color:"purple", trend:"+5% this week"  },
-    { label:"Recently Active",   value:presence?.recentIds?.length || 0,    icon:<Activity size={18}/>, color:"orange", trend:"Last 3 mins"         },
+    { label:"Online Now",        value:presence?.onlineIds?.length || 0,      icon:<Zap size={18}/>,      color:"green",  trend:"Live",           path:"/admin/users" },
+    { label:"Total Users",       value:stats.totalUsers,     icon:<Users size={18}/>,    color:"blue",   trend:"+12% this week", path:"/admin/users" },
+    { label:"Total Questions",   value:stats.totalQuestions, icon:<BookOpen size={18}/>, color:"purple", trend:"+5% this week",  path:"/admin/questions" },
+    { label:"Recently Active",   value:presence?.recentIds?.length || 0,    icon:<Activity size={18}/>, color:"orange", trend:"Last 3 mins",        path:"/admin/users" },
   ];
 
   const chartData = [
@@ -133,7 +134,12 @@ export default function AdminDashboard() {
       {/* ── KPI Cards ── */}
       <div className="admin-stats-grid">
         {kpi.map((k,i) => (
-          <div className="admin-stat-card" key={i}>
+          <div 
+            className="admin-stat-card" 
+            key={i} 
+            onClick={() => k.path && navigate(k.path)}
+            style={{ cursor: k.path ? "pointer" : "default" }}
+          >
             <div className={`admin-stat-icon ${k.color}`}>{k.icon}</div>
             <div className="admin-stat-value">{k.value.toLocaleString()}</div>
             <div className="admin-stat-label">{k.label}</div>

@@ -59,6 +59,18 @@ export default function AdminSettings() {
   const [quizTimer, setQuizTimer] = useState(true);
   const [registrationOpen, setRegistrationOpen] = useState(true);
   const [toast, setToast] = useState(null);
+  
+  // Contact & Social Links
+  const [contactInfo, setContactInfo] = useState({
+    email: "",
+    phone: "",
+    whatsapp: "",
+    facebook: "",
+    tiktok: "",
+    instagram: "",
+    twitter: "",
+    youtube: ""
+  });
 
   // Load settings from backend
   useEffect(() => {
@@ -75,6 +87,12 @@ export default function AdminSettings() {
 
         const { data: ro } = await api.get("settings/registrationOpen");
         if (ro.value !== null) setRegistrationOpen(ro.value);
+
+        const { data: ci } = await api.get("settings/contactInfo");
+        if (ci && ci.value) {
+          // Merge with default empty fields to ensure controlled inputs
+          setContactInfo(prev => ({ ...prev, ...ci.value }));
+        }
       } catch (err) {
         console.error("Error fetching settings:", err);
       }
@@ -119,6 +137,20 @@ export default function AdminSettings() {
     } catch (err) {
       showToast("Failed to save system settings", "error");
     }
+  };
+
+  const saveContactInfo = async () => {
+    try {
+      await api.post("settings", { key: "contactInfo", value: contactInfo });
+      logAction("Updated contact & social links");
+      showToast("Contact information saved");
+    } catch (err) {
+      showToast("Failed to save contact info", "error");
+    }
+  };
+
+  const handleContactChange = (field, val) => {
+    setContactInfo(prev => ({ ...prev, [field]: val }));
   };
 
   return (
@@ -250,6 +282,46 @@ export default function AdminSettings() {
         <Toggle checked={smsNotif} onChange={setSmsNotif} icon="📱" label="SMS Notifications" desc="Receive critical alerts via SMS" />
         <button className="admin-btn primary" style={{ marginTop: 8 }} onClick={() => { showToast("Notification settings saved"); logAction("Updated notification settings"); }}>
           <Save size={14} /> Save Notifications
+        </button>
+      </Section>
+
+      <Section icon="🌐" title="Contact & Social Links">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div>
+            <label style={{ fontSize: ".78rem", color: "var(--admin-muted)", fontWeight: 600, display: "block", marginBottom: 6 }}>SUPPORT EMAIL</label>
+            <input className="admin-input" style={{ width: "100%", boxSizing: "border-box" }} placeholder="support@universalhealth.com" value={contactInfo.email} onChange={e => handleContactChange("email", e.target.value)} />
+          </div>
+          <div>
+            <label style={{ fontSize: ".78rem", color: "var(--admin-muted)", fontWeight: 600, display: "block", marginBottom: 6 }}>PHONE NUMBER</label>
+            <input className="admin-input" style={{ width: "100%", boxSizing: "border-box" }} placeholder="+1 234 567 8900" value={contactInfo.phone} onChange={e => handleContactChange("phone", e.target.value)} />
+          </div>
+          <div>
+            <label style={{ fontSize: ".78rem", color: "var(--admin-muted)", fontWeight: 600, display: "block", marginBottom: 6 }}>WHATSAPP NUMBER</label>
+            <input className="admin-input" style={{ width: "100%", boxSizing: "border-box" }} placeholder="+1 234 567 8900" value={contactInfo.whatsapp} onChange={e => handleContactChange("whatsapp", e.target.value)} />
+          </div>
+          <div>
+            <label style={{ fontSize: ".78rem", color: "var(--admin-muted)", fontWeight: 600, display: "block", marginBottom: 6 }}>FACEBOOK LINK</label>
+            <input className="admin-input" style={{ width: "100%", boxSizing: "border-box" }} placeholder="https://facebook.com/..." value={contactInfo.facebook} onChange={e => handleContactChange("facebook", e.target.value)} />
+          </div>
+          <div>
+            <label style={{ fontSize: ".78rem", color: "var(--admin-muted)", fontWeight: 600, display: "block", marginBottom: 6 }}>TIKTOK LINK</label>
+            <input className="admin-input" style={{ width: "100%", boxSizing: "border-box" }} placeholder="https://tiktok.com/@..." value={contactInfo.tiktok} onChange={e => handleContactChange("tiktok", e.target.value)} />
+          </div>
+          <div>
+            <label style={{ fontSize: ".78rem", color: "var(--admin-muted)", fontWeight: 600, display: "block", marginBottom: 6 }}>INSTAGRAM LINK</label>
+            <input className="admin-input" style={{ width: "100%", boxSizing: "border-box" }} placeholder="https://instagram.com/..." value={contactInfo.instagram} onChange={e => handleContactChange("instagram", e.target.value)} />
+          </div>
+          <div>
+            <label style={{ fontSize: ".78rem", color: "var(--admin-muted)", fontWeight: 600, display: "block", marginBottom: 6 }}>TWITTER (X) LINK</label>
+            <input className="admin-input" style={{ width: "100%", boxSizing: "border-box" }} placeholder="https://twitter.com/..." value={contactInfo.twitter} onChange={e => handleContactChange("twitter", e.target.value)} />
+          </div>
+          <div>
+            <label style={{ fontSize: ".78rem", color: "var(--admin-muted)", fontWeight: 600, display: "block", marginBottom: 6 }}>YOUTUBE LINK</label>
+            <input className="admin-input" style={{ width: "100%", boxSizing: "border-box" }} placeholder="https://youtube.com/..." value={contactInfo.youtube} onChange={e => handleContactChange("youtube", e.target.value)} />
+          </div>
+        </div>
+        <button className="admin-btn primary" style={{ marginTop: 16 }} onClick={saveContactInfo}>
+          <Save size={14} /> Save Contact Info
         </button>
       </Section>
 
