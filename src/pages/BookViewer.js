@@ -64,9 +64,17 @@ export default function BookViewer() {
     const url = getFileUrl(book.fileUrl);
     const cleanUrl = url.split('?')[0].toLowerCase();
     const isLocal = url.includes("localhost") || url.includes("127.0.0.1");
+    const isCloudinary = url.includes("cloudinary.com");
+
+    // Extract extension — check the URL itself, then fall back to the stored fileUrl path
+    const getExt = (u) => {
+      const match = u.split('?')[0].match(/\.([a-z0-9]{2,5})$/i);
+      return match ? match[1].toLowerCase() : null;
+    };
+    const ext = getExt(cleanUrl) || getExt(book.fileUrl || "") || (isCloudinary ? "pdf" : null);
 
     // 1. PDF Handling
-    if (cleanUrl.endsWith(".pdf")) {
+    if (ext === "pdf") {
       // Use native viewer for desktop or local environments to prevent "No preview available"
       if (!isMobile || isLocal) {
         return (
@@ -106,7 +114,7 @@ export default function BookViewer() {
     } 
     
     // 2. Office Documents Handling (PPT, DOC, XLS)
-    else if (cleanUrl.match(/\.(ppt|pptx|doc|docx|xls|xlsx)$/)) {
+    else if (["ppt", "pptx", "doc", "docx", "xls", "xlsx"].includes(ext)) {
       if (isLocal) {
         return (
           <div className="unsupported-viewer">
@@ -133,13 +141,13 @@ export default function BookViewer() {
     }
     
     // 3. Media/Images Handling
-    else if (cleanUrl.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
+    else if (["jpg", "jpeg", "png", "gif", "webp"].includes(ext)) {
       return (
         <div className="media-viewer">
           <img src={url} alt={book.title} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
         </div>
       );
-    } else if (cleanUrl.match(/\.(mp4|webm|ogg)$/)) {
+    } else if (["mp4", "webm", "ogg"].includes(ext)) {
       return (
         <div className="media-viewer" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
           <video src={url} controls style={{ maxWidth: '100%', maxHeight: '100%' }} />
