@@ -8,6 +8,7 @@ export default function AdminRecycleBin() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEmptyModal, setShowEmptyModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
 
   useEffect(() => {
@@ -30,7 +31,17 @@ export default function AdminRecycleBin() {
       await api.post(`admin/recycle-bin/restore/${id}`);
       fetchBin();
     } catch (err) {
-      alert("Restore failed");
+      alert("Restore failed: " + (err.response?.data?.error || err.response?.data?.message || err.message));
+    }
+  };
+
+  const handleEmptyBin = async () => {
+    try {
+      await api.delete("admin/recycle-bin/empty");
+      setShowEmptyModal(false);
+      fetchBin();
+    } catch (err) {
+      alert("Failed to empty recycle bin");
     }
   };
 
@@ -63,8 +74,13 @@ export default function AdminRecycleBin() {
           <h1 className="admin-title">Recycle Bin</h1>
           <p className="admin-subtitle">Deleted items are kept here for 7 days</p>
         </div>
-        <div className="admin-badge orange" style={{ fontSize: '0.8rem', padding: '8px 12px' }}>
-          <AlertTriangle size={14} /> Auto-purge enabled
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <div className="admin-badge orange" style={{ fontSize: '0.8rem', padding: '8px 12px' }}>
+            <AlertTriangle size={14} /> Auto-purge enabled
+          </div>
+          <button className="admin-btn danger" onClick={() => setShowEmptyModal(true)} disabled={items.length === 0}>
+            <Trash2 size={16} /> Empty Bin
+          </button>
         </div>
       </div>
 
@@ -172,6 +188,54 @@ export default function AdminRecycleBin() {
                   onClick={confirmPermanentDelete}
                 >
                   Confirm Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showEmptyModal && (
+        <div className="modal-overlay" onClick={() => setShowEmptyModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+              <div style={{ 
+                width: 56, 
+                height: 56, 
+                borderRadius: '50%', 
+                background: '#fef2f2', 
+                color: '#ef4444', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                marginBottom: 20
+              }}>
+                <Trash2 size={28} />
+              </div>
+              
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--admin-text)', marginBottom: 8 }}>
+                Empty Recycle Bin?
+              </h3>
+              
+              <p style={{ color: 'var(--admin-muted)', fontSize: '0.9rem', lineHeight: 1.5, marginBottom: 28 }}>
+                This will <strong style={{ color: '#ef4444' }}>permanently delete</strong> all items currently in the recycle bin. 
+                This action cannot be undone.
+              </p>
+              
+              <div style={{ display: 'flex', gap: 12, width: '100%' }}>
+                <button 
+                  className="admin-btn secondary" 
+                  style={{ flex: 1, padding: '12px', fontSize: '0.9rem' }}
+                  onClick={() => setShowEmptyModal(false)}
+                >
+                  Cancel
+                </button>
+                <button 
+                  className="admin-btn danger" 
+                  style={{ flex: 1, padding: '12px', fontSize: '0.9rem', border: 'none' }}
+                  onClick={handleEmptyBin}
+                >
+                  Empty Bin
                 </button>
               </div>
             </div>
