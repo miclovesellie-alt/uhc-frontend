@@ -113,12 +113,22 @@ export default function QuizPage() {
     const blockCtx = (e) => e.preventDefault();
     const onBlur = () => setBlurred(true);
     const onFocus = () => setBlurred(false);
+    
+    // Attempt to clear clipboard on PrintScreen keyup
+    const handleKeyUp = (e) => {
+      if (e.key === "PrintScreen") {
+        navigator.clipboard.writeText("");
+      }
+    };
+
     document.addEventListener("keydown", blockKey);
+    document.addEventListener("keyup", handleKeyUp);
     document.addEventListener("contextmenu", blockCtx);
     window.addEventListener("blur", onBlur);
     window.addEventListener("focus", onFocus);
     return () => {
       document.removeEventListener("keydown", blockKey);
+      document.removeEventListener("keyup", handleKeyUp);
       document.removeEventListener("contextmenu", blockCtx);
       window.removeEventListener("blur", onBlur);
       window.removeEventListener("focus", onFocus);
@@ -254,7 +264,7 @@ export default function QuizPage() {
   const pct = questions.length ? Math.round((finalScore / questions.length) * 100) : 0;
 
   return (
-    <div className="quiz-page-wrap">
+    <div className={`quiz-page-wrap ${noSS && stage === "quiz" ? "no-screenshot-mode" : ""}`}>
       {/* Watermark */}
       {noSS && stage === "quiz" && (
         <div className="quiz-watermark-overlay">

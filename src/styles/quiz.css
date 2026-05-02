@@ -622,3 +622,22 @@
 .dark-theme .qnd.ok { background: rgba(34, 197, 94, 0.2); }
 .dark-theme .qnd.bad { background: rgba(239, 68, 68, 0.2); }
 .dark-theme .qnd.flag { background: rgba(245, 158, 11, 0.2); }
+
+/* ===== NO SCREENSHOT / COPY PROTECTION ===== */
+.no-screenshot-mode {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+.no-screenshot-mode img, .no-screenshot-mode svg {
+  pointer-events: none;
+}
+@media print {
+  .no-screenshot-mode {
+    display: none !important;
+  }
+  body {
+    display: none !important;
+  }
+}

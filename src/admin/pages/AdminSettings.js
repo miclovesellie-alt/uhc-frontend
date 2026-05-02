@@ -58,6 +58,9 @@ export default function AdminSettings() {
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [quizTimer, setQuizTimer] = useState(true);
   const [registrationOpen, setRegistrationOpen] = useState(true);
+  const [globalAnnouncement, setGlobalAnnouncement] = useState("");
+  const [allowGuestAccess, setAllowGuestAccess] = useState(false);
+  const [disableFeed, setDisableFeed] = useState(false);
   const [toast, setToast] = useState(null);
   
   // Contact & Social Links
@@ -87,6 +90,15 @@ export default function AdminSettings() {
 
         const { data: ro } = await api.get("settings/registrationOpen");
         if (ro.value !== null) setRegistrationOpen(ro.value);
+
+        const { data: ga } = await api.get("settings/globalAnnouncement");
+        if (ga && ga.value !== null) setGlobalAnnouncement(ga.value);
+
+        const { data: aga } = await api.get("settings/allowGuestAccess");
+        if (aga && aga.value !== null) setAllowGuestAccess(aga.value);
+
+        const { data: df } = await api.get("settings/disableFeed");
+        if (df && df.value !== null) setDisableFeed(df.value);
 
         const { data: ci } = await api.get("settings/contactInfo");
         if (ci && ci.value) {
@@ -132,6 +144,9 @@ export default function AdminSettings() {
     try {
       await api.post("settings", { key: "maintenanceMode", value: maintenanceMode });
       await api.post("settings", { key: "registrationOpen", value: registrationOpen });
+      await api.post("settings", { key: "allowGuestAccess", value: allowGuestAccess });
+      await api.post("settings", { key: "disableFeed", value: disableFeed });
+      await api.post("settings", { key: "globalAnnouncement", value: globalAnnouncement });
       logAction("Updated system settings");
       showToast("System settings saved");
     } catch (err) {
@@ -328,12 +343,27 @@ export default function AdminSettings() {
       <Section icon="🖥️" title="System Configuration">
         <Toggle checked={maintenanceMode} onChange={setMaintenanceMode} icon="🔧" label="Maintenance Mode" desc="Temporarily disable user access to the platform" />
         <Toggle checked={registrationOpen} onChange={setRegistrationOpen} icon="📝" label="Open Registration" desc="Allow new users to sign up" />
+        <Toggle checked={allowGuestAccess} onChange={setAllowGuestAccess} icon="👀" label="Allow Guest Access" desc="Allow unregistered users to view public resources" />
+        <Toggle checked={disableFeed} onChange={setDisableFeed} icon="🔇" label="Disable Social Feed" desc="Hide the community feed from all users temporarily" />
+        
+        <div style={{ marginTop: 16 }}>
+          <label style={{ fontSize: ".78rem", color: "var(--admin-muted)", fontWeight: 600, display: "block", marginBottom: 6 }}>GLOBAL ANNOUNCEMENT BANNER</label>
+          <input 
+            className="admin-input" 
+            style={{ width: "100%", boxSizing: "border-box" }} 
+            placeholder="e.g., Server maintenance scheduled for midnight..." 
+            value={globalAnnouncement} 
+            onChange={e => setGlobalAnnouncement(e.target.value)} 
+          />
+          <div style={{ fontSize: ".75rem", color: "var(--admin-muted)", marginTop: 4 }}>Displayed across the top of the platform if not empty.</div>
+        </div>
+
         {maintenanceMode && (
-          <div style={{ padding: "12px 16px", background: "rgba(239,68,68,0.1)", borderRadius: 10, border: "1px solid rgba(239,68,68,0.3)", fontSize: ".82rem", color: "#ef4444", marginTop: 8 }}>
+          <div style={{ padding: "12px 16px", background: "rgba(239,68,68,0.1)", borderRadius: 10, border: "1px solid rgba(239,68,68,0.3)", fontSize: ".82rem", color: "#ef4444", marginTop: 12 }}>
             ⚠️ <strong>Maintenance Mode is ON.</strong> Regular users cannot access the platform.
           </div>
         )}
-        <button className="admin-btn primary" style={{ marginTop: 12 }} onClick={saveSystem}>
+        <button className="admin-btn primary" style={{ marginTop: 16 }} onClick={saveSystem}>
           <Save size={14} /> Save System Settings
         </button>
       </Section>
