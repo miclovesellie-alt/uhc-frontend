@@ -20,9 +20,13 @@ function DocModal({ book, onClose }) {
 
   // For PPT/PPTX → Microsoft Office viewer
   const isOffice = ["ppt","pptx"].includes(ext);
+
+  // Desktop viewer sources:
+  // PDFs → our backend proxy (browser native renderer, most reliable)
+  // PPT → Microsoft Office viewer
   const viewerSrc = isOffice
     ? `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(rawUrl)}`
-    : proxied; // PDF via our backend proxy → browser's native PDF renderer
+    : proxied;
 
   const headerStyle = {
     display: "flex", alignItems: "center", gap: 10,
@@ -63,16 +67,28 @@ function DocModal({ book, onClose }) {
 
       {/* Viewer body */}
       {isMobile ? (
-        // Mobile: just link out — iframes unreliable on iOS
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "white", gap: 20, padding: 24, textAlign: "center" }}>
+        // Mobile: open proxy URL (sets proper Content-Type) → triggers native PDF reader
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "white", gap: 16, padding: 24, textAlign: "center" }}>
           <div style={{ fontSize: "3.5rem" }}>{isOffice ? "📊" : "📄"}</div>
-          <div>
-            <div style={{ fontWeight: 700, fontSize: "1.1rem", marginBottom: 8 }}>{book.title}</div>
-            <div style={{ opacity: .6, fontSize: ".85rem", marginBottom: 24 }}>Tap below to read this document</div>
-          </div>
-          <a href={rawUrl} target="_blank" rel="noreferrer"
-            style={{ padding: "15px 32px", borderRadius: 14, background: "#4255ff", color: "white", fontWeight: 800, textDecoration: "none", fontSize: "1rem", boxShadow: "0 8px 24px rgba(66,85,255,.4)" }}>
-            📖 Open Document
+          <div style={{ fontWeight: 700, fontSize: "1.05rem", marginBottom: 4 }}>{book.title}</div>
+          <div style={{ opacity: .55, fontSize: ".82rem", marginBottom: 8 }}>Choose how to open this document</div>
+
+          {/* Primary: proxy URL — correct Content-Type header triggers native reader */}
+          <a href={proxied} target="_blank" rel="noreferrer"
+            style={{ width: "100%", maxWidth: 280, padding: "15px 0", borderRadius: 14, background: "#4255ff", color: "white", fontWeight: 800, textDecoration: "none", fontSize: "1rem", boxShadow: "0 8px 24px rgba(66,85,255,.4)", display: "block" }}>
+            📖 Open in PDF Reader
+          </a>
+
+          {/* Fallback: Google Docs viewer (works on most mobile browsers) */}
+          <a href={`https://docs.google.com/viewer?url=${encodeURIComponent(rawUrl)}`} target="_blank" rel="noreferrer"
+            style={{ width: "100%", maxWidth: 280, padding: "12px 0", borderRadius: 14, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", color: "white", fontWeight: 600, textDecoration: "none", fontSize: ".9rem", display: "block" }}>
+            🌐 Open in Google Docs Viewer
+          </a>
+
+          {/* Direct download */}
+          <a href={rawUrl} download target="_blank" rel="noreferrer"
+            style={{ opacity: .6, color: "rgba(255,255,255,.7)", fontSize: ".78rem", textDecoration: "underline" }}>
+            ⬇ Download file instead
           </a>
         </div>
       ) : (
