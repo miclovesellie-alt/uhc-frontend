@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useOutletContext } from "react-router-dom";
 import api from "../../api/api";
-import { Search, Shield, Ban, Key, Trash2, RefreshCw, Eye, EyeOff, Download, Activity } from "lucide-react";
+import { Search, Shield, Ban, Key, Trash2, RefreshCw, Eye, EyeOff, Download } from "lucide-react";
 import { UserContext } from "../../context/UserContext";
 
 const logAction = (action) => {
