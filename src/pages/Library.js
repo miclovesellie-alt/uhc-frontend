@@ -8,15 +8,20 @@ import {
 import { useToast } from "../components/Toast";
 import { toggleBookmark, getBookmarks } from "../utils/bookmarks";
 import { getFileUrl } from "../utils/config";
-import BASE_URL from "../utils/config";
 import "../styles/library.css";
+// Note: No BASE_URL needed — proxy is now a Vercel serverless function on same domain
 
 // ── Inline document viewer modal ────────────────────────────────
 function DocModal({ book, onClose }) {
   const rawUrl  = getFileUrl(book.fileUrl);
-  const proxied = `${BASE_URL}/api/submissions/proxy-pdf?url=${encodeURIComponent(rawUrl)}`;
+  // Use Vercel serverless function — same domain, always warm, no CORS, no cold starts
+  const proxied = `/api/proxy-pdf?url=${encodeURIComponent(rawUrl)}`;
   const ext     = (rawUrl.split("?")[0].match(/\.([a-z0-9]+)$/i)?.[1] || "pdf").toLowerCase();
   const isMobile = window.innerWidth <= 768;
+  const [iframeLoaded, setIframeLoaded] = useState(false);
+
+  // Detect if Cloudinary URL already has a clean extension (e.g. ends in .pdf)
+  // If not, the proxy forces the correct Content-Type header anyway
 
   // For PPT/PPTX → Microsoft Office viewer
   const isOffice = ["ppt","pptx"].includes(ext);
@@ -92,13 +97,24 @@ function DocModal({ book, onClose }) {
           </a>
         </div>
       ) : (
-        // Desktop: native browser iframe
-        <iframe
-          src={viewerSrc}
-          title={book.title}
-          style={{ flex: 1, border: "none", width: "100%", background: "#525659" }}
-          allow="fullscreen"
-        />
+        // Desktop: native browser iframe with loading overlay
+        <div style={{ flex: 1, position: "relative" }}>
+          {/* Loading spinner while iframe loads */}
+          {!iframeLoaded && (
+            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#1e293b", color: "white", gap: 16, zIndex: 2 }}>
+              <div style={{ width: 44, height: 44, border: "4px solid rgba(255,255,255,.15)", borderTopColor: "#4255ff", borderRadius: "50%", animation: "spin 0.9s linear infinite" }}/>
+              <div style={{ opacity: .7, fontSize: ".85rem" }}>Loading document…</div>
+              <a href={rawUrl} target="_blank" rel="noreferrer" style={{ opacity: .45, color: "rgba(255,255,255,.7)", fontSize: ".75rem", textDecoration: "underline", marginTop: 8 }}>Taking too long? Open directly ↗</a>
+            </div>
+          )}
+          <iframe
+            src={viewerSrc}
+            title={book.title}
+            onLoad={() => setIframeLoaded(true)}
+            style={{ width: "100%", height: "100%", border: "none", background: "#525659", display: "block" }}
+            allow="fullscreen"
+          />
+        </div>
       )}
     </div>
   );
@@ -132,18 +148,16 @@ export default function Library() {
   };
 
   useEffect(() => {
-    const fetchLibrary = async () => {
-      try {
-        const [booksRes, coursesRes] = await Promise.all([
-          api.get("library/books"),
-          api.get("library/courses"),
-        ]);
+    // Load books and courses
+    Promise.all([api.get("library/books"), api.get("library/courses")])
+      .then(([booksRes, coursesRes]) => {
         setBooks(booksRes.data);
         setCourses(coursesRes.data);
-      } catch (err) { console.error(err); }
-      finally { setLoading(false); }
-    };
-    fetchLibrary();
+      })
+      .catch(err => console.error("Library fetch failed", err))
+      .finally(() => setLoading(false));
+    // Warm up Vercel proxy function (lightweight ping)
+    fetch("/api/proxy-pdf?ping=1").catch(() => {});
   }, []);
 
   const getBookCount = (name) => books.filter(b => b.course === name).length;

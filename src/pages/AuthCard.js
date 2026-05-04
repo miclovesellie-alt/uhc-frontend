@@ -22,6 +22,7 @@ function AuthCard() {
   const [resetSubmitted, setResetSubmitted] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
 
+  const [showSplash, setShowSplash] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -30,6 +31,68 @@ function AuthCard() {
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const HealthSplash = () => {
+    const icons = ["🩺","📚","💊","🏥","🧬","📖","❤️","🔬","🩻","🎓"];
+    const [iconIdx, setIconIdx] = React.useState(0);
+    const [tipIdx, setTipIdx]   = React.useState(0);
+    const tips = [
+      "Preparing your health dashboard…",
+      "Loading study resources…",
+      "Syncing your progress…",
+      "Almost there — stay healthy! 💙",
+    ];
+    React.useEffect(() => {
+      const i = setInterval(() => setIconIdx(p => (p + 1) % icons.length), 400);
+      const t = setInterval(() => setTipIdx(p => (p + 1) % tips.length), 1200);
+      return () => { clearInterval(i); clearInterval(t); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    return (
+      <div style={{
+        position: "fixed", inset: 0, zIndex: 99999,
+        background: "linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%)",
+        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+        gap: 0,
+      }}>
+        {/* Animated rings */}
+        <div style={{ position: "relative", width: 120, height: 120, marginBottom: 28 }}>
+          <div style={{ position: "absolute", inset: 0, borderRadius: "50%", border: "3px solid rgba(66,85,255,0.2)", animation: "ring1 2s ease-in-out infinite" }}/>
+          <div style={{ position: "absolute", inset: 8, borderRadius: "50%", border: "3px solid rgba(66,85,255,0.35)", animation: "ring1 2s ease-in-out infinite 0.3s" }}/>
+          <div style={{ position: "absolute", inset: 16, borderRadius: "50%", border: "3px solid rgba(66,85,255,0.5)", animation: "ring1 2s ease-in-out infinite 0.6s" }}/>
+          {/* Center icon */}
+          <div style={{ position: "absolute", inset: 24, borderRadius: "50%", background: "rgba(66,85,255,0.15)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "2rem", transition: "all 0.3s" }}>
+            {icons[iconIdx]}
+          </div>
+        </div>
+
+        {/* Logo */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+          <div style={{ fontWeight: 900, fontSize: "2rem", letterSpacing: 3, background: "linear-gradient(135deg,#60a5fa,#a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            UHC
+          </div>
+        </div>
+        <div style={{ color: "rgba(255,255,255,0.35)", fontSize: ".75rem", letterSpacing: 2, textTransform: "uppercase", marginBottom: 36 }}>
+          Universal Health Campus
+        </div>
+
+        {/* Progress bar */}
+        <div style={{ width: 200, height: 3, background: "rgba(255,255,255,0.08)", borderRadius: 99, overflow: "hidden", marginBottom: 20 }}>
+          <div style={{ height: "100%", background: "linear-gradient(90deg,#4255ff,#a78bfa)", borderRadius: 99, animation: "progress 1.5s ease-out forwards" }}/>
+        </div>
+
+        {/* Tip text */}
+        <div style={{ color: "rgba(255,255,255,0.5)", fontSize: ".82rem", fontWeight: 500, transition: "opacity .4s", minHeight: 20 }}>
+          {tips[tipIdx]}
+        </div>
+
+        <style>{`
+          @keyframes ring1 { 0%,100%{transform:scale(1);opacity:.6} 50%{transform:scale(1.06);opacity:1} }
+          @keyframes progress { from{width:0} to{width:100%} }
+        `}</style>
+      </div>
+    );
+  };
 
   // ===== LOGIN =====
   const handleLogin = async (e) => {
@@ -49,17 +112,16 @@ function AuthCard() {
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("userId", user._id);
       setUser(user);
-      setSuccess("Login successful! Redirecting...");
-      if (user.role === "admin" || user.role === "superadmin") {
-        setTimeout(() => navigate("/admin"), 800);
-      } else {
-        setTimeout(() => navigate("/dashboard"), 800);
-      }
+      // Show health splash for 1.5s before redirecting
+      setShowSplash(true);
+      const dest = (user.role === "admin" || user.role === "superadmin") ? "/admin" : "/dashboard";
+      setTimeout(() => navigate(dest), 1500);
     } catch (err) {
       setIsLoading(false);
       setError(err.response?.data?.message || "Invalid credentials");
     }
   };
+
 
   // ===== SIGNUP =====
   const handleSignup = async (e) => {
@@ -131,8 +193,11 @@ function AuthCard() {
 
   return (
     <div className="auth-bg">
+      {/* ===== HEALTH SPLASH (post-login 1.5s screen) ===== */}
+      {showSplash && <HealthSplash />}
+
       {/* ===== LOADING OVERLAY ===== */}
-      {isLoading && (
+      {isLoading && !showSplash && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 9999,
           background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)',
