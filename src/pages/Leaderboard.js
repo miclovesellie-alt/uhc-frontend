@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../api/api";
-import { Trophy, Flame, Star } from "lucide-react";
+import { Flame, Star } from "lucide-react";
 
 const medal = ["🥇","🥈","🥉"];
 
