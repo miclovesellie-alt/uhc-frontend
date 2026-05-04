@@ -7,7 +7,7 @@ import "../styles/dashboard.css";
 
 import {
   Home, BookOpen, ClipboardList, User, LogOut,
-  Search, BarChart2, ChevronRight, X, Bell, PenSquare, Trophy, Settings
+  Search, BarChart2, ChevronRight, X, Bell, PenSquare, Trophy, Settings, Moon, Sun
 } from "lucide-react";
 
 function DashboardLayout() {
@@ -21,7 +21,14 @@ function DashboardLayout() {
   const [announcement, setAnnouncement] = useState("");
   const [announcementDismissed, setAnnouncementDismissed] = useState(false);
   const [showTour, setShowTour] = useState(!localStorage.getItem('uhc_tour_done'));
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('uhc_dark') === '1');
   const logoDropdownRef = useRef();
+
+  // Apply dark mode class to <body> on mount + toggle (matches body.dark-theme CSS)
+  useEffect(() => {
+    document.body.classList.toggle('dark-theme', darkMode);
+    localStorage.setItem('uhc_dark', darkMode ? '1' : '0');
+  }, [darkMode]);
 
   const isActive = (path) => location.pathname === path;
 
@@ -147,6 +154,22 @@ function DashboardLayout() {
             }}
           >
             <Settings size={18} />
+          </button>
+
+          {/* Dark mode toggle */}
+          <button
+            onClick={() => setDarkMode(d => !d)}
+            title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            style={{
+              width: 36, height: 36, borderRadius: "50%",
+              background: "var(--surface)",
+              border: "1.5px solid var(--border)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "var(--text-muted)", cursor: "pointer", flexShrink: 0,
+              transition: "all .2s",
+            }}
+          >
+            {darkMode ? <Sun size={17}/> : <Moon size={17}/>}
           </button>
         </div>
       </div>

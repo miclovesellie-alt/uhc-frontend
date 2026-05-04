@@ -556,6 +556,43 @@ export default function QuizPage() {
             <div className="qr-actions">
               <button className="quiz-btn primary" onClick={handleReview}>Review Answers</button>
               <button className="quiz-btn ghost" onClick={() => { localStorage.removeItem(storeKey); setStage("selectCourse"); setDone(false); setReviewMode(false); }}>New Quiz</button>
+              {pct >= 70 && (
+                <button className="quiz-btn secondary"
+                  onClick={() => {
+                    const date = new Date().toLocaleDateString("en-GB", { day:"numeric", month:"long", year:"numeric" });
+                    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>UHC Certificate</title>
+                    <style>
+                      body{margin:0;font-family:'Georgia',serif;background:#f8fafc;display:flex;align-items:center;justify-content:center;min-height:100vh}
+                      .cert{width:760px;padding:60px;border:12px double #4255ff;background:white;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+                      .logo{font-size:2.2rem;font-weight:900;color:#4255ff;letter-spacing:4px;margin-bottom:4px}
+                      .tagline{font-size:.85rem;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;margin-bottom:36px}
+                      h2{font-size:1.1rem;color:#64748b;font-weight:400;margin:0 0 8px}
+                      .name{font-size:2.6rem;color:#0f172a;font-weight:700;margin:8px 0 20px;border-bottom:2px solid #4255ff;padding-bottom:16px}
+                      .desc{font-size:1rem;color:#374151;line-height:1.7;margin-bottom:24px}
+                      .score{display:inline-block;padding:10px 28px;background:#4255ff;color:white;border-radius:99px;font-size:1.1rem;font-weight:700;margin-bottom:28px}
+                      .date{font-size:.85rem;color:#94a3b8;margin-top:24px}
+                      .seal{font-size:3rem;margin:20px 0 0}
+                      @media print{body{background:white}.cert{box-shadow:none;border-color:#4255ff}}
+                    </style></head><body>
+                    <div class="cert">
+                      <div class="logo">UHC</div>
+                      <div class="tagline">Universal Health Campus</div>
+                      <h2>This is to certify that</h2>
+                      <div class="name">${userName}</div>
+                      <div class="desc">has successfully completed the<br><strong>${selCourse}</strong><br>quiz assessment with distinction</div>
+                      <div class="score">Score: ${pct}% &nbsp;·&nbsp; ${finalScore}/${questions.length} correct</div>
+                      <div class="date">Awarded on ${date}</div>
+                      <div class="seal">🎓</div>
+                    </div>
+                    <script>setTimeout(()=>window.print(),600)</script>
+                    </body></html>`;
+                    const w = window.open("","_blank");
+                    w.document.write(html);
+                    w.document.close();
+                  }}>
+                  🎓 Download Certificate
+                </button>
+              )}
             </div>
           </motion.div>
         )}

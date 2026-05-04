@@ -17,6 +17,23 @@ import gmailLogo from "../assets/gmail.webp";
 const healthEmojis = ["🫀","🧠","🩺","💊","🩻","🩹","🏥","🔬","🧬","💉"];
 function rnd(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
+const HEALTH_TIPS = [
+  "💧 Drink at least 8 glasses of water daily to stay hydrated.",
+  "🛌 Adults need 7-9 hours of sleep for optimal health.",
+  "🚶 Walking 30 minutes a day reduces cardiovascular risk by 35%.",
+  "🥦 Eat 5 portions of fruit and vegetables every day.",
+  "🧠 Mental health is just as important as physical health.",
+  "🩺 Schedule regular check-ups even when you feel healthy.",
+  "🧼 Proper handwashing prevents 80% of infectious diseases.",
+  "🧘 10 minutes of deep breathing daily reduces cortisol levels.",
+  "💊 Never self-medicate — always consult a healthcare professional.",
+  "🌞 15 minutes of sunlight daily boosts your Vitamin D levels.",
+  "🏃 Regular exercise improves mood, memory and sleep quality.",
+  "🦷 Brush twice daily — oral health affects your heart health.",
+];
+// Pick a consistent tip per calendar day
+const getDailyTip = () => HEALTH_TIPS[new Date().getDate() % HEALTH_TIPS.length];
+
 
 
 export default function FYP({ refresh }) {
@@ -37,6 +54,10 @@ export default function FYP({ refresh }) {
   const [bookmarkedPosts, setBookmarkedPosts] = useState(
     () => new Set(getBookmarks('post').map(b => String(b._id)))
   );
+  const [flaggedPosts, setFlaggedPosts] = useState(
+    () => new Set(JSON.parse(localStorage.getItem('uhc_flagged') || '[]'))
+  );
+  const [tipDismissed, setTipDismissed] = useState(() => localStorage.getItem('uhc_tip_dismissed') === new Date().toDateString());
 
   const toggleExpand = (postId) => {
     setExpandedPosts(prev => ({ ...prev, [postId]: !prev[postId] }));
@@ -169,10 +190,32 @@ export default function FYP({ refresh }) {
 
   const toggleLogoMenu = () => logoDropdownRef.current?.classList.toggle("active");
 
+  const flagPost = async (postId) => {
+    if (flaggedPosts.has(postId)) { toast("Already flagged", "info"); return; }
+    try {
+      await api.post(`admin/feed/${postId}/flag`);
+      const updated = new Set(flaggedPosts).add(postId);
+      setFlaggedPosts(updated);
+      localStorage.setItem('uhc_flagged', JSON.stringify([...updated]));
+      toast("🚩 Post flagged for review", "success");
+    } catch { toast("Could not flag post", "error"); }
+  };
+
   const firstName = user?.name?.split(" ")[0] || "there";
 
   return (
     <div style={{ maxWidth: 860, margin: "0 auto" }}>
+      {/* ── Daily Health Tip ── */}
+      {!tipDismissed && (
+        <div style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 16px", borderRadius:14, background:"linear-gradient(135deg,rgba(66,85,255,.08),rgba(16,185,129,.06))", border:"1px solid rgba(66,85,255,.18)", marginBottom:18, position:"relative" }}>
+          <span style={{ fontSize:"1.5rem", flexShrink:0 }}>💡</span>
+          <div style={{ flex:1, fontSize:".85rem", color:"var(--text-body,#374151)", lineHeight:1.5 }}>
+            <strong style={{ color:"var(--accent,#4255ff)" }}>Today's Health Tip: </strong>{getDailyTip()}
+          </div>
+          <button onClick={() => { setTipDismissed(true); localStorage.setItem('uhc_tip_dismissed', new Date().toDateString()); }}
+            style={{ background:"none", border:"none", cursor:"pointer", color:"var(--text-muted)", fontSize:"1.1rem", flexShrink:0, padding:4 }}>✕</button>
+        </div>
+      )}
       {/* ── Welcome banner ── */}
       <div className="dash-welcome-banner">
         <div className="dash-welcome-text">
@@ -327,6 +370,14 @@ export default function FYP({ refresh }) {
               >
                 {bookmarkedPosts.has(String(post._id)) ? '🔖' : '🏷️'}
               </button>
+              {/* Flag button — only on real posts */}
+              {!post.isExternal && (
+                <button
+                  onClick={() => flagPost(post._id)}
+                  title={flaggedPosts.has(post._id) ? 'Flagged for review' : 'Report this post'}
+                  style={{ background:'transparent', border:'none', padding:'8px 10px', cursor:'pointer', color: flaggedPosts.has(post._id) ? '#ef4444' : 'var(--text-muted)', borderRadius:8, fontSize:'1rem', flexShrink:0 }}
+                >🚩</button>
+              )}
             </div>
 
             {/* Interactive Comments Section */}
