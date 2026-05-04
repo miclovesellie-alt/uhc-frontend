@@ -7,7 +7,7 @@ import "../styles/dashboard.css";
 
 import {
   Home, BookOpen, ClipboardList, User, LogOut,
-  Search, BarChart2, ChevronRight, X, Bell, PenSquare, Trophy
+  Search, BarChart2, ChevronRight, X, Bell, PenSquare, Trophy, Settings
 } from "lucide-react";
 
 function DashboardLayout() {
@@ -132,21 +132,21 @@ function DashboardLayout() {
             )}
           </button>
 
-          {/* Profile letter avatar */}
+          {/* Settings icon — replaces letter avatar */}
           <button
             className="topbar-avatar-btn"
             onClick={() => navigate("/profile")}
-            title="Profile"
+            title="Settings & Profile"
             style={{
               width: 36, height: 36, borderRadius: "50%",
-              background: avatarColor(userObj?.name || ""),
-              border: "2px solid rgba(66,85,255,0.3)",
+              background: "var(--surface)",
+              border: "1.5px solid var(--border)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              color: "white", fontWeight: 800, fontSize: ".9rem",
-              cursor: "pointer", flexShrink: 0,
+              color: "var(--text-muted)", cursor: "pointer", flexShrink: 0,
+              transition: "all .2s",
             }}
           >
-            {(userObj?.name || "U")[0].toUpperCase()}
+            <Settings size={18} />
           </button>
         </div>
       </div>

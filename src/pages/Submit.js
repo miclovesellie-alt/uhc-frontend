@@ -26,6 +26,8 @@ export default function Submit() {
   const [feedTitle, setFeedTitle]       = useState("");
   const [feedContent, setFeedContent]   = useState("");
   const [feedCategory, setFeedCategory] = useState("Health");
+  const [feedImage, setFeedImage]       = useState(null);
+  const [feedImagePreview, setFeedImagePreview] = useState("");
 
   useEffect(() => {
     api.get("courses").then(r => setCourses(r.data || [])).catch(() => {});
@@ -84,9 +86,14 @@ export default function Submit() {
     if (!feedTitle || !feedContent) { setError("Title and content are required."); return; }
     setLoading(true); setError(""); setSuccess("");
     try {
-      await api.post("submissions/feed", { title: feedTitle, content: feedContent, category: feedCategory });
+      const fd = new FormData();
+      fd.append("title", feedTitle);
+      fd.append("content", feedContent);
+      fd.append("category", feedCategory);
+      if (feedImage) fd.append("image", feedImage);
+      await api.post("submissions/feed", fd, { headers: { "Content-Type": "multipart/form-data" } });
       setSuccess("📰 Post submitted! An admin will review it shortly.");
-      setFeedTitle(""); setFeedContent(""); setFeedCategory("Health");
+      setFeedTitle(""); setFeedContent(""); setFeedCategory("Health"); setFeedImage(null); setFeedImagePreview("");
       const r = await api.get("submissions/my-submissions");
       setSubmissions(r.data);
     } catch (err) {
@@ -179,10 +186,32 @@ export default function Submit() {
           <select style={inputStyle} value={feedCategory} onChange={e=>setFeedCategory(e.target.value)}>
             {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
-          <textarea style={{ ...inputStyle, minHeight: 140, resize:"vertical" }} placeholder="Write your post content here… (share health tips, research summaries, case studies, etc.)" value={feedContent} onChange={e=>setFeedContent(e.target.value)} required />
-          <p style={{ fontSize:".75rem", color:"var(--text-muted)", margin:"-6px 0" }}>Posts are reviewed by admin before going public.</p>
+          <textarea style={{ ...inputStyle, minHeight: 140, resize:"vertical" }} placeholder="Write your post content here…" value={feedContent} onChange={e=>setFeedContent(e.target.value)} required />
+
+          {/* Image attachment */}
+          <input id="feed-image-input" type="file" accept="image/*" style={{ display:"none" }}
+            onChange={e => {
+              const f = e.target.files[0];
+              if (!f) return;
+              setFeedImage(f);
+              setFeedImagePreview(URL.createObjectURL(f));
+            }}
+          />
+          {feedImagePreview ? (
+            <div style={{ position:"relative", borderRadius: 12, overflow:"hidden", border:"1px solid var(--border,#e2e8f0)" }}>
+              <img src={feedImagePreview} alt="preview" style={{ width:"100%", maxHeight:200, objectFit:"cover", display:"block" }} />
+              <button type="button" onClick={() => { setFeedImage(null); setFeedImagePreview(""); }}
+                style={{ position:"absolute", top:8, right:8, background:"rgba(0,0,0,.55)", color:"white", border:"none", borderRadius:"50%", width:28, height:28, cursor:"pointer", fontWeight:800, fontSize:".9rem", display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
+            </div>
+          ) : (
+            <label htmlFor="feed-image-input" style={{ display:"flex", alignItems:"center", gap:10, padding:"11px 14px", borderRadius:12, border:"1.5px dashed var(--border,#e2e8f0)", cursor:"pointer", color:"var(--text-muted)", fontSize:".85rem", fontWeight:600 }}>
+              <span style={{ fontSize:"1.2rem" }}>🖼️</span> Attach an image (optional)
+            </label>
+          )}
+
+          <p style={{ fontSize:".75rem", color:"var(--text-muted)", margin:"-4px 0" }}>Posts are reviewed by admin before going public.</p>
           <button type="submit" disabled={loading}
-            style={{ padding:"13px", borderRadius: 12, background:"#4255ff", color:"white", fontWeight: 800, border:"none", fontSize:".95rem", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap: 8 }}>
+            style={{ padding:"13px", borderRadius:12, background:"#4255ff", color:"white", fontWeight:800, border:"none", fontSize:".95rem", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
             {loading ? "Submitting…" : <><Newspaper size={16}/> Submit Post</>}
           </button>
         </form>
@@ -201,7 +230,11 @@ export default function Submit() {
                 <div style={{ flex:1, minWidth:0 }}>
                   <div style={{ fontWeight: 700, fontSize:".875rem", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{item.title}</div>
                   <div style={{ fontSize:".72rem", color:"var(--text-muted)" }}>{new Date(item.createdAt).toLocaleDateString()} · {item._type}</div>
-                  {item.rejectReason && <div style={{ fontSize:".72rem", color:"#dc2626", marginTop: 2 }}>Reason: {item.rejectReason}</div>}
+                  {item.rejectReason && (
+                    <div style={{ marginTop:6, padding:"8px 10px", borderRadius:8, background:"#fef2f2", border:"1px solid #fecaca", fontSize:".78rem", color:"#dc2626", fontWeight:600, lineHeight:1.4 }}>
+                      ❌ Admin feedback: {item.rejectReason}
+                    </div>
+                  )}
                 </div>
                 <div style={{ display:"flex", alignItems:"center", gap: 4, fontSize:".75rem", fontWeight: 700, color: statusColor(item.status) }}>
                   {statusIcon(item.status)} {item.status}
