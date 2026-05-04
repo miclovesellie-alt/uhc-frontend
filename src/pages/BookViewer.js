@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../api/api";
-import { ArrowLeft, Download, Maximize2, Minimize2, BookOpen, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react";
+import { ArrowLeft, Download, BookOpen, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react";
 import { getFileUrl } from "../utils/config";
 import "../styles/BookViewer.css";
 
