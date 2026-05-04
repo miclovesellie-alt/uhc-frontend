@@ -7,7 +7,7 @@ import "../styles/dashboard.css";
 
 import {
   Home, BookOpen, ClipboardList, User, LogOut,
-  Search, BarChart2, ChevronRight, Menu, X, Bell
+  Search, BarChart2, ChevronRight, X, Bell
 } from "lucide-react";
 
 function DashboardLayout() {

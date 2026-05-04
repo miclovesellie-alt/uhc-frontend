@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Flag, BookOpen, CheckCircle, Clock, AlertTriangle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 import { useToast } from "./Toast";
 import "../styles/quiz.css";
@@ -58,7 +57,6 @@ const loadQ = async (course, limit) => {
    MAIN COMPONENT
 ══════════════════════════════════════ */
 export default function QuizPage() {
-  const navigate = useNavigate();
   const toast    = useToast();
   const userId   = localStorage.getItem("userId");
   const storeKey = `activeQuiz_${userId}`;
