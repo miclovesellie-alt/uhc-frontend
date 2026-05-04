@@ -129,17 +129,28 @@ export default function Submit() {
       {/* ── BOOK FORM ── */}
       {tab === "book" && (
         <form onSubmit={submitBook} style={{ display:"flex", flexDirection:"column", gap: 14 }}>
-          <div style={{ padding:"18px", borderRadius: 14, border:"2px dashed var(--border,#e2e8f0)", background:"var(--surface,#f8fafc)", textAlign:"center", cursor:"pointer", position:"relative" }}
-            onClick={() => document.getElementById("book-file-input").click()}>
-            <Upload size={28} style={{ margin:"0 auto 8px", color:"var(--accent,#4255ff)" }} />
-            <div style={{ fontWeight: 700, color:"var(--text,#0f172a)" }}>
+          {/* Hidden real input — label triggers it reliably */}
+          <input
+            id="book-file-input"
+            type="file"
+            accept=".pdf,.ppt,.pptx"
+            onChange={handleFileChange}
+            style={{ display: "none" }}
+          />
+          <label htmlFor="book-file-input" style={{
+            display:"block", padding:"22px 18px", borderRadius: 14,
+            border:`2px dashed ${bookFile ? "#4255ff" : "var(--border,#e2e8f0)"}`,
+            background: bookFile ? "rgba(66,85,255,.05)" : "var(--surface,#f8fafc)",
+            textAlign:"center", cursor:"pointer", transition:"all .2s",
+          }}>
+            <Upload size={28} style={{ margin:"0 auto 8px", color: bookFile ? "#4255ff" : "var(--text-muted,#94a3b8)", display:"block" }} />
+            <div style={{ fontWeight: 700, color: bookFile ? "#4255ff" : "var(--text,#0f172a)", fontSize:".9rem" }}>
               {fileName || "Click to select PDF or PPT file"}
             </div>
             <div style={{ fontSize:".75rem", color:"var(--text-muted)", marginTop: 4 }}>
               Accepted: .pdf, .ppt, .pptx · Max 50MB
             </div>
-            <input id="book-file-input" type="file" accept=".pdf,.ppt,.pptx" onChange={handleFileChange} style={{ position:"absolute", opacity:0, width:"100%", height:"100%", top:0, left:0, cursor:"pointer" }} />
-          </div>
+          </label>
 
           {uploading && (
             <div style={{ borderRadius: 8, overflow:"hidden", background:"var(--border,#e2e8f0)", height: 6 }}>
