@@ -62,61 +62,63 @@ export default function BookViewer() {
   const getViewerContent = () => {
     const url = getFileUrl(book.fileUrl);
     const isLocal = url.includes("localhost") || url.includes("127.0.0.1");
-    
-    // Improved Extension Detection
+
+    // Detect extension — Cloudinary URLs sometimes strip extension, so also check raw fileUrl
     const getExt = (u) => {
       if (!u) return null;
-      // Remove query params
       const cleanPath = u.split('?')[0];
-      // Get everything after the last dot
       const extMatch = cleanPath.match(/\.([a-z0-9]+)$/i);
       return extMatch ? extMatch[1].toLowerCase() : null;
     };
 
     const ext = getExt(url) || getExt(book.fileUrl) || "pdf";
+    const isMedia = ["jpg", "jpeg", "png", "gif", "webp"].includes(ext);
+    const isVideo = ["mp4", "webm", "ogg"].includes(ext);
 
-    // 1. PDF Handling
-    if (ext === "pdf") {
-      // DESKTOP: Use direct iframe
-      if (!isMobile || isLocal) {
-        return (
-          <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-            <iframe 
-              id="pdf-viewer-frame"
-              src={`${url}#toolbar=0`} 
-              title={book.title}
-              className="pdf-iframe"
-            />
-            <div className="viewer-mobile-fallback" style={{ position: 'absolute', bottom: 20, right: 20, zIndex: 10 }}>
-               <button className="viewer-action-btn primary" onClick={() => window.open(url, "_blank")}>
-                 Open in New Tab ↗
-               </button>
-            </div>
-          </div>
-        );
-      }
-      
-      // MOBILE: Splash screen for better reliability
+    // ── Images ──
+    if (isMedia) {
+      return (
+        <div className="media-viewer">
+          <img src={url} alt={book.title} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+        </div>
+      );
+    }
+
+    // ── Videos ──
+    if (isVideo) {
+      return (
+        <div className="media-viewer" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <video src={url} controls style={{ maxWidth: '100%', maxHeight: '100%' }} />
+        </div>
+      );
+    }
+
+    // ── Mobile: always show splash with open button (most reliable) ──
+    if (isMobile) {
       return (
         <div className="unsupported-viewer">
           <div className="viewer-splash-icon">
-             <BookOpen size={80} color="var(--accent)" />
+            <BookOpen size={80} color="var(--accent)" />
           </div>
           <h2>Document Ready</h2>
-          <p>This PDF is ready for viewing. Tap below to open it in your device's native reader for the best experience.</p>
-          <button className="viewer-action-btn primary large" style={{ padding: '16px 32px', fontSize: '1.1rem' }} onClick={() => window.open(url, "_blank")}>
-            Start Reading 📖
+          <p>Tap below to open this document in your browser or native reader.</p>
+          <button
+            className="viewer-action-btn primary large"
+            style={{ padding: '16px 32px', fontSize: '1.1rem' }}
+            onClick={() => window.open(url, "_blank")}
+          >
+            Open Document 📖
           </button>
           <p style={{ marginTop: 20, fontSize: '0.8rem', color: 'var(--text-muted)' }}>
             Cloud-optimized reader powered by UHC
           </p>
         </div>
       );
-    } 
-    
-    // 2. Office Documents Handling (PPT, DOC, XLS)
-    else if (["ppt", "pptx", "doc", "docx", "xls", "xlsx"].includes(ext)) {
-      if (isLocal) {
+    }
+
+    // ── Desktop Local (development) ──
+    if (isLocal) {
+      if (["ppt","pptx","doc","docx","xls","xlsx"].includes(ext)) {
         return (
           <div className="unsupported-viewer">
             <BookOpen size={64} />
@@ -128,47 +130,42 @@ export default function BookViewer() {
           </div>
         );
       }
+      // Local PDF: direct iframe
       return (
         <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-          <iframe 
-            id="office-viewer-frame"
-            src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`} 
+          <iframe
+            id="pdf-viewer-frame"
+            src={`${url}#toolbar=0`}
             title={book.title}
             className="pdf-iframe"
           />
-          <div className="viewer-mobile-fallback" style={{ position: 'absolute', bottom: 20, right: 20, zIndex: 10 }}>
-             <button className="viewer-action-btn primary" onClick={() => window.open(url, "_blank")}>
-               View Direct ↗
-             </button>
-          </div>
-        </div>
-      );
-    }
-    
-    // 3. Media/Images Handling
-    else if (["jpg", "jpeg", "png", "gif", "webp"].includes(ext)) {
-      return (
-        <div className="media-viewer">
-          <img src={url} alt={book.title} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
-        </div>
-      );
-    } else if (["mp4", "webm", "ogg"].includes(ext)) {
-      return (
-        <div className="media-viewer" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-          <video src={url} controls style={{ maxWidth: '100%', maxHeight: '100%' }} />
         </div>
       );
     }
 
-    // 4. Default Fallback
+    // ── Production Desktop: Google Docs Viewer (handles PDF, PPTX, DOCX, XLS etc.) ──
+    // This is the most reliable cross-origin viewer and works with Cloudinary URLs.
+    const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+
     return (
-      <div className="unsupported-viewer">
-        <BookOpen size={64} />
-        <h2>Document Reader</h2>
-        <p>This file format is supported for download. Click below to view the resource.</p>
-        <button className="viewer-action-btn primary" onClick={() => window.open(url, "_blank")}>
-          Open Resource ↗
-        </button>
+      <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+        <iframe
+          id="pdf-viewer-frame"
+          src={googleViewerUrl}
+          title={book.title}
+          className="pdf-iframe"
+          allow="fullscreen"
+        />
+        {/* Always show a direct open button as fallback */}
+        <div style={{ position: 'absolute', bottom: 16, right: 16, zIndex: 10, display: 'flex', gap: 8 }}>
+          <button
+            className="viewer-action-btn primary"
+            onClick={() => window.open(url, "_blank")}
+            title="Open in new tab"
+          >
+            Open Direct ↗
+          </button>
+        </div>
       </div>
     );
   };

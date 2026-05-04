@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import api from "../api/api";
-import { BookMarked, BookOpen, ChevronRight, ArrowLeft, GraduationCap, Bookmark } from "lucide-react";
+import { BookMarked, BookOpen, ChevronRight, ArrowLeft, GraduationCap, Bookmark, Search } from "lucide-react";
 import { useToast } from "../components/Toast";
 import { toggleBookmark, getBookmarks } from "../utils/bookmarks";
 import "../styles/library.css";
@@ -18,6 +18,11 @@ function Library() {
   const [bookmarkedBooks, setBookmarkedBooks] = useState(
     () => new Set(getBookmarks('book').map(b => String(b._id)))
   );
+
+  const [localSearch, setLocalSearch] = useState("");
+
+  // Combine local search with global search from topbar
+  const combinedSearch = (localSearch || searchQuery || "").toLowerCase();
 
   const handleBookmarkBook = (book) => {
     const added = toggleBookmark('book', book);
@@ -53,8 +58,8 @@ function Library() {
   };
 
   const filteredBooks = books.filter(book => {
-    const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          book.author?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = book.title.toLowerCase().includes(combinedSearch) || 
+                          book.author?.toLowerCase().includes(combinedSearch);
     const matchesCourse = activeCourse ? book.course === activeCourse : true;
     return matchesSearch && matchesCourse;
   });
@@ -67,6 +72,7 @@ function Library() {
   const goBack = () => {
     setView("courses");
     setActiveCourse(null);
+    setLocalSearch("");
   };
 
   if (loading) return <div className="viewer-loading">Loading Study Library...</div>;
@@ -85,15 +91,30 @@ function Library() {
           </h1>
         </div>
         
-        <div className="library-controls" style={{ visibility: 'hidden' }}>
-          {/* Global search in topbar handles this now */}
+        {/* Inline search bar */}
+        <div style={{ position: 'relative', minWidth: 200, maxWidth: 320 }}>
+          <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', opacity: 0.5 }} />
+          <input
+            type="text"
+            placeholder={view === "courses" ? "Search courses..." : "Search books..."}
+            value={localSearch}
+            onChange={e => setLocalSearch(e.target.value)}
+            style={{
+              width: '100%', boxSizing: 'border-box',
+              padding: '9px 14px 9px 36px', borderRadius: 12,
+              border: '1px solid var(--border, #e2e8f0)',
+              background: 'var(--card-bg, #f8fafc)',
+              color: 'var(--text, #0f172a)',
+              fontSize: '.85rem', outline: 'none',
+            }}
+          />
         </div>
       </div>
 
       {view === "courses" ? (
         <div className="library-topics-grid">
           {courses
-            .filter(c => c.toLowerCase().includes(searchQuery.toLowerCase()))
+            .filter(c => c.toLowerCase().includes(combinedSearch))
             .map(course => (
             <div key={course} className="course-card-classic" onClick={() => selectCourse(course)}>
               <div className="course-card-icon">

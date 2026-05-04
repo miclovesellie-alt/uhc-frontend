@@ -6,7 +6,7 @@ import axios from "axios";
 import "../admin_styles/AdminLayout.css";
 import {
   LayoutDashboard, Users, HelpCircle, Upload,
-  Bell, Settings, LogOut, Menu, X, FileText, Shield, Library, Mail, Layout, Trash2
+  Bell, Settings, LogOut, Menu, X, FileText, Shield, Library, Mail, Layout, Trash2, Megaphone
 } from "lucide-react";
 
 const baseNavItems = [
@@ -18,6 +18,7 @@ const baseNavItems = [
   { icon: <Upload         size={17} />, label: "Bulk Upload",    path: "/admin/uploads"        },
   { icon: <FileText       size={17} />, label: "Activity Logs",  path: "/admin/logs"           },
   { icon: <Bell           size={17} />, label: "Notifications",  path: "/admin/notifications"  },
+  { icon: <Megaphone      size={17} />, label: "Announcements",  path: "/admin/announcements"  },
   { icon: <Trash2         size={17} />, label: "Recycle Bin",    path: "/admin/recycle-bin"    },
   { icon: <Mail           size={17} />, label: "Messages",       path: "/admin/messages"       },
   { icon: <Settings       size={17} />, label: "Settings",       path: "/admin/settings"       },
@@ -132,7 +133,7 @@ export default function AdminLayout() {
           ))}
 
           <div className="admin-nav-section" style={{ marginTop: 8 }}>Monitoring</div>
-          {navItems.filter(item => item.path === "/admin/logs" || item.path === "/admin/notifications" || item.path === "/admin/messages" || item.path === "/admin/recycle-bin").map(item => (
+          {navItems.filter(item => item.path === "/admin/logs" || item.path === "/admin/notifications" || item.path === "/admin/messages" || item.path === "/admin/recycle-bin" || item.path === "/admin/announcements").map(item => (
             <NavLink
               key={item.path}
               to={item.path}

@@ -40,6 +40,11 @@ import AdminLibrary from "./admin/pages/AdminLibrary";
 import AdminFeed from "./admin/pages/AdminFeed";
 import AdminRecycleBin from "./admin/pages/AdminRecycleBin";
 import DuplicateQuestions from "./admin/pages/DuplicateQuestions";
+import AdminAnnouncements from "./admin/pages/AdminAnnouncements";
+
+// ===== USER PAGES =====
+import Leaderboard from "./pages/Leaderboard";
+import QuizHistory from "./pages/QuizHistory";
 
 // ===== ADMIN LAYOUT =====
 import AdminLayout from "./admin/components/AdminLayout";
@@ -123,6 +128,7 @@ function AppRoutes() {
         <Route path="recycle-bin"   element={<AdminRecycleBin />} />
         <Route path="uploads"       element={<BulkUpload />} />
         <Route path="duplicates"    element={<DuplicateQuestions />} />
+        <Route path="announcements" element={<AdminAnnouncements />} />
       </Route>
 
       {/* ===== DASHBOARD LAYOUT WRAPPER ===== */}
@@ -156,6 +162,12 @@ function AppRoutes() {
 
         {/* ===== SEARCH ===== */}
         <Route path="/search" element={<SearchPage />} />
+
+        {/* ===== LEADERBOARD ===== */}
+        <Route path="/leaderboard" element={<Leaderboard />} />
+
+        {/* ===== QUIZ HISTORY ===== */}
+        <Route path="/quiz-history" element={<QuizHistory />} />
       </Route>
 
       {/* ===== 404 ===== */}

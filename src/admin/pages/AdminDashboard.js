@@ -284,6 +284,37 @@ export default function AdminDashboard() {
         </div>
       )}
 
+      {/* \u2500\u2500 Quick Actions \u2500\u2500 */}
+      <div className="admin-section-header" style={{ marginTop: 4, marginBottom: 16 }}>
+        <span className="admin-section-title">⚡ Quick Actions</span>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 12, marginBottom: 32 }}>
+        {[
+          { label: "Add Question",    emoji: "➕", color: "#4255ff", bg: "rgba(66,85,255,0.08)",  path: "/admin/questions" },
+          { label: "Bulk Upload",     emoji: "📤", color: "#16a34a", bg: "rgba(22,163,74,0.08)",  path: "/admin/uploads"   },
+          { label: "View Reported",   emoji: "🚩", color: "#dc2626", bg: "rgba(220,38,38,0.08)",  path: "/admin/questions?filter=reported" },
+          { label: "Manage Library",  emoji: "📚", color: "#8b5cf6", bg: "rgba(139,92,246,0.08)", path: "/admin/userlibrary" },
+          { label: "Send Notif",      emoji: "🔔", color: "#d97706", bg: "rgba(217,119,6,0.08)",  path: "/admin/notifications" },
+          { label: "View Logs",       emoji: "📋", color: "#06b6d4", bg: "rgba(6,182,212,0.08)",  path: "/admin/logs" },
+        ].map(action => (
+          <div
+            key={action.label}
+            onClick={() => navigate(action.path)}
+            style={{
+              padding: "16px 14px", borderRadius: 14, cursor: "pointer",
+              background: action.bg, border: `1px solid ${action.color}25`,
+              display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8,
+              transition: "transform .15s, box-shadow .15s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = `0 6px 20px ${action.color}20`; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+          >
+            <span style={{ fontSize: "1.5rem" }}>{action.emoji}</span>
+            <span style={{ fontSize: ".82rem", fontWeight: 700, color: action.color }}>{action.label}</span>
+          </div>
+        ))}
+      </div>
+
       <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
     </div>
   );

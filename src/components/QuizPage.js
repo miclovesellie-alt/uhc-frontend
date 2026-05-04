@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Flag, BookOpen, CheckCircle, Clock, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Flag, BookOpen, CheckCircle, Clock, AlertTriangle, Search } from "lucide-react";
 import { UserContext } from "../context/UserContext";
 import { useToast } from "./Toast";
 import "../styles/quiz.css";
@@ -73,6 +73,7 @@ export default function QuizPage() {
   const [stage, setStage]               = useState("selectCourse");
   const [courses, setCourses]           = useState([]);
   const [selCourse, setSelCourse]       = useState(null);
+  const [courseSearch, setCourseSearch] = useState("");
   const [questions, setQuestions]       = useState([]);
   const [loadingQ, setLoadingQ]         = useState(false);
   const [idx, setIdx]                   = useState(0);
@@ -298,13 +299,42 @@ export default function QuizPage() {
             <div className="quiz-header-badge"><BookOpen size={16} /> Quiz Arena</div>
             <h1 className="quiz-card-title">Choose a Course</h1>
             <p className="quiz-card-sub">Select the subject you want to practice</p>
+
+            {/* Search bar */}
+            <div style={{ position: 'relative', marginBottom: 16 }}>
+              <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted, #94a3b8)' }} />
+              <input
+                type="text"
+                placeholder="Search courses..."
+                value={courseSearch}
+                onChange={e => setCourseSearch(e.target.value)}
+                style={{
+                  width: '100%', boxSizing: 'border-box',
+                  padding: '10px 14px 10px 38px', borderRadius: 12,
+                  border: '1.5px solid var(--border, #e2e8f0)',
+                  background: 'var(--card-bg, #f8fafc)',
+                  color: 'var(--text, #0f172a)',
+                  fontSize: '.875rem', outline: 'none',
+                }}
+              />
+            </div>
+
             <div className="quiz-course-grid">
-              {(courses.length > 0 ? courses.map(c => c.name) : Object.keys(coursesTopics)).map(name => (
-                <button key={name} className="quiz-course-card" onClick={() => { setSelCourse(name); setStage("selectNumber"); }}>
-                  <span className="quiz-course-icon">📚</span>
-                  <span>{name}</span>
-                </button>
-              ))}
+              {(courses.length > 0 ? courses.map(c => c.name) : Object.keys(coursesTopics))
+                .filter(name => name.toLowerCase().includes(courseSearch.toLowerCase()))
+                .map(name => (
+                  <button key={name} className="quiz-course-card" onClick={() => { setSelCourse(name); setStage("selectNumber"); }}>
+                    <span className="quiz-course-icon">📚</span>
+                    <span>{name}</span>
+                  </button>
+                ))
+              }
+              {(courses.length > 0 ? courses.map(c => c.name) : Object.keys(coursesTopics))
+                .filter(name => name.toLowerCase().includes(courseSearch.toLowerCase())).length === 0 && (
+                <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '20px', color: 'var(--text-muted, #94a3b8)', fontSize: '.875rem' }}>
+                  No courses match "{courseSearch}"
+                </div>
+              )}
             </div>
           </motion.div>
         )}

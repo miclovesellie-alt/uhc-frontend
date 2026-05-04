@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useOutletContext } from "react-router-dom";
 import api from "../../api/api";
-import { Search, Shield, Ban, Key, Trash2, RefreshCw, Eye, EyeOff, Download } from "lucide-react";
+import { Search, Shield, Ban, Key, Trash2, RefreshCw, Eye, EyeOff, Download, Clock } from "lucide-react";
 import { UserContext } from "../../context/UserContext";
 
 const logAction = (action) => {
@@ -74,6 +74,9 @@ export default function AdminUsers() {
   const [resetPasswordModal, setResetPasswordModal] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [showNewPass, setShowNewPass] = useState(false);
+  const [suspendModal, setSuspendModal] = useState(false);
+  const [suspendDays, setSuspendDays] = useState("3");
+  const [suspendReason, setSuspendReason] = useState("");
 
   const showToast = (msg, type = "success") => {
     setToast({ msg, type });
@@ -133,6 +136,25 @@ export default function AdminUsers() {
     }
   };
 
+  const doSuspend = async () => {
+    try {
+      await api.patch(`social/suspend/${selectedUser._id}`, { days: suspendDays, reason: suspendReason });
+      logAction(`Suspended ${selectedUser.name} for ${suspendDays} days`);
+      showToast(`${selectedUser.name} suspended for ${suspendDays} days`);
+      setSuspendModal(false); setSuspendDays("3"); setSuspendReason("");
+      setSelectedUser(null); fetchUsers();
+    } catch { showToast("Suspend failed", "error"); }
+  };
+
+  const doUnsuspend = async () => {
+    try {
+      await api.patch(`social/unsuspend/${selectedUser._id}`);
+      logAction(`Unsuspended ${selectedUser.name}`);
+      showToast(`${selectedUser.name} unsuspended`);
+      setSelectedUser(null); fetchUsers();
+    } catch { showToast("Unsuspend failed", "error"); }
+  };
+
   const filteredUsers = users
     .filter(u => {
       // Hide admins and superadmins if current user is not a superadmin
@@ -142,9 +164,10 @@ export default function AdminUsers() {
       return true;
     })
     .filter(u => {
-      if (filter === "admins")  return u.role === "admin";
-      if (filter === "banned")  return u.status === "banned";
-      if (filter === "active")  return u.status !== "banned";
+      if (filter === "admins")    return u.role === "admin";
+      if (filter === "banned")    return u.status === "banned";
+      if (filter === "suspended") return u.status === "suspended";
+      if (filter === "active")    return u.status !== "banned" && u.status !== "suspended";
       return true;
     })
     .filter(u => `${u.name} ${u.email}`.toLowerCase().includes(search.toLowerCase()));
@@ -199,6 +222,7 @@ export default function AdminUsers() {
           <option value="active">Active</option>
           <option value="admins">Admins</option>
           <option value="banned">Banned</option>
+          <option value="suspended">Suspended</option>
         </select>
       </div>
 
@@ -244,8 +268,8 @@ export default function AdminUsers() {
                   <td style={{ color: "var(--admin-muted)", fontSize: ".82rem" }}>{u.email}</td>
                   <td><span className={`admin-badge ${roleColor(u.role)}`}>{u.role || "user"}</span></td>
                   <td>
-                    <span className={`admin-badge ${presence?.onlineIds?.includes(u._id) ? "green" : u.status === "banned" ? "red" : "gray"}`}>
-                      {presence?.onlineIds?.includes(u._id) ? "Active (Live)" : u.status === "banned" ? "Banned" : "Offline"}
+                    <span className={`admin-badge ${presence?.onlineIds?.includes(u._id) ? "green" : u.status === "banned" ? "red" : u.status === "suspended" ? "orange" : "gray"}`}>
+                      {presence?.onlineIds?.includes(u._id) ? "Live" : u.status === "banned" ? "Banned" : u.status === "suspended" ? `Suspended` : "Offline"}
                     </span>
                   </td>
                   <td style={{ color: "var(--admin-muted)", fontSize: ".82rem" }}>{u.country || "—"}</td>
@@ -300,6 +324,15 @@ export default function AdminUsers() {
                   <button className="admin-btn secondary" style={{ justifyContent: "flex-start", gap: 10 }} onClick={() => setConfirmAction({ type: "ban", label: selectedUser.status === "banned" ? "Unban User" : "Ban User" })}>
                     <Ban size={15} /> {selectedUser.status === "banned" ? "Unban User" : "Ban User"}
                   </button>
+                  {selectedUser.status === "suspended" ? (
+                    <button className="admin-btn secondary" style={{ justifyContent: "flex-start", gap: 10 }} onClick={doUnsuspend}>
+                      <Clock size={15} /> Unsuspend User
+                    </button>
+                  ) : (
+                    <button className="admin-btn secondary" style={{ justifyContent: "flex-start", gap: 10, color: "#d97706" }} onClick={() => setSuspendModal(true)}>
+                      <Clock size={15} /> Suspend Temporarily
+                    </button>
+                  )}
                   <button className="admin-btn secondary" style={{ justifyContent: "flex-start", gap: 10 }} onClick={() => setResetPasswordModal(true)}>
                     <Key size={15} /> Reset Password
                   </button>
@@ -375,6 +408,31 @@ export default function AdminUsers() {
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
               <button className="admin-btn secondary" onClick={() => { setResetPasswordModal(false); setNewPassword(""); }}>Cancel</button>
               <button className="admin-btn primary" onClick={doResetPassword}>Reset Password</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── SUSPEND MODAL ── */}
+      {suspendModal && selectedUser && (
+        <div className="admin-modal-overlay" onClick={()=>setSuspendModal(false)}>
+          <div className="admin-modal" onClick={e=>e.stopPropagation()} style={{maxWidth:380}}>
+            <h3 style={{margin:"0 0 14px"}}>⏸ Suspend {selectedUser.name}</h3>
+            <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:18}}>
+              <div>
+                <label style={{fontSize:".78rem",color:"var(--admin-muted)",fontWeight:600,display:"block",marginBottom:4}}>DAYS</label>
+                <select className="admin-select" style={{width:"100%"}} value={suspendDays} onChange={e=>setSuspendDays(e.target.value)}>
+                  {["1","3","7","14","30"].map(d=><option key={d} value={d}>{d} {d==="1"?"day":"days"}</option>)}
+                </select>
+              </div>
+              <div>
+                <label style={{fontSize:".78rem",color:"var(--admin-muted)",fontWeight:600,display:"block",marginBottom:4}}>REASON</label>
+                <input className="admin-input" style={{width:"100%",boxSizing:"border-box"}} placeholder="e.g. Inappropriate behaviour" value={suspendReason} onChange={e=>setSuspendReason(e.target.value)} />
+              </div>
+            </div>
+            <div style={{display:"flex",gap:10,justifyContent:"flex-end"}}>
+              <button className="admin-btn secondary" onClick={()=>setSuspendModal(false)}>Cancel</button>
+              <button className="admin-btn danger" onClick={doSuspend}>Suspend</button>
             </div>
           </div>
         </div>
