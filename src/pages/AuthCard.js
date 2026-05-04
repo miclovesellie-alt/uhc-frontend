@@ -24,6 +24,7 @@ function AuthCard() {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -34,6 +35,7 @@ function AuthCard() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError(""); setSuccess("");
+    setIsLoading(true);
     try {
       const payload = { password: formData.password };
       if (loginMode === "email") {
@@ -48,13 +50,13 @@ function AuthCard() {
       localStorage.setItem("userId", user._id);
       setUser(user);
       setSuccess("Login successful! Redirecting...");
-      // Auto-detect admin/superadmin and redirect to admin panel
       if (user.role === "admin" || user.role === "superadmin") {
-        setTimeout(() => navigate("/admin"), 600);
+        setTimeout(() => navigate("/admin"), 800);
       } else {
-        setTimeout(() => navigate("/dashboard"), 600);
+        setTimeout(() => navigate("/dashboard"), 800);
       }
     } catch (err) {
+      setIsLoading(false);
       setError(err.response?.data?.message || "Invalid credentials");
     }
   };
@@ -129,6 +131,37 @@ function AuthCard() {
 
   return (
     <div className="auth-bg">
+      {/* ===== LOADING OVERLAY ===== */}
+      {isLoading && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 9999,
+          background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24
+        }}>
+          {/* Pulsing rings */}
+          <div style={{ position: 'relative', width: 100, height: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '3px solid rgba(66,85,255,0.3)', animation: 'uhcPulse 1.8s ease-out infinite' }} />
+            <div style={{ position: 'absolute', inset: 10, borderRadius: '50%', border: '3px solid rgba(66,85,255,0.5)', animation: 'uhcPulse 1.8s ease-out infinite 0.3s' }} />
+            <div style={{ position: 'absolute', inset: 20, borderRadius: '50%', border: '3px solid rgba(66,85,255,0.7)', animation: 'uhcPulse 1.8s ease-out infinite 0.6s' }} />
+            {/* UHC logo */}
+            <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg,#4255ff,#8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '1rem', color: 'white', letterSpacing: '0.05em', boxShadow: '0 0 30px rgba(66,85,255,0.6)' }}>UHC</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ color: 'white', fontWeight: 700, fontSize: '1.2rem', marginBottom: 8 }}>Signing you in…</div>
+            <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Please wait while we load your dashboard</div>
+          </div>
+          {/* Animated dots */}
+          <div style={{ display: 'flex', gap: 8 }}>
+            {[0,1,2].map(i => (
+              <div key={i} style={{ width: 8, height: 8, borderRadius: '50%', background: '#4255ff', animation: `uhcDot 1.2s ease-in-out infinite ${i * 0.2}s` }} />
+            ))}
+          </div>
+          <style>{`
+            @keyframes uhcPulse { 0% { transform: scale(0.8); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
+            @keyframes uhcDot { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+          `}</style>
+        </div>
+      )}
       <div className="auth-card-wrapper">
         <div className="auth-card">
 

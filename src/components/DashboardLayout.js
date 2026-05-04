@@ -74,13 +74,14 @@ function DashboardLayout() {
 
       {/* ===== TOP NAVBAR ===== */}
       <div className="dashboard-topbar">
-        {/* Hamburger for mobile */}
+        {/* Logout for mobile (replaces hamburger since bottom nav is used) */}
         <button
           className="topbar-hamburger"
-          onClick={() => setSidebarOpen(o => !o)}
-          title="Menu"
+          onClick={() => setShowLogoutModal(true)}
+          title="Logout"
+          style={{ color: '#ef4444' }}
         >
-          {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+          <LogOut size={20} />
         </button>
 
         {/* Logo */}

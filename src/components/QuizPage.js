@@ -86,6 +86,7 @@ export default function QuizPage() {
   const [streak, setStreak]             = useState(0);
   const [bestStreak, setBestStreak]     = useState(0);
   const [done, setDone]                 = useState(false);
+  const [reviewMode, setReviewMode]     = useState(false);
   const [showNav, setShowNav]           = useState(false);
   const [timeLeft, setTimeLeft]         = useState(45);
   const [blurred, setBlurred]           = useState(false);
@@ -259,8 +260,9 @@ export default function QuizPage() {
   };
 
   const handleReview = () => {
-    localStorage.removeItem(storeKey);
-    navigate("/review", { state: { questions, userAnswers: answers, score, totalQuestions: questions.length } });
+    setReviewMode(true);
+    setDone(false);
+    goTo(0);
   };
 
   const q = questions[idx];
@@ -351,6 +353,14 @@ export default function QuizPage() {
             style={noSS ? { userSelect: "none", MozUserSelect: "none", WebkitUserSelect: "none", msUserSelect: "none" } : {}}
           >
 
+            {/* Review Mode Banner */}
+            {reviewMode && (
+              <div style={{ background: 'linear-gradient(135deg,rgba(66,85,255,0.1),rgba(139,92,246,0.1))', border: '1px solid rgba(66,85,255,0.2)', borderRadius: 10, padding: '8px 14px', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--accent)' }}>📝 Review Mode — Q{idx + 1} of {questions.length}</span>
+                <button onClick={() => { setReviewMode(false); setDone(true); }} style={{ background: 'none', border: '1px solid rgba(66,85,255,0.3)', borderRadius: 6, padding: '3px 10px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent)', cursor: 'pointer' }}>✕ Exit Review</button>
+              </div>
+            )}
+
             {/* Top bar */}
             <div className="quiz-top-bar">
               <div className="quiz-tb-left">
@@ -421,24 +431,26 @@ export default function QuizPage() {
             <div className="quiz-opts">
               {q.options.map((opt, i) => {
                 let cls = "quiz-opt";
-                if (locked) {
+                const effectiveLocked = reviewMode || locked;
+                const effectiveSel = reviewMode ? answers[idx] : selAns;
+                if (effectiveLocked) {
                   if (i === q.answer) cls += " correct";
-                  else if (i === selAns) cls += " wrong";
+                  else if (i === effectiveSel) cls += " wrong";
                   else cls += " dimmed";
                 } else if (selAns === i) cls += " selected";
                 return (
-                  <div 
-                    key={i} 
-                    className={cls} 
-                    onClick={() => !locked && setSelAns(i)} 
+                  <div
+                    key={i}
+                    className={cls}
+                    onClick={() => !effectiveLocked && setSelAns(i)}
                     role="button"
                     tabIndex={0}
-                    onKeyDown={(e) => { if(!locked && (e.key === 'Enter' || e.key === ' ')) setSelAns(i); }}
-                    style={{ cursor: locked ? 'default' : 'pointer' }}
+                    onKeyDown={(e) => { if(!effectiveLocked && (e.key === 'Enter' || e.key === ' ')) setSelAns(i); }}
+                    style={{ cursor: effectiveLocked ? 'default' : 'pointer' }}
                   >
                     <span className="opt-letter">{String.fromCharCode(65 + i)}</span>
                     <div className="opt-text">{opt}</div>
-                    {locked && i === q.answer && <CheckCircle size={15} className="opt-check" />}
+                    {effectiveLocked && i === q.answer && <CheckCircle size={15} className="opt-check" />}
                   </div>
                 );
               })}
@@ -453,10 +465,17 @@ export default function QuizPage() {
 
             {/* Actions */}
             <div className="quiz-act-row">
-              {!locked
-                ? <button className="quiz-btn primary" disabled={selAns === null} onClick={() => confirmAnswer(false)}>Confirm Answer</button>
-                : <button className="quiz-btn success" onClick={handleNext}>{idx < questions.length - 1 ? "Next →" : "Finish 🏁"}</button>
-              }
+              {reviewMode ? (
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
+                  <button className="quiz-btn ghost" disabled={idx === 0} onClick={() => goTo(idx - 1)}>← Prev</button>
+                  <button className="quiz-btn primary" onClick={() => { setReviewMode(false); setDone(true); }}>Back to Results</button>
+                  <button className="quiz-btn ghost" disabled={idx === questions.length - 1} onClick={() => goTo(idx + 1)}>Next →</button>
+                </div>
+              ) : !locked ? (
+                <button className="quiz-btn primary" disabled={selAns === null} onClick={() => confirmAnswer(false)}>Confirm Answer</button>
+              ) : (
+                <button className="quiz-btn success" onClick={handleNext}>{idx < questions.length - 1 ? "Next →" : "Finish 🏁"}</button>
+              )}
             </div>
 
             {/* Mini stats */}
@@ -508,7 +527,7 @@ export default function QuizPage() {
 
             <div className="qr-actions">
               <button className="quiz-btn primary" onClick={handleReview}>Review Answers</button>
-              <button className="quiz-btn ghost" onClick={() => { localStorage.removeItem(storeKey); setStage("selectCourse"); setDone(false); }}>New Quiz</button>
+              <button className="quiz-btn ghost" onClick={() => { localStorage.removeItem(storeKey); setStage("selectCourse"); setDone(false); setReviewMode(false); }}>New Quiz</button>
             </div>
           </motion.div>
         )}
