@@ -21,6 +21,7 @@ export default function AdminPending() {
     setLoading(false);
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, []);
 
   const approve = async (type, id) => {

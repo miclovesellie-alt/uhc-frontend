@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import api from "../api/api";
 import { Upload, BookOpen, FileText, CheckCircle, Clock, XCircle, Plus, Newspaper } from "lucide-react";
 
 const CATEGORIES = ["Health","Nutrition","Mental Health","Anatomy","Pharmacology","Nursing","Research","General"];
 
 export default function Submit() {
-  const navigate = useNavigate();
   const [tab, setTab]             = useState("book"); // book | feed
   const [courses, setCourses]     = useState([]);
   const [submissions, setSubmissions] = useState({ books: [], posts: [] });
