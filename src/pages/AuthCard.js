@@ -25,7 +25,6 @@ function AuthCard() {
   const [showSplash, setShowSplash] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -98,7 +97,6 @@ function AuthCard() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError(""); setSuccess("");
-    setIsLoading(true);
     try {
       const payload = { password: formData.password };
       if (loginMode === "email") {
@@ -117,7 +115,6 @@ function AuthCard() {
       const dest = (user.role === "admin" || user.role === "superadmin") ? "/admin" : "/dashboard";
       setTimeout(() => navigate(dest), 2000);
     } catch (err) {
-      setIsLoading(false);
       setError(err.response?.data?.message || "Invalid credentials");
     }
   };
