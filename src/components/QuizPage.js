@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Flag, BookOpen, CheckCircle, Clock, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
+import { useToast } from "./Toast";
 import "../styles/quiz.css";
 import api from "../api/api";
 import coursesTopics from "../data/courses_topics.json";
@@ -58,9 +59,18 @@ const loadQ = async (course, limit) => {
 ══════════════════════════════════════ */
 export default function QuizPage() {
   const navigate = useNavigate();
+  const toast    = useToast();
   const userId   = localStorage.getItem("userId");
   const storeKey = `activeQuiz_${userId}`;
   const userName = (() => { try { return JSON.parse(localStorage.getItem("user") || "{}").name || "Student"; } catch { return "Student"; } })();
+
+  // Save a quiz result to history
+  const saveQuizHistory = (course, score, total, bstreak) => {
+    const histKey = `quizHistory_${userId}`;
+    const prev = (() => { try { return JSON.parse(localStorage.getItem(histKey) || '[]'); } catch { return []; } })();
+    const entry = { course, score, total, pct: total ? Math.round((score/total)*100) : 0, bestStreak: bstreak, date: new Date().toISOString() };
+    localStorage.setItem(histKey, JSON.stringify([entry, ...prev].slice(0, 30)));
+  };
 
   const [stage, setStage]               = useState("selectCourse");
   const [courses, setCourses]           = useState([]);
@@ -177,7 +187,7 @@ export default function QuizPage() {
     setLoadingQ(true);
     const qs = await loadQ(selCourse, num);
     setLoadingQ(false);
-    if (!qs.length) { alert("No questions available!"); return; }
+    if (!qs.length) { toast("No questions found for this course yet.", "warning"); return; }
     const fixed = qs.map(q => ({ ...q, correctAnswerText: q.options[q.answer] }));
     setQuestions(fixed);
     setAnswers(new Array(fixed.length).fill(null));
@@ -217,25 +227,19 @@ export default function QuizPage() {
     if (idx < questions.length - 1) {
       goTo(idx + 1);
     } else {
-      // Calculate Quiz Points
-      // 1 point for completing the quiz
-      // 3 points for every 10 questions answered
       const completedQuizPoints = 1;
       const questionsAnsweredPoints = Math.floor(questions.length / 10) * 3;
-      
       const totalPoints = completedQuizPoints + questionsAnsweredPoints;
-      
-      if (totalPoints > 0) {
-        awardPoints(totalPoints, "Quiz Completion");
-      }
-      
+      if (totalPoints > 0) awardPoints(totalPoints, "Quiz Completion");
+      // Save to history
+      const fs = answers.filter((a, i) => a === questions[i]?.answer).length;
+      saveQuizHistory(selCourse, fs, questions.length, bestStreak);
       setDone(true);
     }
   };
 
   const submitReport = async () => {
     if (!reportReason) return;
-    
     const q = questions[idx];
     try {
       await api.post("questions/report", {
@@ -243,10 +247,10 @@ export default function QuizPage() {
         questionText: q.question,
         reason: reportReason
       });
-      alert("Question reported. Thank you for your feedback!");
+      toast("Question reported — thank you for your feedback!", "success");
       setShowReportModal(false);
     } catch (err) {
-      alert("Failed to send report. Please try again later.");
+      toast("Failed to send report. Please try again.", "error");
     }
   };
 

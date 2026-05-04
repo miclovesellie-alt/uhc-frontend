@@ -1,0 +1,228 @@
+{
+  "questions": [
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What is the main function of the respiratory system?",
+      "options": [
+        "To break food down.",
+        "Supply the blood with oxygen.",
+        "Circulate the blood.",
+        "B and C.",
+        "All of above."
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The exchange of gases between blood and cells is called",
+      "options": [
+        "Pulmonary ventilation.",
+        "Internal respiration.",
+        "External respiration.",
+        "Cellular respiration."
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "How does the respiratory system deliver oxygen to different parts of the body?",
+      "options": [
+        "Breathing.",
+        "Circulation.",
+        "Inhale carbon dioxide.",
+        "None of above.",
+        "All of Above."
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Which part of the body is not used for the respiratory system to work?",
+      "options": [
+        "Mouth",
+        "Nose",
+        "Small intestine",
+        "Diaphragm",
+        "A and D."
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Which of the following does NOT belong to the conducting portion of the respiratory system?",
+      "options": [
+        "Alveoli",
+        "Bronchioles",
+        "Nose",
+        "Pharynx"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The structure which closes off the larynx is the:",
+      "options": [
+        "Glottis.",
+        "Adam's apple.",
+        "Epiglottis.",
+        "Vocal cords."
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What is the trachea?",
+      "options": [
+        "The tube connecting the lungs to the outside of the body.",
+        "The network of second-largest air sacs within each lung.",
+        "The outermost lining of the lungs.",
+        "None of the above."
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The trachea is a part of the respiratory system. What can the trachea also be called and what is its function?",
+      "options": [
+        "Windpipe, filters the air we breathe.",
+        "Windpipe, releases air out of the body.",
+        "Tubes; carries air to the lungs.",
+        "All of above.",
+        "None of above."
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Which of the following describes a correct order of structures in the respiratory passageways?",
+      "options": [
+        "Pharynx, trachea, larynx, bronchi, bronchioles",
+        "Larynx, pharynx, trachea, bronchiles, bronchi",
+        "Trachea, pharynx, larynx, bronchi, bronchioles",
+        "Pharynx, larynx, trachea, bronchi, bronchioles"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The exchange of gases occurs in the:",
+      "options": [
+        "Trachea.",
+        "Bronchioles.",
+        "Alveoli.",
+        "Bronchus."
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "About how many miles of airways do your lungs contain?",
+      "options": [
+        "150 miles.",
+        "1500 miles.",
+        "100 miles.",
+        "500 miles."
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What is the diaphragm?",
+      "options": [
+        "The seal of tissue at the top of the trachea that stops food or drink from being inhaled.",
+        "A sheet of muscle beneath the lungs that is essential for breathing.",
+        "The cup-like structure found at the base of each lung that aids gas exchange.",
+        "B and C."
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What is the diaphragm's main function?",
+      "options": [
+        "Pump blood into the lungs",
+        "Pump carbon dioxide out of the lungs and pull oxygen into the lungs",
+        "Pump oxygen out of the lungs and pull carbon dioxide into the lungs",
+        "All of above."
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Inside each of the lungs there are tubes called bronchi. These branch into even smaller tubes much like the branches of a tree. What are at the ends of these tubes?",
+      "options": [
+        "Aleoli.",
+        "Diaphragms.",
+        "Cells.",
+        "A and C."
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The volume of air that can be exhaled after normal exhalation is the",
+      "options": [
+        "Tidal volume.",
+        "Residual volume.",
+        "Inspiratory reserve volume.",
+        "Expiratory reserve volume."
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The volume of air in a normal breath is called",
+      "options": [
+        "Total lung capacity.",
+        "Vital capacity.",
+        "Tidal volume.",
+        "Residual volume."
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Gas exchange in the lungs happens by the process of",
+      "options": [
+        "Osmosis.",
+        "Diffusion.",
+        "Exocytosis.",
+        "Active transport."
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Most oxygen in the blood is transported",
+      "options": [
+        "As gas dissolved in plasma.",
+        "As oxyhemoglobin.",
+        "As carboxyhemoglobin.",
+        "As bicarbonate."
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The primary chemical stimulus for breathing is the concentration of",
+      "options": [
+        "Carbon monoxide in the blood.",
+        "Carbon dioxide in the blood.",
+        "Oxygen in the blood.",
+        "Carbonic acid in the blood."
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "How do the lungs stay inflated?",
+      "options": [
+        "Each lung is ribbed with cartilage to prevent collapse on exhalation.",
+        "The lungs are tethered to the ribcage with a network of connective tissue.",
+        "The lungs rely on a vacuum within the chest, maintained by the diaphragm.",
+        "By intercostal muscles."
+      ],
+      "answer": 2
+    }
+  ]
+}

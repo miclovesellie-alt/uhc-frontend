@@ -8,6 +8,10 @@ import DashboardLayout from "./components/DashboardLayout";
 import PrivateRoute from "./components/PrivateRoute";
 import QuizPage from "./components/QuizPage";
 import { UserProvider, UserContext } from "./context/UserContext";
+import { ToastProvider } from "./components/Toast";
+import NotFoundPage from "./pages/NotFoundPage";
+import SearchPage from "./pages/SearchPage";
+import "./styles/dark-theme.css";
 
 import ProfilePage from "./components/ProfilePage";
 
@@ -149,17 +153,13 @@ function AppRoutes() {
         <Route path="/library" element={<Library />} />
         <Route path="/library/view/:id" element={<BookViewer />} />
         <Route path="/library/:topic" element={<TopicPage />} />
+
+        {/* ===== SEARCH ===== */}
+        <Route path="/search" element={<SearchPage />} />
       </Route>
 
       {/* ===== 404 ===== */}
-      <Route
-        path="*"
-        element={
-          <div style={{ textAlign: "center", marginTop: "50px" }}>
-            404 — Page Not Found
-          </div>
-        }
-      />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
     </AnimatePresence>
   );
@@ -168,7 +168,9 @@ function AppRoutes() {
 function App() {
   return (
     <UserProvider>
-      <AppRoutes />
+      <ToastProvider>
+        <AppRoutes />
+      </ToastProvider>
     </UserProvider>
   );
 }

@@ -1,6 +1,8 @@
 import React, { useContext, useState, useRef, useEffect } from "react";
 import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
+import api from "../api/api";
+import OnboardingTour from "./OnboardingTour";
 import "../styles/dashboard.css";
 
 import {
@@ -16,6 +18,9 @@ function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [announcement, setAnnouncement] = useState("");
+  const [announcementDismissed, setAnnouncementDismissed] = useState(false);
+  const [showTour, setShowTour] = useState(!localStorage.getItem('uhc_tour_done'));
   const logoDropdownRef = useRef();
 
   const isActive = (path) => location.pathname === path;
@@ -47,6 +52,13 @@ function DashboardLayout() {
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  // Fetch sitewide announcement
+  useEffect(() => {
+    api.get('settings/globalAnnouncement')
+      .then(res => { if (res.data?.value) setAnnouncement(res.data.value); })
+      .catch(() => {});
   }, []);
 
 
@@ -88,6 +100,11 @@ function DashboardLayout() {
             placeholder="Search topics, quizzes, resources..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && searchQuery.trim()) {
+                navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+              }
+            }}
           />
         </div>
 
@@ -190,6 +207,13 @@ function DashboardLayout() {
 
         {/* ===== MAIN CONTENT ===== */}
         <main className="dashboard-content">
+          {/* Announcement Banner */}
+          {announcement && !announcementDismissed && (
+            <div className="uhc-announcement">
+              <span>📢&nbsp;&nbsp;{announcement}</span>
+              <button className="uhc-announcement__close" onClick={() => setAnnouncementDismissed(true)}>✕</button>
+            </div>
+          )}
           <Outlet context={{ searchQuery }} />
         </main>
       </div>
@@ -255,6 +279,23 @@ function DashboardLayout() {
             <style>{`@keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }`}</style>
           </div>
         )}
+
+      {/* ===== MOBILE BOTTOM NAV ===== */}
+      <nav className="uhc-bottom-nav" aria-label="Main navigation">
+        {navItems.slice(0, 4).map((item) => (
+          <button
+            key={item.path}
+            className={`uhc-bottom-nav__item${isActive(item.path) ? " active" : ""}`}
+            onClick={() => { navigate(item.path); setSidebarOpen(false); }}
+          >
+            {item.icon}
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </nav>
+
+      {/* ===== ONBOARDING TOUR ===== */}
+      {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}
     </div>
   );
 }

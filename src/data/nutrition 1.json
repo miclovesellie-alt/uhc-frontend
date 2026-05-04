@@ -1,0 +1,316 @@
+{
+  "questions": [
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "When the food is directly given into the veins, it is called ______ nutrition",
+      "options": ["Parenteral", "Enteral", "Intravenous", "Saline"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "When food is given in the stomach or intestines directly, then it is ________ nutrition",
+      "options": ["Intravenous", "Saline", "Enteral", "Parenteral"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "A person who has had a renal transplant should regulate the intake of ______",
+      "options": ["Carbohydrates", "Proteins", "Fats", "Vitamins"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "To overcome diabetes, a person can increase the intake of ______ and reduce the intake of _________",
+      "options": ["Carbohydrates, Proteins", "Proteins, Fats", "Fats, Carbohydrates", "Carbohydrates, Fats"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "For a person suffering from problems like slow neural transmission, e.g. dementia, they should be given __________",
+      "options": ["Increased Sodium", "Increased Potassium", "Increased Calcium", "Increased Magnesium"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "A person who is suffering from high blood pressure should cut down on _______",
+      "options": ["Sodium", "Potassium", "Calcium", "Magnesium"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Long periods of parenteral nutrition are not recommended because of ______",
+      "options": ["It increases blood toxicity", "It puts pressure on the kidney", "It puts pressure on the heart", "It causes the GI tract to degenerate"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "In cases of renal insufficiency, what should take in place of proteins?",
+      "options": ["Triglycerides", "Essential Amino Acids", "Glucose", "Vitamin K"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "In cases of muscle fatigue, which vitamin should be taken?",
+      "options": ["Vitamin A", "Vitamin D", "Vitamin E", "Vitamin K"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Which vitamin in large amounts harms the bones?",
+      "options": ["Vitamin A", "Vitamin B", "Vitamin C", "Vitamin D"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Choose the incorrect statement about BMR",
+      "options": ["BMR is directly related to surface area", "BMR is inversely proportional to age", "BMR is increased in warm climate", "Males have higher BMR than age matched females"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "The percentage of total calories obtained from carbohydrates should be between",
+      "options": ["15-20%", "20-35%", "50-60%", "5-10%"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "All are true about milk as a diet except",
+      "options": ["Low iron, rich in Ca, Na, K", "Lactose is main carbohydrate", "Proteins are casein and lactalbumin", "Rich in vitamin C and D but poor in A and riboflavin"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Which has the highest glycemic index?",
+      "options": ["Ice cream", "Cucumber", "Bread", "Dextrose"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "All except one are true about dietary fiber",
+      "options": ["Promotes peristalsis", "Reduces cholesterol absorption", "Increases glycemic index", "Acts as antioxidant"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Human most easily tolerates a lack of which nutrient",
+      "options": ["Protein", "Carbohydrate", "Lipids", "Calcium"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Kwashiorkor is a deficiency disease of",
+      "options": ["Carbohydrates", "Proteins", "Iron", "Vitamin D"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "The vitamin which helps eye adjust vision in dim light is",
+      "options": ["Vitamin A", "Vitamin D", "Vitamin E", "Vitamin K"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Osteomalacia is the deficiency disease of",
+      "options": ["Vitamin B", "Vitamin D", "Vitamin E", "Vitamin K"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "The vitamin associated with blood clotting is",
+      "options": ["Vitamin B", "Vitamin D", "Vitamin E", "Vitamin K"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Vitamin made up of thiazol and pyridine moiety is",
+      "options": ["Vitamin B1", "Vitamin B6", "Vitamin B12", "Biotin"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Beri beri is the deficiency disease of",
+      "options": ["Vitamin B1", "Vitamin B6", "Vitamin D", "Niacin"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Riboflavin exists in the form of coenzyme",
+      "options": ["NAD", "NADP", "FAD", "None of these"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Deficiency of vitamin leads to glossitis",
+      "options": ["Vitamin B1", "Vitamin B2", "Vitamin B12", "Niacin"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Pellagra is caused by deficiency of",
+      "options": ["Vitamin B1", "Vitamin C", "Vitamin E", "Niacin"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Vitamin that takes part in transamination",
+      "options": ["Vitamin B1", "Vitamin B2", "Vitamin B6", "Niacin"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Vitamin associated with synthesis of nucleic acid and RBC formation",
+      "options": ["Biotin", "Folic acid", "Thiamin", "Niacin"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Vitamin that takes part in carboxylation reactions",
+      "options": ["Biotin", "Folic acid", "Thiamin", "Niacin"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Vitamin that binds with avidin",
+      "options": ["Biotin", "Folic acid", "Thiamin", "Niacin"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Pernicious anemia is caused due to deficiency of",
+      "options": ["Biotin", "Protein", "Cyanocobalamin", "Iron"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Ascorbic acid deficiency results in",
+      "options": ["Beri beri", "Dermatitis", "Scurvy", "Glossitis"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Potassium deficiency leads to",
+      "options": ["Osteomalacia", "Dermatitis", "Rickets", "Muscular paralysis"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Mineral associated with insulin production",
+      "options": ["Iron", "Calcium", "Zinc", "Magnesium"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Number of naturally occurring amino acids are",
+      "options": ["24", "20", "18", "22"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Protein provides how much energy per gram?",
+      "options": ["9 Kcal", "6 Kcal", "4 Kcal", "7 Kcal"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Amino acid essential for children is",
+      "options": ["Alanine", "Arginine", "Histidine", "Cysteine"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Protein requirement is highest on body weight basis for",
+      "options": ["Women", "Men", "Children", "Adults"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Precursor of vitamin A is",
+      "options": ["Lycopene", "Beta-carotene", "Anthocyanin", "Chlorophyll"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Main source of beta-carotene is",
+      "options": ["Watermelon", "Tomato", "Carrot", "All of these"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Cholecalciferol (D3) main source is",
+      "options": ["Plants", "Animals", "Both", "None"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Rich source of vitamin E is",
+      "options": ["Rice bran", "Wheat germ", "Rice flour", "Wheat bran"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Vitamin B6 is also known as",
+      "options": ["Niacin", "Biotin", "Pyridoxine", "Folic acid"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Rich source of vitamin C is",
+      "options": ["Cereals", "Pulses", "Citrus fruits", "Oilseeds"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Osmotic pressure of body fluids is maintained by",
+      "options": ["Calcium", "Sodium", "Chlorine", "Magnesium"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Magnesium is part of",
+      "options": ["Lycopene", "Beta-carotene", "Anthocyanin", "Chlorophyll"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Which is not a sulfur-containing amino acid",
+      "options": ["Cysteine", "Cystine", "Methionine", "Arginine"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Goiter is deficiency of",
+      "options": ["Magnesium", "Iron", "Iodine", "Zinc"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Selenium is associated with vitamin",
+      "options": ["A", "B", "E", "K"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Fluorine is needed for formation of",
+      "options": ["Body tissue", "Hair", "Bone and teeth", "None"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Carotene provides vitamin",
+      "options": ["A", "B", "E", "K"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Chlorophyll provides mineral",
+      "options": ["Magnesium", "Iron", "Iodine", "Zinc"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Water soluble vitamin is",
+      "options": ["Vitamin A", "Vitamin C", "Vitamin D", "Vitamin E"],
+      "answer": 1
+    }
+  ]
+}

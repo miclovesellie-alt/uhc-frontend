@@ -1,13 +1,63 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useOutletContext } from "react-router-dom";
 import api from "../../api/api";
-import { Search, Shield, Ban, Key, Trash2, RefreshCw, Eye, EyeOff } from "lucide-react";
+import { Search, Shield, Ban, Key, Trash2, RefreshCw, Eye, EyeOff, Download, Activity } from "lucide-react";
 import { UserContext } from "../../context/UserContext";
 
 const logAction = (action) => {
   const logs = JSON.parse(localStorage.getItem("adminLogs") || "[]");
   logs.unshift({ ts: new Date().toISOString(), action, by: "Admin" });
   localStorage.setItem("adminLogs", JSON.stringify(logs.slice(0, 500)));
+};
+
+/* ── UserActivityFeed ── */
+function UserActivityFeed({ userId }) {
+  const [logs, setLogs] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  React.useEffect(() => {
+    let alive = true;
+    import("../../api/api").then(m => m.default.get("admin/activity/logs"))
+      .then(res => {
+        if (!alive) return;
+        const all = Array.isArray(res.data) ? res.data : [];
+        setLogs(all.filter(l => l.targetId === userId || l.admin?._id === userId).slice(0, 15));
+      }).catch(() => {}).finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
+  }, [userId]);
+  if (loading) return <div style={{ padding: 20, textAlign: 'center', color: 'var(--admin-muted)', fontSize: '.85rem' }}>Loading activity…</div>;
+  if (!logs.length) return (
+    <div style={{ padding: '28px 20px', textAlign: 'center', color: 'var(--admin-muted)' }}>
+      <div style={{ fontSize: '2rem', marginBottom: 8 }}>📭</div>
+      <p style={{ fontSize: '.85rem' }}>No activity recorded for this user yet.</p>
+    </div>
+  );
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 300, overflowY: 'auto' }}>
+      {logs.map((log, i) => (
+        <div key={log._id || i} style={{ display: 'flex', gap: 10, padding: '10px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: 10, border: '1px solid var(--admin-border)' }}>
+          <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>{log.action?.toLowerCase().includes('delet') ? '🗑️' : log.action?.toLowerCase().includes('add') ? '➕' : '📋'}</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: '.82rem', color: 'var(--admin-text)', fontWeight: 600 }}>{log.action?.replace('_', ' ')}</div>
+            <div style={{ fontSize: '.72rem', color: 'var(--admin-muted)', marginTop: 2 }}>{log.message}</div>
+          </div>
+          <div style={{ fontSize: '.7rem', color: 'var(--admin-muted)', flexShrink: 0 }}>{new Date(log.createdAt).toLocaleDateString()}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+const exportCSV = (users) => {
+  const headers = ['Name','Email','Role','Status','Country','Points','Category'];
+  const rows = users.map(u => [
+    `"${u.name || ''}"`, `"${u.email || ''}"`, u.role || 'user',
+    u.status || 'active', `"${u.country || ''}"`, u.points || 0, `"${u.category || ''}"`
+  ]);
+  const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `uhc_users_${Date.now()}.csv`; a.click();
+  URL.revokeObjectURL(url);
 };
 
 export default function AdminUsers() {
@@ -18,6 +68,7 @@ export default function AdminUsers() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [selectedUser, setSelectedUser] = useState(null);
+  const [userTab, setUserTab] = useState('info'); // 'info' | 'activity'
   const [toast, setToast] = useState(null);
   const [confirmAction, setConfirmAction] = useState(null);
   const [resetPasswordModal, setResetPasswordModal] = useState(false);
@@ -125,9 +176,14 @@ export default function AdminUsers() {
             {users.length} total users
           </p>
         </div>
-        <button className="admin-btn secondary sm" onClick={fetchUsers} disabled={loading}>
-          <RefreshCw size={13} /> Refresh
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="admin-btn secondary sm" onClick={() => exportCSV(filteredUsers)}>
+            <Download size={13} /> Export CSV
+          </button>
+          <button className="admin-btn secondary sm" onClick={fetchUsers} disabled={loading}>
+            <RefreshCw size={13} /> Refresh
+          </button>
+        </div>
       </div>
 
       {/* Search + filter */}
@@ -208,62 +264,54 @@ export default function AdminUsers() {
 
       {/* ── USER ACTIONS MODAL ── */}
       {selectedUser && !confirmAction && (
-        <div className="admin-modal-overlay" onClick={() => setSelectedUser(null)}>
-          <div className="admin-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 420 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
+        <div className="admin-modal-overlay" onClick={() => { setSelectedUser(null); setUserTab('info'); }}>
+          <div className="admin-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 440 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{
-                  width: 48, height: 48, borderRadius: "50%",
-                  background: "var(--admin-accent-pale)", color: "var(--admin-accent)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontWeight: 800, fontSize: "1.1rem"
-                }}>{selectedUser.name?.[0]}</div>
+                <div style={{ width: 48, height: 48, borderRadius: "50%", background: "var(--admin-accent-pale)", color: "var(--admin-accent)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: "1.1rem" }}>{selectedUser.name?.[0]}</div>
                 <div>
                   <div style={{ fontWeight: 700, color: "var(--admin-text)" }}>{selectedUser.name}</div>
                   <div style={{ fontSize: ".8rem", color: "var(--admin-muted)" }}>{selectedUser.email}</div>
                 </div>
               </div>
-              <button className="admin-btn secondary sm" onClick={() => setSelectedUser(null)}>✕</button>
+              <button className="admin-btn secondary sm" onClick={() => { setSelectedUser(null); setUserTab('info'); }}>✕</button>
             </div>
-
-            {/* User info grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
-              {[
-                ["Role", selectedUser.role || "user"],
-                ["Status", selectedUser.status || "active"],
-                ["Country", selectedUser.country || "—"],
-                ["Category", selectedUser.category || "—"],
-                ["Points", selectedUser.points || 0],
-                ["Phone", selectedUser.phone || "—"],
-              ].map(([label, val]) => (
-                <div key={label} style={{ padding: "10px 12px", background: "rgba(255,255,255,0.04)", borderRadius: 10, border: "1px solid var(--admin-border)" }}>
-                  <div style={{ fontSize: ".7rem", color: "var(--admin-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 4 }}>{label}</div>
-                  <div style={{ fontSize: ".875rem", color: "var(--admin-text)", fontWeight: 600 }}>{String(val)}</div>
-                </div>
+            {/* Tabs */}
+            <div style={{ display: 'flex', gap: 6, marginBottom: 16, borderBottom: '1px solid var(--admin-border)', paddingBottom: 12 }}>
+              {[['info','👤 Info'],['activity','📋 Activity']].map(([t,l]) => (
+                <button key={t} onClick={() => setUserTab(t)} className={userTab === t ? 'admin-btn primary sm' : 'admin-btn secondary sm'}>{l}</button>
               ))}
             </div>
 
-            {/* Action buttons */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              <button className="admin-btn secondary" style={{ justifyContent: "flex-start", gap: 10 }}
-                onClick={() => setConfirmAction({ type: "role", label: selectedUser.role === "admin" ? "Demote to User" : "Promote to Admin" })}>
-                <Shield size={15} />
-                {selectedUser.role === "admin" ? "Demote to User" : "Promote to Admin"}
-              </button>
-              <button className="admin-btn secondary" style={{ justifyContent: "flex-start", gap: 10 }}
-                onClick={() => setConfirmAction({ type: "ban", label: selectedUser.status === "banned" ? "Unban User" : "Ban User" })}>
-                <Ban size={15} />
-                {selectedUser.status === "banned" ? "Unban User" : "Ban User"}
-              </button>
-              <button className="admin-btn secondary" style={{ justifyContent: "flex-start", gap: 10 }}
-                onClick={() => { setResetPasswordModal(true); }}>
-                <Key size={15} /> Reset Password
-              </button>
-              <button className="admin-btn danger" style={{ justifyContent: "flex-start", gap: 10 }}
-                onClick={() => setConfirmAction({ type: "delete", label: `Delete ${selectedUser.name}` })}>
-                <Trash2 size={15} /> Delete User
-              </button>
-            </div>
+            {userTab === 'info' && (
+              <>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
+                  {[["Role",selectedUser.role||"user"],["Status",selectedUser.status||"active"],["Country",selectedUser.country||"—"],["Category",selectedUser.category||"—"],["Points",selectedUser.points||0],["Phone",selectedUser.phone||"—"]].map(([label, val]) => (
+                    <div key={label} style={{ padding: "10px 12px", background: "rgba(255,255,255,0.04)", borderRadius: 10, border: "1px solid var(--admin-border)" }}>
+                      <div style={{ fontSize: ".7rem", color: "var(--admin-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 4 }}>{label}</div>
+                      <div style={{ fontSize: ".875rem", color: "var(--admin-text)", fontWeight: 600 }}>{String(val)}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <button className="admin-btn secondary" style={{ justifyContent: "flex-start", gap: 10 }} onClick={() => setConfirmAction({ type: "role", label: selectedUser.role === "admin" ? "Demote to User" : "Promote to Admin" })}>
+                    <Shield size={15} /> {selectedUser.role === "admin" ? "Demote to User" : "Promote to Admin"}
+                  </button>
+                  <button className="admin-btn secondary" style={{ justifyContent: "flex-start", gap: 10 }} onClick={() => setConfirmAction({ type: "ban", label: selectedUser.status === "banned" ? "Unban User" : "Ban User" })}>
+                    <Ban size={15} /> {selectedUser.status === "banned" ? "Unban User" : "Ban User"}
+                  </button>
+                  <button className="admin-btn secondary" style={{ justifyContent: "flex-start", gap: 10 }} onClick={() => setResetPasswordModal(true)}>
+                    <Key size={15} /> Reset Password
+                  </button>
+                  <button className="admin-btn danger" style={{ justifyContent: "flex-start", gap: 10 }} onClick={() => setConfirmAction({ type: "delete", label: `Delete ${selectedUser.name}` })}>
+                    <Trash2 size={15} /> Delete User
+                  </button>
+                </div>
+              </>
+            )}
+            {userTab === 'activity' && (
+              <UserActivityFeed userId={selectedUser._id} />
+            )}
           </div>
         </div>
       )}

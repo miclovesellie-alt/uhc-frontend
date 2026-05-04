@@ -8,6 +8,7 @@ import {
 import "../styles/profile.css";
 import countries from "../data/countries";
 import api from "../api/api";
+import { getBookmarks } from "../utils/bookmarks";
 
 const avatarGradient = (name = "") => {
   const palettes = [
@@ -31,6 +32,14 @@ function ProfilePage({ user, setUser }) {
   }, []);
 
   if (!user) return null;
+
+  // Real quiz history from localStorage
+  const userId = localStorage.getItem('userId');
+  const quizHistory = (() => { try { return JSON.parse(localStorage.getItem(`quizHistory_${userId}`) || '[]'); } catch { return []; } })();
+  const totalSolved = quizHistory.reduce((acc, h) => acc + (h.total || 0), 0);
+  const savedBooks = getBookmarks('book');
+  const savedPosts = getBookmarks('post');
+  const totalSaved = savedBooks.length + savedPosts.length;
 
   const handleChange = (field, value) => setUser({ ...user, [field]: value });
 
@@ -194,22 +203,22 @@ function ProfilePage({ user, setUser }) {
               <div className="stat-pill">
                 <span className="pill-icon">📝</span>
                 <div className="pill-text">
-                  <span className="pill-val">245</span>
+                  <span className="pill-val">{totalSolved}</span>
                   <span className="pill-lab">Solved</span>
                 </div>
               </div>
               <div className="stat-pill">
                 <span className="pill-icon">🔥</span>
                 <div className="pill-text">
-                  <span className="pill-val">{Math.max(userStreak, 0) || 12}</span>
+                  <span className="pill-val">{userStreak || 0}</span>
                   <span className="pill-lab">Day Streak</span>
                 </div>
               </div>
               <div className="stat-pill">
-                <span className="pill-icon">🏅</span>
+                <span className="pill-icon">🔖</span>
                 <div className="pill-text">
-                  <span className="pill-val">Top 5%</span>
-                  <span className="pill-lab">Ranking</span>
+                  <span className="pill-val">{totalSaved}</span>
+                  <span className="pill-lab">Saved</span>
                 </div>
               </div>
             </div>
@@ -222,12 +231,7 @@ function ProfilePage({ user, setUser }) {
               {leaderboard.map((u, i) => (
                 <div key={u._id} className={`leaderboard-row ${u._id === user._id ? 'highlight' : ''}`}>
                   <div style={{ width: '30px', fontWeight: '800', color: i < 3 ? '#f59e0b' : 'var(--text-muted)' }}>#{i + 1}</div>
-                  <div style={{ 
-                    width: '40px', height: '40px', borderRadius: '50%', 
-                    background: avatarGradient(u.name), color: 'white', 
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                    fontWeight: 'bold', marginRight: '16px'
-                  }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: avatarGradient(u.name), color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', marginRight: '16px' }}>
                     {u.name[0]?.toUpperCase()}
                   </div>
                   <div style={{ flex: 1 }}>
@@ -241,6 +245,66 @@ function ProfilePage({ user, setUser }) {
               {leaderboard.length === 0 && <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted)' }}>No top users yet.</div>}
             </div>
           </section>
+
+          {/* ===== QUIZ HISTORY ===== */}
+          {quizHistory.length > 0 && (
+            <section className="profile-section" style={{ marginTop: '30px' }}>
+              <h3 className="section-title">📊 Quiz History <span style={{ fontSize: '0.75rem', fontWeight: 500, color: 'var(--text-muted)' }}>({quizHistory.length} session{quizHistory.length !== 1 ? 's' : ''})</span></h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {quizHistory.slice(0, 5).map((h, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'var(--bg-input)', borderRadius: 12, border: '1px solid var(--border)' }}>
+                    <div style={{ width: 40, height: 40, borderRadius: '50%', background: h.pct >= 70 ? 'rgba(66,85,255,0.1)' : h.pct >= 50 ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', flexShrink: 0 }}>
+                      {h.pct >= 70 ? '🎯' : h.pct >= 50 ? '📈' : '💪'}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 700, color: 'var(--text-heading)', fontSize: '0.9rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{h.course}</div>
+                      <div style={{ fontSize: '0.73rem', color: 'var(--text-muted)' }}>{new Date(h.date).toLocaleDateString()} · {h.total} questions · 🔥{h.bestStreak} streak</div>
+                    </div>
+                    <div style={{ fontWeight: 800, fontSize: '1.1rem', color: h.pct >= 70 ? 'var(--accent)' : h.pct >= 50 ? '#f59e0b' : '#ef4444', flexShrink: 0 }}>{h.pct}%</div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* ===== SAVED ITEMS ===== */}
+          {totalSaved > 0 && (
+            <section className="profile-section" style={{ marginTop: '30px' }}>
+              <h3 className="section-title">🔖 Saved Items <span style={{ fontSize: '0.75rem', fontWeight: 500, color: 'var(--text-muted)' }}>({totalSaved})</span></h3>
+              {savedBooks.length > 0 && (
+                <div style={{ marginBottom: 16 }}>
+                  <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.06em' }}>📚 Books ({savedBooks.length})</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {savedBooks.slice(0, 3).map((b, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: 'var(--bg-input)', borderRadius: 10, border: '1px solid var(--border)' }}>
+                        <span style={{ fontSize: '1.2rem' }}>📖</span>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-heading)' }}>{b.title}</div>
+                          <div style={{ fontSize: '0.73rem', color: 'var(--text-muted)' }}>{b.author || 'Unknown'} · {b.course}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {savedPosts.length > 0 && (
+                <div>
+                  <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.06em' }}>📰 Posts ({savedPosts.length})</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {savedPosts.slice(0, 3).map((p, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: 'var(--bg-input)', borderRadius: 10, border: '1px solid var(--border)' }}>
+                        <span style={{ fontSize: '1.2rem' }}>📰</span>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-heading)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title}</div>
+                          <div style={{ fontSize: '0.73rem', color: 'var(--text-muted)' }}>{p.category || 'Health'}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
 
           {isEditing && (
             <div className="editing-actions-v2">

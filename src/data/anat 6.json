@@ -1,0 +1,671 @@
+{
+  "questions": [
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the three main components of a human cell.",
+      "options": [
+        "Cytoskeleton, plasma membrane and organelles",
+        "Cytoskeleton, plasma membrane and nucleus",
+        "Cytoplasm, plasma membrane and organelles",
+        "Cytoplasm, plasma membrane and nucleus"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the cell structure that allows the cell to maintain its shape and allows for cellular movement.",
+      "options": [
+        "Cytoskeleton",
+        "Flagellum",
+        "Golgi apparatus",
+        "Plasma membrane"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Which of the following is NOT a function of the plasma membrane?",
+      "options": [
+        "surrounds the cell",
+        "control center of the cell",
+        "keeps the cell intact",
+        "controls what enters and exits the cell"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What term describes how the plasma membrane controls what enters and exits the cell?",
+      "options": [
+        "semipermeable",
+        "permeable",
+        "semisaturated",
+        "superpermeable"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The main structural molecule of the plasma membrane is:",
+      "options": [
+        "carbohydrates",
+        "cholesterol",
+        "proteins",
+        "phospholipids"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Molecules that are embedded within the phospholipid bilayer are:",
+      "options": [
+        "proteins",
+        "nucleic acids",
+        "carbohydrates",
+        "triglycerides"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Because proteins in the plasma membrane can move laterally, this model is called the ______ model.",
+      "options": [
+        "hydrophilia",
+        "hydrophobia",
+        "plasma protein fluid",
+        "fluid-mosaic"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the components of the plasma membrane:",
+      "options": [
+        "phospholipids, proteins, cholesterol and carbohydrates",
+        "phospholipids, triglycerides, cholesterol and carbohydrates",
+        "triglycerides, proteins, carbohydrates and nucleic acids",
+        "cholesterol, carbohydrates, phospholipids and triglycerides"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the component of the plasma membrane that marks cells as belonging to a particular individual.",
+      "options": [
+        "proteins",
+        "glycoproteins",
+        "cholesterol",
+        "phospholipids"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What is the main function of proteins in the plasma membrane?",
+      "options": [
+        "make cellular energy",
+        "contain cell contents",
+        "make ribosomes",
+        "transport through the membrane"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What is the form of the genetic material in a non-dividing cell?",
+      "options": [
+        "chromosomes",
+        "nucleolus",
+        "chromatin",
+        "chromaphore"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Describe the structure of the nuclear envelope.",
+      "options": [
+        "It is double layered with pores.",
+        "It is single layered and solid.",
+        "It is double layered and solid.",
+        "It is single layered with pores."
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What is the function of the nucleolus?",
+      "options": [
+        "It makes protein.",
+        "It makes ribosomes.",
+        "It makes phospholipids.",
+        "It contains the genetic material."
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the function of DNA.",
+      "options": [
+        "Controls the production of protein.",
+        "Produces proteins.",
+        "Produces ribosomes.",
+        "Controls the production of phospholipids."
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What organelle is the site of protein synthesis?",
+      "options": [
+        "vacuole",
+        "mitochondria",
+        "Golgi apparatus",
+        "ribosomes"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Which organelle and function is correctly matched?",
+      "options": [
+        "Golgi apparatus – produce ATP",
+        "Lysosomes - cellular digestion with hydrolytic enzymes",
+        "Mitochondria - supports the cell",
+        "Centrioles - produces ribosomes"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Which organelle and function is correctly matched?",
+      "options": [
+        "Smooth ER - makes proteins",
+        "Peroxisomes – produce ATP",
+        "Golgi apparatus - processing and packaging materials",
+        "Ribosomes - movement by the cell"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What organelle produces ATP?",
+      "options": [
+        "mitochondria",
+        "cilia",
+        "Golgi apparatus",
+        "Rough ER"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The function of the rough ER is ______ and smooth ER is _______.",
+      "options": [
+        "production of steroids; production of ATP",
+        "modification of proteins: production of ATP",
+        "modification of proteins; production of phospholipids",
+        "production of lysosomes: production of steroids"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Microtubules form _________ that assist in movement of chromosomes.",
+      "options": [
+        "spindle fibers",
+        "actin filaments",
+        "globular proteins",
+        "microvilli"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Sperm cells move by using a ________.",
+      "options": [
+        "microvilli",
+        "cilia",
+        "flagellum",
+        "centrioles"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Which of the following would NOT be found in the cytoplasm?",
+      "options": [
+        "chromatin",
+        "endoplasmic reticulum",
+        "peroxisomes",
+        "mitochondria"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "An example of a passive transport mechanism is:",
+      "options": [
+        "endocytosis",
+        "exocytosis",
+        "facilitated diffusion",
+        "phagocytosis"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "An example of an active transport mechanism is:",
+      "options": [
+        "facilitated diffusion",
+        "osmosis",
+        "pinocytosis",
+        "simple diffusion"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Random movement from high to low concentration is called:",
+      "options": [
+        "diffusion",
+        "active transport",
+        "filtration",
+        "pinocytosis"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Diffusion of water across a membrane is called:",
+      "options": [
+        "phagocytosis",
+        "filtration",
+        "osmosis",
+        "active transport"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "If a red blood cell is placed in a hypertonic solution, it will:",
+      "options": [
+        "shrink",
+        "swell",
+        "remain the same"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "In a hypotonic solution, water will move ____ the cell and it may ____.",
+      "options": [
+        "into; crenate",
+        "into; lyse",
+        "out of; crenate",
+        "out of; lyse"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Blood pressure movement of fluid out of capillaries is called:",
+      "options": [
+        "active transport",
+        "diffusion",
+        "filtration",
+        "osmosis"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Transport requiring ATP is:",
+      "options": [
+        "exocytosis",
+        "facilitated diffusion",
+        "osmosis",
+        "simple diffusion"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "In active transport, materials move from _____ to ____ concentration.",
+      "options": [
+        "lower; higher",
+        "higher; lower"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Pancreatic insulin release occurs by:",
+      "options": [
+        "exocytosis",
+        "facilitated diffusion",
+        "filtration",
+        "osmosis"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Proteins involved in active transport are called:",
+      "options": [
+        "pores",
+        "tubules",
+        "filters",
+        "pumps"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Cell eating is:",
+      "options": [
+        "phagocytosis",
+        "exocytosis",
+        "pinocytosis",
+        "cell pumping"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Formation of vesicle to bring material in is:",
+      "options": [
+        "exocytosis",
+        "endocytosis",
+        "filtration",
+        "osmosis"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Programmed cell death is called:",
+      "options": [
+        "apoptosis",
+        "crenation",
+        "endocytosis",
+        "exocytosis"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The two major parts of the cell cycle are:",
+      "options": [
+        "interphase and prophase",
+        "interphase and mitosis",
+        "interphase and metaphase",
+        "interphase and apoptosis"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Which does NOT occur in interphase?",
+      "options": [
+        "normal activities",
+        "DNA replication",
+        "chromosomes condense",
+        "protein synthesis"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Exact copy of DNA is made during:",
+      "options": [
+        "protein synthesis",
+        "transcription",
+        "translation",
+        "replication"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "DNA to mRNA is called:",
+      "options": [
+        "transcription",
+        "replication",
+        "translation",
+        "apoptosis"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "New DNA consists of:",
+      "options": [
+        "two new strands",
+        "two old strands",
+        "one old and one new strand"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "A gene codes for a:",
+      "options": [
+        "amino acid",
+        "carbohydrate",
+        "lipid",
+        "protein"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Three bases on DNA / mRNA pairing is:",
+      "options": [
+        "peptide; triplet",
+        "triplet; codon",
+        "codon; triplet",
+        "codon; anticodon"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Three bases on mRNA and complementary are:",
+      "options": [
+        "peptide; triplet",
+        "triplet; codon",
+        "codon; triplet",
+        "codon; anticodon"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Order of protein synthesis events:",
+      "options": [
+        "2-3-5-4",
+        "4-1-2-3-5",
+        "2-3-5-1-4",
+        "2-5-3-4-1"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Process of making protein is:",
+      "options": [
+        "mitosis",
+        "transcription",
+        "translation",
+        "replication"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Mitosis functions in:",
+      "options": [
+        "growth",
+        "spermatogenesis",
+        "oogenesis",
+        "B and C only"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Phases of interphase:",
+      "options": [
+        "Anaphase, metaphase, prophase, telophase",
+        "Anaphase, cytokinesis, prophase, telophase",
+        "Cytokinesis, G1 and G2",
+        "G1, S, G2"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Order of mitosis:",
+      "options": [
+        "metaphase, anaphase, prophase, telophase",
+        "prophase, metaphase, anaphase, telophase",
+        "prophase, anaphase, metaphase, telophase",
+        "anaphase, prophase, telophase, metaphase"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "NOT related to mitosis:",
+      "options": [
+        "tissue repair",
+        "spindle fibers",
+        "two daughter cells",
+        "chromosome reduction"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Chromatin condenses into:",
+      "options": [
+        "mRNA",
+        "ribosomes",
+        "chromosomes",
+        "polyribosomes"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Chromosomes become visible during:",
+      "options": [
+        "metaphase",
+        "interphase",
+        "prophase",
+        "telophase"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Chromosomes align at equator during:",
+      "options": [
+        "anaphase",
+        "telophase",
+        "prophase",
+        "metaphase"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Spindle fibers form during:",
+      "options": [
+        "prophase",
+        "anaphase",
+        "telophase",
+        "metaphase"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Sister chromatids separate during:",
+      "options": [
+        "metaphase",
+        "telophase",
+        "prophase",
+        "anaphase"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Nuclear envelope reforms during:",
+      "options": [
+        "metaphase",
+        "telophase",
+        "anaphase",
+        "prophase"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Cleavage furrow begins:",
+      "options": [
+        "interphase",
+        "anaphase",
+        "cytokinesis",
+        "mitosis"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Division of cytoplasm is:",
+      "options": [
+        "apoptosis",
+        "cytokinesis",
+        "interphase",
+        "mitosis"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Cells after mitosis (from 46) have:",
+      "options": [
+        "23",
+        "92",
+        "46",
+        "69"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Meiosis occurs in:",
+      "options": [
+        "body cells",
+        "sex cells",
+        "hair cells",
+        "skin cells"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Cells after meiosis (from 46) have:",
+      "options": [
+        "23",
+        "92",
+        "46",
+        "69"
+      ],
+      "answer": 0
+    }
+  ]
+}

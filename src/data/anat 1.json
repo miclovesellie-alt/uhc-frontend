@@ -1,0 +1,370 @@
+{
+  "questions": [
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The respiratory system allows oxygen to enter the blood. The oxygen is necessary for cellular production of _______.",
+      "options": ["ATP", "carbon dioxide", "glucose", "protein"],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Pulmonary ventilation is also known as:",
+      "options": ["breathing", "cellular respiration", "external respiration", "internal respiration"],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Exchange of gases between the air and blood is _____ and the exchange of gases between blood and tissue fluid is ______.",
+      "options": ["external respiration; internal respiration", "external respiration; ventilation", "internal respiration; external respiration", "ventilation; internal respiration"],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the function of the mucous membrane lining respiratory airways.",
+      "options": ["clean, warm and moisten air.", "exchange gases and warm and moisten air.", "exchange gases and clean and warm air.", "exchange gases and moisten and warm air."],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the structures that aid in the cleansing of the air.",
+      "options": ["blood vessels, cilia and mucous", "blood vessels, cilia and coarse nasal hairs", "blood vessels coarse nasal hairs and mucus", "cilia, coarse nasal hairs and mucous"],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The function of the nasal conchae is to increase surface area:",
+      "options": ["for gas exchange.", "for smell.", "for cleansing, moisturizing, and warming the air.", "bring in more air."],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify structures of the upper respiratory tract.",
+      "options": ["Alveoli, nasal cavity, pharynx and trachea.", "Bronchus, nasal cavity, pharynx and larynx.", "Nasal cavity, pharynx, glottis and larynx.", "Trachea, nasal cavity pharynx and larynx."],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the sections of the pharynx in order as air is inhaled.",
+      "options": ["Laryngopharynx, nasopharynx and oropharynx", "Nasopharynx, laryngopharynx and oropharynx", "Nasopharynx, oropharynx and laryngopharynx", "Oropharynx, nasopharynx and laryngopharynx"],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the region(s) of the pharynx that serves as a passageway for air only.",
+      "options": ["Laryngopharynx", "Nasopharynx", "Oropharynx", "Laryngopharynx and nasopharynx"],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the structure that keeps food and drink from entering the lower respiratory tract.",
+      "options": ["nasal conchae", "tonsils", "tongue", "epiglottis"],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The \"Adam's Apple\" is also known as the:",
+      "options": ["epiglottis of the larynx", "Laryngopharynx of pharynx", "thyroid cartilage of the larynx", "trachea"],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The voice box is also called the _____.",
+      "options": ["bronchus", "larynx", "pharynx", "trachea"],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The tonsils are part of the:",
+      "options": ["endocrine system.", "digestive system.", "lymphatic system.", "respiratory system."],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The windpipe is also known as the _____.",
+      "options": ["bronchus", "epiglottis", "pharynx", "trachea"],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The C-shaped cartilaginous rings around the trachea are open posteriorly to:",
+      "options": ["allow for expansion of the esophagus during swallowing", "allow the vocal cords to relax", "prevent food from entering the nasal cavity during swallowing", "prevent food from entering the trachea"],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "When the tension on the vocal cords increase, the glottis becomes _____ and the pitch of the voice becomes ______.",
+      "options": ["more narrow; higher", "more narrow; lower", "wider: higher", "wider; lower"],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What structures allow the trachea and bronchi to stay open all the time?",
+      "options": ["cilia", "C-shaped cartilage rings", "glottis", "mucous membranes"],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The trachea is lined with",
+      "options": ["ciliated simple squamous epithelium.", "stratified squamous epithelium.", "pseudostratified ciliated columnar epithelium.", "pseudostratified squamous epithelium."],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The right lung has _____ secondary bronchi and the left lung has _____ secondary bronchi.",
+      "options": ["2; 2", "2; 3", "3; 2", "3; 3"],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The serous membrane adhering to the surface of the lungs is the ______ and the serous membrane that lines the thoracic cavity is the ______.",
+      "options": ["diaphragm; parietal pleura", "parietal pleura; diaphragm", "parietal pleura; visceral pleura", "visceral pleura; parietal pleura"],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The trachea divides into the right and left _____ that enter into the right and left lungs.",
+      "options": ["alveoli", "bronchioles", "primary bronchi", "secondary bronchi"],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "During gas exchange within the lungs, oxygen diffuses from the ____ into the blood of the ______.",
+      "options": ["alveoli; pulmonary capillaries", "alveoli; bronchiole capillaries", "lobule; pulmonary capillaries", "lobule; bronchiole capillaires"],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "List the correct sequence of organs through which air passes into the body.",
+      "options": ["nose, larynx, pharynx, trachea, bronchi, lungs", "nose, pharynx, larynx, bronchi, trachea, lungs", "nose, pharynx, larynx, trachea, bronchi, lungs", "nose, trachea, pharynx, larynx, bronchi, lungs"],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What substance is necessary to keep alveoli from collapsing because of the surface tension of the water?",
+      "options": ["surfactant", "mucus", "blood", "air"],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Infant respiratory distress syndrome results from a(n)",
+      "options": ["lack of surfactant.", "autoimmune disorder.", "congenital lung defect.", "inactive respiratory center."],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The respiratory membrane consists of the:",
+      "options": ["alveolar walls.", "capillary walls.", "alveolar","capillary walls."],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify muscles of inspiration.",
+      "options": ["Abdominal muscles and external intercostal.", "Diaphragm and external intercostal muscles", "Diaphragm and internal intercostal muscles", "Internal and external intercostal muscles"],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "During rest, inspiration is considered a(n) ______ phase of ventilation and expiration is considered a(n) _____ phase of ventilation.",
+      "options": ["active; active", "active; passive", "passive; passive", "passive; active"],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "During inspiration, the diaphragm contracts, causing the volume of the thoracic cavity to ______ and the intrapulmonary pressure to ______.",
+      "options": ["decrease; decrease", "decrease; increase", "increase; decrease", "increase; increase"],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "During inspiration, air flows into the lungs because atmospheric pressure is:",
+      "options": ["greater than intrapulmonary pressure", "less than intrapulmonary pressure", "equal to intrapulmonary pressure", "greater than intrapleural pressure"],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Airflow into the lungs will stop when the pressure in the air (atmospheric pressure) is:",
+      "options": ["greater than intrapulmonary pressure", "less than intrapulmonary pressure", "equal to intrapulmonary pressure", "greater than intrapleural pressure"],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "During expiration, the diaphragm relaxes, causing the volume of the thoracic cavity to ______ and the intrapulmonary pressure to ______.",
+      "options": ["decrease; decrease", "decrease; increase", "increase; decrease", "increase; increase"],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "During expiration, air flows out of the lungs because atmospheric pressure is:",
+      "options": ["greater than intrapulmonary pressure", "less than intrapulmonary pressure", "equal to intrapulmonary pressure", "greater than intrapleural pressure"],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "In order to sing or blow out birthday candles, contraction of the ____ muscles are needed.",
+      "options": ["external intercostal", "internal intercostal", "pectoralis major", "sternocleidomastoid"],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The vital capacity equals the",
+      "options": ["total lung volume.", "inspiratory reserve volume + expiratory reserve volume.", "inspiratory reserve volume + expiratory reserve volume + tidal volume."],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Normal, quiet respiration moves about 500 mLs of air. What is this volume called?",
+      "options": ["vital capacity", "expiratory reserve volume", "residual volume", "tidal volume"],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "A big, deep inspiration before going under water is the",
+      "options": ["vital capacity.", "residual volume.", "inspiratory reserve volume.", "tidal volume."],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The primary respiratory center is located in the",
+      "options": ["brachiocephalic trunk.", "hypothalamus.", "medulla oblongata.", "cerebrum."],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "To breathe rhythmically at a normal rate and volume requires input from the",
+      "options": ["cerebrum.", "cerebellum.", "thalamus.", "pons."],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The normal quiet pattern of breathing of a smooth, sustained inspiration followed by a smooth, sustained expiration is called:",
+      "options": ["apnea", "eupnea", "hyperpnea", "hypoventilation"],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The respiratory center is directly sensitive to:",
+      "options": ["elevated carbon dioxide", "elevated carbon dioxide and hydrogen ions", "elevated hydrogen ion", "low oxygen levels"],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The exchange of respiratory gases in the lungs is called",
+      "options": ["pulmonary ventilation.", "external respiration.", "internal respiration.", "expiration."],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The driving factor(s) for gas exchange is (are)",
+      "options": ["different partial pressures of the blood gases.", "the number of white blood cells in the blood.", "different concentrations of the blood gases.", "Both A and C"],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "External respiration occurs between the alveoli and the pulmonary capillaries because the concentration of oxygen levels is higher in the ______ and the concentration of carbon dioxide is higher in the ______.",
+      "options": ["alveoli; pulmonary capillaries", "pulmonary capillaries; alveoli", "systemic capillaries; tissue fluid", "tissue fluid; systemic capillaries"],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The exchange of gases between the blood and tissue fluids is called",
+      "options": ["pulmonary ventilation.", "external respiration.", "internal respiration.", "expiration."],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Internal respiration occurs between the systemic capillaries and the tissue fluid because the concentration of oxygen levels is higher in the ______ and the concentration of carbon dioxide is higher in the ______.",
+      "options": ["alveoli; pulmonary capillaries", "pulmonary capillaries; alveoli", "systemic capillaries; tissue fluid", "tissue fluid; systemic capillaries"],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Most of the carbon dioxide in the blood is transported as",
+      "options": ["carbon dioxide dissolved in the plasma.", "bicarbonate ions.", "carbaminohemoglobin.", "carbonic acid."],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Carbonic acid can be formed from",
+      "options": ["water and carbon dioxide.", "hydrogen ions and bicarbonate ions.", "carbon dioxide and bicarbonate ions.", "A and B, but not C."],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Most of the oxygen in the blood is transported",
+      "options": ["dissolved oxygen in the plasma.", "attached to the heme group of the hemoglobin in the red blood cells.", "attached to the globin part of the hemoglobin in the red blood cells.", "as bicarbonate ions in the red blood cells."],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What ion must enter a red blood cell so that bicarbonate ions can move into the plasma for transport?",
+      "options": ["sodium", "calcium", "hydrogen", "chloride"],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Which of the following is NOT a way that carbon dioxide is transported in the blood?",
+      "options": ["a gas dissolved in the plasma", "as bicarbonate ion in the plasma", "attached to the heme group of hemoglobin", "as carbaminohemoglobin"],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Which part of the pharynx contains the openings to the auditory tubes?",
+      "options": ["laryngopharynx", "nasopharynx", "oropharynx"],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Infection can move from the upper respiratory tract to the ear and cause",
+      "options": ["otitis media.", "sinusitis.", "tonsillitis.", "rhinitis."],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Hoarseness leading to not being able to talk audibly is an infection of which structure?",
+      "options": ["tonsils", "sinuses", "larynx", "eustachian tube"],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Pulmonary tuberculosis is caused by a(n) ________.",
+      "options": ["bacterium", "virus", "interferon", "protozoan"],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Fibrous connective tissue builds up in the lungs causing them not to inflate properly, and actually deflating them is called ________?",
+      "options": ["chronic bronchitis", "emphysema", "pulmonary fibrosis", "asthma"],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Which of the following is NOT true of emphysema?",
+      "options": ["It is a restrictive pulmonary disorder.", "Alveolar walls are damaged.", "Lungs lose elasticity and the ability to recoil.", "Exhaling is difficult."],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Describe the correct sequence of changes leading to lung cancer.",
+      "options": ["cilia lost, thickening and callusing of cells, disordered cells, atypical nuclei, metastasis", "Thickening and callusing of cells, cilia lost, atypical nuclei, disordered cells, metastasis", "atypical nuclei, disordered cells, metastasis, thickening and callusing of cells, cilia lost", "disordered cells, metastasis, cilia lost, thickening and callusing of cells, atypical nuclei"],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Which of the following is NOT an effect of aging on the respiratory system?",
+      "options": ["Less efficient gas exchange", "Greater incidence of respiratory diseases.", "Increased inspiratory reserve volume.", "Increased residual air."],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Hyperventilation causes",
+      "options": ["alkalosis.", "acidosis.", "no change."],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "A decrease in pH or _____ can occur when one ______.",
+      "options": ["acidosis; hyperventilates", "acidosis; hypoventilates", "alkalosis; hyperventilates", "alkalosis; hypoventilattes"],
+      "answer": 1
+    }
+  ]
+}

@@ -1,17 +1,33 @@
 import React, { useState, useEffect } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import api from "../api/api";
-import { BookMarked, BookOpen, ChevronRight, ArrowLeft, GraduationCap } from "lucide-react";
+import { BookMarked, BookOpen, ChevronRight, ArrowLeft, GraduationCap, Bookmark } from "lucide-react";
+import { useToast } from "../components/Toast";
+import { toggleBookmark, getBookmarks } from "../utils/bookmarks";
 import "../styles/library.css";
 
 function Library() {
   const navigate = useNavigate();
+  const toast = useToast();
   const { searchQuery } = useOutletContext();
   const [books, setBooks] = useState([]);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState("courses"); // 'courses' or 'books'
+  const [view, setView] = useState("courses");
   const [activeCourse, setActiveCourse] = useState(null);
+  const [bookmarkedBooks, setBookmarkedBooks] = useState(
+    () => new Set(getBookmarks('book').map(b => String(b._id)))
+  );
+
+  const handleBookmarkBook = (book) => {
+    const added = toggleBookmark('book', book);
+    setBookmarkedBooks(prev => {
+      const next = new Set(prev);
+      added ? next.add(String(book._id)) : next.delete(String(book._id));
+      return next;
+    });
+    toast(added ? '🔖 Book saved!' : 'Removed from saved', added ? 'success' : 'info');
+  };
 
   useEffect(() => {
     fetchLibrary();
@@ -120,9 +136,17 @@ function Library() {
                 <div className="book-info">
                   <h3 className="book-title">{book.title}</h3>
                   <p className="book-author">{book.author || "Unknown Author"}</p>
-                  <div className="book-actions">
-                    <button className="book-btn" onClick={() => navigate(`/library/view/${book._id}`)}>
+                  <div className="book-actions" style={{ display: 'flex', gap: 8 }}>
+                    <button className="book-btn" style={{ flex: 1 }} onClick={() => navigate(`/library/view/${book._id}`)}>
                       <BookOpen size={16} /> Open Reader
+                    </button>
+                    <button
+                      className="book-btn"
+                      onClick={() => handleBookmarkBook(book)}
+                      title={bookmarkedBooks.has(String(book._id)) ? 'Remove bookmark' : 'Save book'}
+                      style={{ padding: '0 12px', background: bookmarkedBooks.has(String(book._id)) ? 'var(--accent-pale)' : undefined, color: bookmarkedBooks.has(String(book._id)) ? 'var(--accent)' : undefined }}
+                    >
+                      <Bookmark size={16} fill={bookmarkedBooks.has(String(book._id)) ? 'currentColor' : 'none'} />
                     </button>
                   </div>
                 </div>

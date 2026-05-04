@@ -1,0 +1,304 @@
+{
+  "questions": [
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Which of the following is the building block of protein?",
+      "options": ["Amino acids", "Triglycerides", "Glucose", "Monosaccharide"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "A 5-year old boy is consuming less than required protein intake, what is he prone to?",
+      "options": ["Marasmus", "Kwashiorkor", "Calorie-deficiency malnutrition", "Obesity"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Bernadette has hypoglycemia, which carbohydrate supplies glucose immediately?",
+      "options": ["Sugar candies", "Cereal", "Milk", "Water"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Fruits and vegetables are rich in all EXCEPT:",
+      "options": ["Vitamins", "Minerals", "Fiber", "Fat"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Which food should NOT be recommended for bodybuilding?",
+      "options": ["Egg whites", "Apples", "Lean meat", "Egg yolk"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Healthy fats mainly come from:",
+      "options": ["Butter", "Fruits and vegetables", "Fish, nuts and vegetable oils", "Butter and nuts"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Correct exercise recommendation for weight loss is:",
+      "options": [
+        "60–90 min 4 days/week",
+        "30 min weekends only",
+        "30 min most days of the week",
+        "Fast then exercise weekends"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Complete protein sources EXCEPT:",
+      "options": ["Pork", "Fish", "Vegetables", "Dairy products"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Calorie deficiency malnutrition is:",
+      "options": ["Diabetes", "Kwashiorkor", "Marasmus", "Ketosis"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Correct Filipino nutritional guideline is:",
+      "options": [
+        "Exclusive breastfeeding 0–6 months",
+        "Rock salt preferred",
+        "Baby oil foods daily",
+        "No exercise needed"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Component of food required by the body is:",
+      "options": ["Nutrition", "Food", "Nutrients", "Malnutrition"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Cholesterol is produced in the:",
+      "options": ["Liver", "Brain", "Kidneys", "Spleen"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Which should be avoided due to saturated fat?",
+      "options": ["Nuts", "Olive oil", "Canola oil", "Coconut oil"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Too much protein may cause:",
+      "options": ["Marasmus", "Prostate problems", "Kwashiorkor", "Diabetes"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Main energy sources are:",
+      "options": ["Fish, egg, chicken", "Vegetables", "Fruits", "Pasta, corn, sweet potato"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Which is NOT a function of carbohydrates?",
+      "options": [
+        "Protein sparing",
+        "Primary energy source",
+        "Facilitates absorption of vitamins ADEK",
+        "Normal fat metabolism"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Compound sugar example is:",
+      "options": ["Lactose", "Fruits", "Galactose", "Glucose"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "High saturated fat food is:",
+      "options": ["Bread", "Whole milk and cheese", "Corn oil", "Cereal"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Excess saturated fat increases risk of:",
+      "options": ["Scurvy", "Hepatitis", "Diabetes", "Heart disease"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Fruits are NOT high in:",
+      "options": ["Protein", "Vitamins", "Fiber", "None"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Which is NOT a carbohydrate form?",
+      "options": ["Sugar", "Starch", "Protein", "Fiber"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Food that prevents hunger easily is:",
+      "options": ["Chocolates", "Milk", "Oats or cereal", "White bread"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "During diarrhea, increase intake of:",
+      "options": [
+        "Fish protein",
+        "Egg and bread",
+        "Avocado and cheese",
+        "Apples and leafy vegetables"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "High unsaturated fat source is:",
+      "options": ["Lard", "Olive oil", "Coconut oil", "None"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Waxy substance for hormones and vitamin D synthesis:",
+      "options": ["Cholesterol", "Amino acids", "Triglycerides", "Glucose"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Correct food guideline is:",
+      "options": [
+        "Limit solid fats",
+        "Keep saturated fats high",
+        "Eat high sugar foods",
+        "No exercise needed"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Bad cholesterol is:",
+      "options": ["HDL", "LDL only", "LDL/VLDL", "All"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Best diet for diabetic patient is:",
+      "options": ["Low fat", "Amino acids", "Triglycerides", "Glucose"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Highest calorie per gram food is:",
+      "options": ["Fat", "Protein", "Carbohydrate", "All equal"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Unused carbohydrates are:",
+      "options": [
+        "Stored as fat",
+        "Stored as amino acids",
+        "Circulate forever",
+        "All used immediately"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "High saturated fat intake:",
+      "options": [
+        "Increase HDL decrease LDL",
+        "Increase HDL and LDL",
+        "Decrease HDL increase LDL",
+        "Decrease both HDL and LDL"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Fat soluble vitamin EXCEPT:",
+      "options": ["A", "B", "D", "E"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Coconut oil and avocado are saturated fats:",
+      "options": ["True", "False", "I don’t know", "Don’t care"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "For wound healing, recommend:",
+      "options": [
+        "Lean meat, legumes, oranges",
+        "Milk, bread, bacon",
+        "Water, banana, potato",
+        "Water and steak"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Essential amino acids are important because:",
+      "options": [
+        "Help make nonessential amino acids",
+        "Increase body supply",
+        "Small quantities produced",
+        "Cannot be synthesized by body"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Macronutrients EXCEPT:",
+      "options": ["Protein", "Carbohydrates", "Fats", "None of the above"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Correct salt usage practice is:",
+      "options": [
+        "Add iodized salt after cooking",
+        "Add during cooking only",
+        "Add anytime",
+        "Avoid salt always"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Correct oil recommendation is:",
+      "options": [
+        "Butter and margarine",
+        "Fruits and vegetables",
+        "Fish, nuts and vegetable oils",
+        "Butter and nuts"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Indigestible portion of food is:",
+      "options": ["Protein", "Cholesterol", "Fats", "Fiber"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Which is NOT a carbohydrate function?",
+      "options": [
+        "Protein sparing",
+        "Energy source",
+        "Facilitates ADEK absorption",
+        "Fat metabolism support"
+      ],
+      "answer": 2
+    }
+  ]
+}

@@ -1,0 +1,490 @@
+{
+  "questions": [
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "The basic building blocks of all matter are:",
+      "options": ["gases", "liquids", "elements", "solids"],
+      "answer": 2
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Over 90% of the human body is comprised of the elements:",
+      "options": [
+        "carbon, hydrogen, sodium and nitrogen",
+        "carbon, hydrogen, oxygen and nitrogen",
+        "oxygen, hydrogen, iron and calcium",
+        "sodium, iron, calcium and oxygen"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Na is the chemical symbol for:",
+      "options": ["chlorine", "nitrogen", "oxygen", "sodium"],
+      "answer": 3
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "K is the chemical symbol for:",
+      "options": ["calcium", "phosphorous", "potassium", "sodium"],
+      "answer": 2
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "The smallest unit of an element that has all the properties of that element is a(an):",
+      "options": ["atom", "gas", "molecule", "isotope"],
+      "answer": 0
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Identify the subatomic particles found within the nucleus of an atom.",
+      "options": ["protons and electron", "electrons and neutrons", "positrons and electrons", "protons and neutrons"],
+      "answer": 3
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Identify the subatomic particle that is negatively charged.",
+      "options": ["electron", "proton", "nucleus", "neutron"],
+      "answer": 0
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "The subatomic particle that has a mass of 1 amu and has no charge is the:",
+      "options": ["electron", "proton", "nucleus", "neutron"],
+      "answer": 3
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "If a neutral atom has 12 protons, how many electrons does it have?",
+      "options": ["24", "12", "8", "10"],
+      "answer": 1
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "An atom of carbon has 6 protons, 6 neutrons and 6 electrons. What is the mass number of this isotope of carbon?",
+      "options": ["6", "9", "12", "18"],
+      "answer": 2
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "An atom of nitrogen has 7 protons and 7 neutrons. What is the atomic number of nitrogen?",
+      "options": ["7", "14", "21", "49"],
+      "answer": 0
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "What subatomic particle(s) determine(s) the chemical properties of an atom?",
+      "options": ["protons", "neutrons", "electrons", "protons and neutrons"],
+      "answer": 2
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Different isotopes of a particular element have different numbers of ________.",
+      "options": ["protons", "electrons", "neutrons", "ions"],
+      "answer": 2
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Atoms with more than one energy shell are most stable when the ______ shell has ______ electrons.",
+      "options": ["innermost: 6", "outermost: 8", "innermost: 2", "outermost: 2"],
+      "answer": 1
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Which of the following is NOT a use of high level radiation?",
+      "options": [
+        "sterilizing medical and dental products",
+        "sterilizing the U.S. mail",
+        "killing cancer cells",
+        "radioactive tracers"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "A radioactive isotope intentionally put into a human body for metabolic tracing is called a(n):",
+      "options": ["isotope", "geiger", "tracer", "neutrons"],
+      "answer": 2
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Atoms can bond to form a chemical unit called a:",
+      "options": ["molecule", "electron", "attraction", "inorganic matter"],
+      "answer": 0
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Particles that have either a positive or negative charge are called:",
+      "options": ["reactions", "ions", "compound", "molecule"],
+      "answer": 1
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Covalent bonds result from ________ and ionic bonds result from ________.",
+      "options": [
+        "isotope formation, ionization",
+        "sharing of electrons, attraction between opposite charges",
+        "positive charges, negative charges",
+        "inorganic attractions, organic attractions"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Ions are formed when an atom gains or loses:",
+      "options": ["electrons", "neutrons", "protons", "electrons or neutrons"],
+      "answer": 0
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "A double covalent bond occurs when two atoms share:",
+      "options": ["2 electrons", "2 pairs of electrons", "2 neutrons", "2 pairs of neutrons"],
+      "answer": 1
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "The most abundant molecule in living things is:",
+      "options": ["carbon dioxide", "oxygen", "water", "nitrogen monoxide"],
+      "answer": 2
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "What type of bond is formed when electrons are shared unequally?",
+      "options": ["Hydrogen bond", "Ionic bond", "Non-polar covalent bond", "Polar covalent bond"],
+      "answer": 3
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "What type of bond is formed when electrons are shared equally?",
+      "options": ["Hydrogen bond", "Ionic bond", "Non-polar covalent bond", "Polar covalent bond"],
+      "answer": 2
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Which of the following does NOT describe a water molecule?",
+      "options": ["Covalently bonded", "Polar molecule", "Inorganic", "An ionic compound"],
+      "answer": 3
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Which of the following is NOT a property of water?",
+      "options": [
+        "Cannot absorb only small quantities of heat",
+        "Can dissolve polar and ionic compounds",
+        "Cohesive yet flows",
+        "High heat of vaporization"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Water clinging to surfaces is called:",
+      "options": ["adhesion", "cohesion", "vaporization", "ionization"],
+      "answer": 0
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "What type of bond forms between water molecules?",
+      "options": ["Hydrogen bond", "Ionic bond", "Non-polar covalent bond", "Polar covalent bond"],
+      "answer": 0
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "What type of substances dissolve in water?",
+      "options": ["Non-polar only", "Polar only", "Non-polar and ions", "Polar molecules and ions"],
+      "answer": 3
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "A solution with pH 3 is:",
+      "options": ["acidic", "basic", "neutral"],
+      "answer": 0
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "A solution with pH 11 is:",
+      "options": ["acidic", "basic", "neutral"],
+      "answer": 1
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "A substance that releases hydrogen ions or accepts hydroxide ions is a:",
+      "options": ["acid", "base", "buffer", "isotope"],
+      "answer": 1
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "An acid is a substance that:",
+      "options": ["releases hydrogen ions", "accepts hydrogen ions", "maintains pH", "neutralizes solution"],
+      "answer": 0
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "pH measures concentration of:",
+      "options": ["acids", "bases", "hydrogen ions", "sodium ions"],
+      "answer": 2
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "A buffer is a substance that:",
+      "options": ["acid", "base", "buffer", "isotope"],
+      "answer": 2
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "As pH increases, hydrogen ion concentration:",
+      "options": ["decreases", "increases", "stays same", "fluctuates"],
+      "answer": 0
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "A substance that releases ions in water is a:",
+      "options": ["electrolyte", "isotope", "carbohydrate", "lipid"],
+      "answer": 0
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Normal blood pH is:",
+      "options": ["2.2", "6.8", "7.0", "7.4"],
+      "answer": 3
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Acidosis occurs when blood pH is:",
+      "options": [">7.0", "<7.0", ">7.45", "<7.35"],
+      "answer": 1
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "The four macromolecules of life are:",
+      "options": [
+        "carbohydrates, electrolytes, lipids, water",
+        "electrolytes, lipids, proteins, water",
+        "carbohydrates, lipids, nucleic acids, proteins",
+        "electrolytes, proteins, nucleic acids, water"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "A polymer is made of:",
+      "options": ["buffers", "macromolecules", "monomers", "monosaccharides"],
+      "answer": 2
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Carbohydrates have a 2:1 hydrogen to oxygen ratio:",
+      "options": ["carbohydrates", "lipids", "nucleic acids", "proteins"],
+      "answer": 0
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Monomer of carbohydrates is:",
+      "options": ["amino acids", "fatty acids", "monosaccharides", "nucleotides"],
+      "answer": 2
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Immediate energy source is:",
+      "options": ["amino acids", "DNA", "fatty acids", "glucose"],
+      "answer": 3
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Hydrolysis of disaccharide produces:",
+      "options": ["polysaccharide", "two amino acids", "two monosaccharides", "two nucleotides"],
+      "answer": 2
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Monosaccharide in fruit:",
+      "options": ["glycogen", "lactose", "sucrose", "fructose"],
+      "answer": 3
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Storage form of glucose in animals:",
+      "options": ["cellulose", "starch", "sucrose", "glycogen"],
+      "answer": 3
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Macromolecule forming membranes and long-term energy storage:",
+      "options": ["carbohydrates", "lipids", "nucleic acids", "proteins"],
+      "answer": 1
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Storage form of glucose in plants:",
+      "options": ["cellulose", "starch", "sucrose", "glycogen"],
+      "answer": 1
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Most energy per gram:",
+      "options": ["carbohydrates", "lipids", "nucleic acids", "proteins"],
+      "answer": 1
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Indigestible polysaccharide:",
+      "options": ["cellulose", "starch", "maltose", "glycogen"],
+      "answer": 0
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Fats vs oils at room temperature:",
+      "options": ["yellow/white", "solids/liquids", "liquids/solids", "white/yellow"],
+      "answer": 1
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "NOT a lipid function:",
+      "options": ["insulation", "energy storage", "membrane formation", "genetic information"],
+      "answer": 3
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "NOT a lipid type:",
+      "options": ["glycogen", "steroids", "triglycerides", "phospholipids"],
+      "answer": 0
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Main component of cell membrane:",
+      "options": ["cholesterol", "fatty acids", "phospholipids", "polysaccharides"],
+      "answer": 2
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "NOT a lipid:",
+      "options": ["amino acids", "fats", "phospholipids", "steroids"],
+      "answer": 0
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Two amino acids form a:",
+      "options": ["dipeptide", "disaccharide", "polypeptide", "protein"],
+      "answer": 0
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "NOT a protein function:",
+      "options": ["antibodies", "movement", "enzymes", "energy creation"],
+      "answer": 3
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "NOT a protein function:",
+      "options": ["hormones", "monosaccharides", "transport molecules", "hair and nails"],
+      "answer": 1
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Protein building blocks:",
+      "options": ["nucleic acids", "amino acids", "fatty acids", "glycerol"],
+      "answer": 1
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Number of amino acids in humans:",
+      "options": ["10", "12", "20", "24"],
+      "answer": 2
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Amino acid sequence structure is:",
+      "options": ["quaternary", "tertiary", "secondary", "primary"],
+      "answer": 3
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Multiple polypeptide chains structure:",
+      "options": ["primary", "tertiary", "quaternary", "secondary"],
+      "answer": 2
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Protein shape destruction is called:",
+      "options": ["denaturation", "radiation", "saturation", "unsaturation"],
+      "answer": 0
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Protein catalysts are:",
+      "options": ["acids", "buffers", "enzymes", "genes"],
+      "answer": 2
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Enzymes function by:",
+      "options": [
+        "decreasing pH",
+        "increasing pH",
+        "decreasing activation energy",
+        "increasing activation energy"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Joining small molecules into large ones is:",
+      "options": ["degradation", "replacement", "synthesis", "decomposition"],
+      "answer": 2
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Breaking down macromolecules is:",
+      "options": ["synthesis", "degradation", "composition", "replacement"],
+      "answer": 1
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Protein formation via dehydration is:",
+      "options": ["synthesis", "degradation", "decomposition", "replacement"],
+      "answer": 0
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "NOT part of nucleotide:",
+      "options": ["sugar", "phosphate", "base", "amino acid"],
+      "answer": 3
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "DNA rungs are:",
+      "options": ["sugar-phosphate", "base pairs", "uracil-phosphate", "none"],
+      "answer": 1
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Adenine pairs with:",
+      "options": ["uracil", "thymine", "cytosine", "guanine"],
+      "answer": 1
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "DNA shape is:",
+      "options": ["double helix", "double circle", "straight strand", "none"],
+      "answer": 0
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Genetic code produces:",
+      "options": ["carbohydrates", "lipids", "proteins", "cholesterol"],
+      "answer": 2
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "Energy carrier molecule:",
+      "options": ["ATP", "DNA", "RNA", "glucose"],
+      "answer": 0
+    },
+    {
+      "course": "Chemistry & Biochemistry",
+      "question": "ATP yield from glucose:",
+      "options": ["26", "30", "36", "50"],
+      "answer": 2
+    }
+  ]
+}

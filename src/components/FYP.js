@@ -5,6 +5,8 @@ import { getFileUrl } from "../utils/config";
 import api from "../api/api";
 import axios from "axios";
 import "../styles/dashboard.css";
+import { useToast } from "./Toast";
+import { toggleBookmark, getBookmarks } from "../utils/bookmarks";
 
 import fbLogo from "../assets/fb.webp";
 import igLogo from "../assets/ig.webp";
@@ -19,6 +21,7 @@ function rnd(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
 export default function FYP({ refresh }) {
   const { user, setUser } = useContext(UserContext);
+  const toast = useToast();
   const { searchQuery } = useOutletContext();
   const navigate = useNavigate();
   const logoDropdownRef = useRef();
@@ -31,9 +34,22 @@ export default function FYP({ refresh }) {
   const [replyingTo, setReplyingTo] = useState(null);
   const [selectedArticle, setSelectedArticle] = useState(null);
   const [expandedPosts, setExpandedPosts] = useState({});
+  const [bookmarkedPosts, setBookmarkedPosts] = useState(
+    () => new Set(getBookmarks('post').map(b => String(b._id)))
+  );
 
   const toggleExpand = (postId) => {
     setExpandedPosts(prev => ({ ...prev, [postId]: !prev[postId] }));
+  };
+
+  const handleBookmarkPost = (post) => {
+    const added = toggleBookmark('post', post);
+    setBookmarkedPosts(prev => {
+      const next = new Set(prev);
+      added ? next.add(String(post._id)) : next.delete(String(post._id));
+      return next;
+    });
+    toast(added ? '🔖 Post saved to bookmarks!' : 'Removed from bookmarks', added ? 'success' : 'info');
   };
 
   const awardPoints = async (amount, reason) => {
@@ -131,7 +147,7 @@ export default function FYP({ refresh }) {
       } else {
         setCommentInputs(prev => ({ ...prev, [id]: "" }));
       }
-      alert("Comment posted! +1 point");
+      toast("Comment posted! +1 point 🎉", "success");
       return;
     }
 
@@ -174,6 +190,22 @@ export default function FYP({ refresh }) {
       </div>
 
 
+
+      {/* ── Quick Stats Bar ── */}
+      <div className="uhc-stats-bar">
+        {[
+          { icon: '🔥', label: 'Streak', value: `${user?.streak || 0} days` },
+          { icon: '⭐', label: 'Points', value: (user?.points || 0).toLocaleString() },
+          { icon: '📝', label: 'Quizzes', value: (() => { try { return JSON.parse(localStorage.getItem(`quizHistory_${localStorage.getItem('userId')}`) || '[]').length; } catch { return 0; } })() },
+          { icon: '🔖', label: 'Saved', value: getBookmarks('post').length + getBookmarks('book').length },
+        ].map(s => (
+          <div key={s.label} className="uhc-stats-bar__item">
+            <span className="uhc-stats-bar__icon">{s.icon}</span>
+            <span className="uhc-stats-bar__value">{s.value}</span>
+            <span className="uhc-stats-bar__label">{s.label}</span>
+          </div>
+        ))}
+      </div>
 
       {/* ── Feed header ── */}
       <div className="dash-section-header">
@@ -280,12 +312,20 @@ export default function FYP({ refresh }) {
               >
                 {likedPosts[post._id] ? "❤️" : "🤍"} {post.likes} Likes
               </button>
-              <button 
-                className="dash-post-action-btn" 
+              <button
+                className="dash-post-action-btn"
                 onClick={() => setSelectedArticle(post)}
                 style={{ background: 'transparent', padding: '8px 16px', fontSize: '0.9rem', flex: 1, justifyContent: 'center', borderRadius: '8px' }}
               >
                 💬 {post.comments?.length || 0} Comments
+              </button>
+              <button
+                className={`dash-post-action-btn${bookmarkedPosts.has(String(post._id)) ? ' bookmarked' : ''}`}
+                onClick={() => handleBookmarkPost(post)}
+                title={bookmarkedPosts.has(String(post._id)) ? 'Remove bookmark' : 'Save post'}
+                style={{ background: 'transparent', padding: '8px 12px', fontSize: '1rem', justifyContent: 'center', borderRadius: '8px', flexShrink: 0 }}
+              >
+                {bookmarkedPosts.has(String(post._id)) ? '🔖' : '🏷️'}
               </button>
             </div>
 

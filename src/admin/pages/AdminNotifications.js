@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { RefreshCw, Check } from "lucide-react";
+import { RefreshCw, Check, Send } from "lucide-react";
 import { useOutletContext } from "react-router-dom";
 import api from "../../api/api";
 import { io } from "socket.io-client";
@@ -9,7 +9,17 @@ const NOTIF_TYPES = ["All", "Reports", "Users", "System", "Quiz", "Security"];
 export default function AdminNotifications() {
   const [notifications, setNotifications] = useState([]);
   const [filter, setFilter] = useState("All");
+  const [showBroadcast, setShowBroadcast] = useState(false);
+  const [broadcastMsg, setBroadcastMsg] = useState("");
+  const [broadcastTarget, setBroadcastTarget] = useState("all");
+  const [broadcasting, setBroadcasting] = useState(false);
+  const [bToast, setBToast] = useState(null);
   const { setUnreadCount } = useOutletContext() || {};
+
+  const showBToast = (msg, type = "success") => {
+    setBToast({ msg, type });
+    setTimeout(() => setBToast(null), 3000);
+  };
 
   const load = useCallback(async () => {
     try {
@@ -98,7 +108,8 @@ export default function AdminNotifications() {
             {notifications.length} total · {unread} unread
           </p>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+      <div style={{ display: "flex", gap: 8 }}>
+          <button className="admin-btn primary sm" onClick={() => setShowBroadcast(true)}><Send size={13} /> Send Broadcast</button>
           <button className="admin-btn secondary sm" onClick={markAllRead}><Check size={13} /> Mark All Read</button>
           <button className="admin-btn secondary sm" onClick={load}><RefreshCw size={13} /> Refresh</button>
         </div>
@@ -153,6 +164,61 @@ export default function AdminNotifications() {
             </div>
           ))}
         </div>
+      )}
+
+      {/* ── Broadcast Modal ── */}
+      {showBroadcast && (
+        <div className="admin-modal-overlay" onClick={() => setShowBroadcast(false)}>
+          <div className="admin-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 440 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}><Send size={18} /> Send Broadcast</h3>
+              <button className="admin-btn secondary sm" onClick={() => setShowBroadcast(false)}>✕</button>
+            </div>
+            <p style={{ fontSize: '.85rem', color: 'var(--admin-muted)', marginBottom: 16 }}>Send a notification to users on the platform.</p>
+            <label style={{ fontSize: '.78rem', fontWeight: 600, color: 'var(--admin-muted)', display: 'block', marginBottom: 6 }}>AUDIENCE</label>
+            <select className="admin-select" style={{ width: '100%', marginBottom: 14, boxSizing: 'border-box' }} value={broadcastTarget} onChange={e => setBroadcastTarget(e.target.value)}>
+              <option value="all">All Users</option>
+              <option value="students">Students Only</option>
+              <option value="tutors">Health Tutors / Nurses / Doctors</option>
+            </select>
+            <label style={{ fontSize: '.78rem', fontWeight: 600, color: 'var(--admin-muted)', display: 'block', marginBottom: 6 }}>MESSAGE</label>
+            <textarea
+              className="admin-input"
+              rows={4}
+              style={{ width: '100%', boxSizing: 'border-box', resize: 'vertical', fontFamily: 'inherit', padding: '10px 14px' }}
+              placeholder="Type your announcement message here..."
+              value={broadcastMsg}
+              onChange={e => setBroadcastMsg(e.target.value)}
+            />
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 16 }}>
+              <button className="admin-btn secondary" onClick={() => setShowBroadcast(false)}>Cancel</button>
+              <button
+                className="admin-btn primary"
+                disabled={!broadcastMsg.trim() || broadcasting}
+                onClick={async () => {
+                  if (!broadcastMsg.trim()) return;
+                  setBroadcasting(true);
+                  try {
+                    await api.post('admin/notifications/broadcast', { message: broadcastMsg, target: broadcastTarget });
+                    showBToast('Broadcast sent successfully! ✅');
+                    setBroadcastMsg('');
+                    setShowBroadcast(false);
+                    load();
+                  } catch (err) {
+                    showBToast(err.response?.data?.message || 'Failed to send broadcast', 'error');
+                  } finally { setBroadcasting(false); }
+                }}
+              >
+                <Send size={14} /> {broadcasting ? 'Sending…' : 'Send Now'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Toast ── */}
+      {bToast && (
+        <div style={{ position: 'fixed', top: 70, right: 24, zIndex: 9999, padding: '12px 20px', borderRadius: 12, fontWeight: 600, fontSize: '.875rem', background: bToast.type === 'error' ? '#ef4444' : '#22c55e', color: 'white', boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}>{bToast.msg}</div>
       )}
     </div>
   );

@@ -1,0 +1,629 @@
+{
+  "questions": [
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Anatomy is the study of:",
+      "options": [
+        "the structure of a part",
+        "the structural relationship of one part with another structure.",
+        "how structures function.",
+        "A and B only."
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "A group of similar types of cells that performs a specific function is a(n):",
+      "options": [
+        "organism",
+        "organelle",
+        "organ",
+        "tissue"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The basic unit of living things is the:",
+      "options": [
+        "atom",
+        "cell",
+        "organ",
+        "tissue"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "A group of two or more types of tissues is a(n):",
+      "options": [
+        "cell",
+        "organelle",
+        "organ",
+        "macromolecule"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Structures found within a cell that perform specific functions are:",
+      "options": [
+        "atoms",
+        "organelles",
+        "organs",
+        "tissues"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Place the levels of organization in order from least complex to most complex.",
+      "options": [
+        "molecule, atom, organelle, cell, tissue, organ, organ system, organism",
+        "atom, molecule, organelle, cell, tissue, organ, organ system, organism",
+        "atom, molecule, organelle, tissue, cell, organ, organ system, organism",
+        "atom, molecule, organelle, cell, organ, tissue, organ system, organism"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The mitochondrion is an example of a(an)",
+      "options": [
+        "organ.",
+        "organelle.",
+        "cell.",
+        "tissue."
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Which of the following does NOT describe anatomical position?",
+      "options": [
+        "standing erect",
+        "palms facing backward",
+        "arms at sides",
+        "toes facing forward"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the directional term that refers to a structure that is located above another structure?",
+      "options": [
+        "superior",
+        "inferior",
+        "anterior",
+        "central"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The nose is _______ to the chin.",
+      "options": [
+        "anterior",
+        "lateral",
+        "posterior",
+        "superior"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The nose is _________ to the ears.",
+      "options": [
+        "lateral",
+        "anterior",
+        "medial",
+        "B and C, but not A"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The calf is _________ to the knee.",
+      "options": [
+        "deep",
+        "distal",
+        "proximal",
+        "A and B, but not C"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The term that refers to a structure that is closer to a point of attachment is:",
+      "options": [
+        "anterior",
+        "distal",
+        "medial",
+        "proximal"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The knee is ______ to the thigh.",
+      "options": [
+        "anterior",
+        "distal",
+        "lateral",
+        "proximal"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The directional term lateral describes a structure that is:",
+      "options": [
+        "closer to a point of attachment",
+        "further from a point of attachment",
+        "closer to the midline",
+        "further from the midline"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The little or “pinky” finger is _______to the thumb.",
+      "options": [
+        "distal",
+        "lateral",
+        "medial",
+        "proximal"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The muscles are _____ to the skin.",
+      "options": [
+        "lateral",
+        "superficial",
+        "superior",
+        "deep"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The term that describes body parts that are on the same side of the body is:",
+      "options": [
+        "ipsilateral",
+        "anterior",
+        "contralateral",
+        "peripheral"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The sternum is anterior or ______ to the heart.",
+      "options": [
+        "dorsal",
+        "lateral",
+        "proximal",
+        "ventral"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The region of the body that includes the head, neck, spinal column and ribs is the:",
+      "options": [
+        "appendicular portion",
+        "axial portion",
+        "pelvis",
+        "trunk"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What is the scientific term for the forearm?",
+      "options": [
+        "brachial",
+        "antecubital",
+        "acromial",
+        "antebrachial"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What is the scientific term for the mouth?",
+      "options": [
+        "oral",
+        "mental",
+        "buccal",
+        "otic"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What is the scientific term for the armpit?",
+      "options": [
+        "acromial",
+        "brachial",
+        "axillary",
+        "sternal"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What is the scientific term for the back of the knee?",
+      "options": [
+        "femoral",
+        "patellar",
+        "popliteal",
+        "crural"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The term occipital refers to the:",
+      "options": [
+        "back of the head",
+        "cavity of the eyes",
+        "cheek",
+        "elbow"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The term antebrachial refers to the:",
+      "options": [
+        "arm",
+        "chest",
+        "forearm",
+        "leg"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The term sural refers to the:",
+      "options": [
+        "calf",
+        "forearm",
+        "kneecap",
+        "thigh"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the plane that would divide the body into left and right sides.",
+      "options": [
+        "coronal",
+        "frontal",
+        "transverse",
+        "sagittal"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The plane that divides a body part into anterior and posterior sections is the ______ plane.",
+      "options": [
+        "coronal",
+        "sagittal",
+        "frontal",
+        "A and C, but not B"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The cavity that contains the pleural and abdominopelvic cavities is the ______ cavity.",
+      "options": [
+        "ventral",
+        "dorsal",
+        "thoracic",
+        "pericardial"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The cavity that contains the pericardial and pleural cavities is the ______ cavity.",
+      "options": [
+        "ventral",
+        "dorsal",
+        "thoracic",
+        "Both A and C, but not B"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The vertebral canal and cranial cavity is located within the ______ cavity.",
+      "options": [
+        "ventral",
+        "dorsal",
+        "abdominopelvic",
+        "cranial"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The thoracic and abdominopelvic cavities are separated by the:",
+      "options": [
+        "diaphragm",
+        "mediastinum",
+        "sternum",
+        "ventral cavity"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the two primary cavities within the ventral cavity.",
+      "options": [
+        "dorsal and thoracic cavities",
+        "thoracic and abdominopelvic cavities",
+        "cranial and thoracic cavities",
+        "dorsal and abdominopelvic cavities"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The posterior cavity is lined by three membranous layers called:",
+      "options": [
+        "thoracic",
+        "mediastinum",
+        "meninges",
+        "parietal"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The serous membrane that lines the thoracic cavity is the",
+      "options": [
+        "visceral pleura",
+        "parietal pleura",
+        "visceral pericardium",
+        "parietal peritoneum"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The serous membrane covering the heart is the",
+      "options": [
+        "parietal pleura.",
+        "parietal pericardium.",
+        "visceral peritoneum.",
+        "visceral pericardium."
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Which of the following is NOT found in the mediastinum?",
+      "options": [
+        "heart",
+        "lungs",
+        "thymus gland",
+        "trachea"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Which of the following is NOT found in the abdominopelvic cavity?",
+      "options": [
+        "heart",
+        "stomach",
+        "liver",
+        "urinary bladder"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Most of the liver would be found in the _______ of the abdominopelvic cavity.",
+      "options": [
+        "right lumbar region",
+        "left iliac region",
+        "right hypochondriac region",
+        "hypogastric region"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "A small child states that their stomach hurts but points to their umbilical region. Most likely the pain is originating from the:",
+      "options": [
+        "Liver",
+        "Gall bladder",
+        "Small intestine",
+        "Stomach"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The stomach would lie in the ______ quadrant of the abdominopelvic cavity.",
+      "options": [
+        "upper left",
+        "lower left",
+        "upper right",
+        "lower right"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Emily needs to have her gall bladder removed. Her incision would be in the _________ quadrant of the abdominopelvic cavity.",
+      "options": [
+        "upper left",
+        "lower left",
+        "upper right",
+        "lower right"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the organ system responsible for the production of blood cells.",
+      "options": [
+        "cardiovascular system",
+        "muscular system",
+        "skeletal system",
+        "integumentary system"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the organ systems that function in integration and coordination?",
+      "options": [
+        "nervous and cardiovascular systems",
+        "nervous and endocrine systems",
+        "cardiovascular and endocrine systems",
+        "respiratory and cardiovascular systems"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the system that removes nitrogenous wastes from the blood.",
+      "options": [
+        "urinary system",
+        "cardiovascular system",
+        "endocrine system",
+        "digestive system"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the system that consists of the glands that secrete hormones.",
+      "options": [
+        "integumentary system",
+        "cardiovascular system",
+        "digestive system",
+        "endocrine system"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The female reproductive system includes which body parts?",
+      "options": [
+        "testes",
+        "ovaries",
+        "femur",
+        "thyroid"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Which membrane inflammation is correctly matched with the organ involved?",
+      "options": [
+        "pericarditis - lungs",
+        "meningitis - brain and spinal cord",
+        "pleurisy - stomach",
+        "peritonitis - heart"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The relative consistency of the body's internal environment is called",
+      "options": [
+        "hemostasis.",
+        "regulation.",
+        "homeostasis.",
+        "systemic"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Which of the following is NOT part of a homeostatic mechanism?",
+      "options": [
+        "control center",
+        "effector",
+        "artery",
+        "sensor"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "When body temperature rises, the body responds by causing sweating and dilation of skin blood vessels. This type of response is called",
+      "options": [
+        "negative feedback.",
+        "positive feedback."
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What is the mechanism called which brings about an increasing change in the same direction?",
+      "options": [
+        "homeostasis",
+        "positive feedback",
+        "negative feedback",
+        "homeothermic"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "A disease that affects the entire body or involves several organ systems is referred to as:",
+      "options": [
+        "chronic",
+        "systemic",
+        "acute",
+        "local"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "A disease that occurs suddenly and usually lasts for only a short time is called:",
+      "options": [
+        "chronic",
+        "systemic",
+        "acute",
+        "local"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify a body imaging method that may not be used on patients with metal in their bodies.",
+      "options": [
+        "MRI",
+        "PET",
+        "X-Ray",
+        "CAT"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify a type of medical scan that places the radioactive material inside the body instead of hitting the body from the outside.",
+      "options": [
+        "x-rays",
+        "CT scan",
+        "MRI",
+        "PET"
+      ],
+      "answer": 3
+    }
+  ]
+}

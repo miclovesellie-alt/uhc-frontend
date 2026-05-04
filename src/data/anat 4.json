@@ -1,0 +1,628 @@
+{
+  "questions": [
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Your body couldn't breathe without this system. Which one is it?",
+      "options": [
+        "It is the Perspiration system.",
+        "It is the Respiratory system.",
+        "It is the Photosynthesis",
+        "It is the Urinary system."
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The Respiratory system is made up of trachea, the lungs, and the ______________.",
+      "options": [
+        "liver.",
+        "diaphragm.",
+        "esophagus.",
+        "pancreas."
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "When you breathe in air, you bring oxygen into your lungs and blow out _________________.",
+      "options": [
+        "carbon dioxide.",
+        "carbon monoxide.",
+        "oxygen.",
+        "hydrogen."
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "When you inhale, your lungs _________________.",
+      "options": [
+        "inflate",
+        "turn purple",
+        "deflate",
+        "disappear."
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What is the name of the tiny air sacs in the lungs?",
+      "options": [
+        "Bronchioles",
+        "Ravioli",
+        "Alveoli",
+        "Bronx"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "_________________ is not good for lungs.",
+      "options": [
+        "Exercising",
+        "Singing",
+        "Smoking",
+        "Yelling"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The trachea is also called the ________________.",
+      "options": [
+        "lungs.",
+        "Diaphragm.",
+        "Windpipe.",
+        "Bronchus."
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The tiny hairs that keep mucus and dirt out of your lungs are called _____________.",
+      "options": [
+        "lung hairs.",
+        "stubble.",
+        "Bronchioles",
+        "Cilia"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The voice box is also known as the ______________________.",
+      "options": [
+        "Alveoli",
+        "Larynx",
+        "Trachea",
+        "Motormouth"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "As you breathe, this contracts and flattens to give your lungs room to fill up with air ____________________.",
+      "options": [
+        "Laxynx.",
+        "Lung balloon.",
+        "Diaphragm",
+        "Bronchiole"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What happens when you breathe in?",
+      "options": [
+        "Diaphragm expands and ribcage contracts",
+        "Diaphragm contracts and ribcage expands",
+        "Diaphragm explodes",
+        "Diaphragm does not move"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Air enters your lungs through the _________________.",
+      "options": [
+        "Trachea",
+        "Esophagus",
+        "Alveoli",
+        "Larynx"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "How many lungs do humans have?",
+      "options": [
+        "Four",
+        "One",
+        "Three",
+        "Two"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What are bronchial tubes?",
+      "options": [
+        "Air passages inside lungs",
+        "Blood vessels",
+        "Tiny air sacs",
+        "Large air sacs"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What muscles allow you to breathe in and out?",
+      "options": [
+        "nose",
+        "trachea",
+        "tongue",
+        "diaphragm"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Which can not be stored by the body?",
+      "options": [
+        "Vitamins",
+        "Energy",
+        "Minerals",
+        "Oxygen"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "When you breathe out, what gas does the body get rid of?",
+      "options": [
+        "Nitrogen",
+        "Carbon dioxide",
+        "Oxygen",
+        "Carbon monoxide"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What are capillaries?",
+      "options": [
+        "Tiny lung sacs",
+        "Tiny blood vessels",
+        "Blood cells",
+        "Large blood cells"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What are alveoli?",
+      "options": [
+        "Tiny cells",
+        "Large blood vessels",
+        "Tiny blood vessels",
+        "Tiny sacs in lungs"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What disease can be caused by smoking?",
+      "options": [
+        "Emphysema",
+        "Bronchitis",
+        "Alveolitis",
+        "Diabetes"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Labored breathing from lying down is?",
+      "options": [
+        "apnea",
+        "hyperpnea",
+        "tachypnea",
+        "orthopnea"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Severe chest pain, fever and shallow breathing are symptoms of?",
+      "options": [
+        "cleft palate",
+        "tonsillitis",
+        "pleurisy",
+        "hypoxia"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "To clear the upper respiratory tract, one would?",
+      "options": [
+        "cough",
+        "hiccup",
+        "sneeze",
+        "yawn"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "During inspiration,",
+      "options": [
+        "decreased thoracic volume",
+        "thoracic pressure decreases",
+        "external intercostals relax",
+        "diaphragm relaxes and lowers"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Actual gas exchange takes place in the?",
+      "options": [
+        "trachea",
+        "diaphragm",
+        "bronchi",
+        "alveoli"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The job of the concha is?",
+      "options": [
+        "separate cavities",
+        "increase surface area for air movement",
+        "trap pathogens",
+        "warm air and removes water"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Chemoreceptors for oxygen are not found in the?",
+      "options": [
+        "carotid artery",
+        "aorta",
+        "lungs"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Barrel chest is from?",
+      "options": [
+        "alveoli losing elasticity",
+        "overexchange of gases",
+        "TB"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What does oxygen bind to on a blood cell?",
+      "options": [
+        "antigen",
+        "hemoglobin",
+        "antibody",
+        "nucleus"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "When standing, respiration is?",
+      "options": [
+        "higher",
+        "lower",
+        "unchanged"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Gas exchange between the blood and the cells is?",
+      "options": [
+        "pulmonary ventilation",
+        "external respiration",
+        "gas transport",
+        "internal respiration"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "How does the larynx produce sound?",
+      "options": [
+        "vibrations",
+        "folds open/close",
+        "swells",
+        "relaxes"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The part of the body that consists of nose, mouth, pharynx, epiglottis, larynx, and trachea is the..?",
+      "options": [
+        "Upper Quadrant",
+        "Lower Respiratory System",
+        "Upper Respiratory System",
+        "Nasal Cavity"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What is the lid-like structure that closes to allow food to pass through the esophagus?",
+      "options": [
+        "Tonsils",
+        "Epiglottis",
+        "Larynx",
+        "Pharynx"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "How many lobes does the right lung contain?",
+      "options": [
+        "4",
+        "2",
+        "1",
+        "3"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What are the thin hairs inside the nostrils?",
+      "options": [
+        "Cilia",
+        "Mucus",
+        "Tonsils",
+        "Mucous membrane"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The medical term for the Voice Box?",
+      "options": [
+        "Tonsils",
+        "Larynx",
+        "Trachea",
+        "Pharynx"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Medical term for Windpipe?",
+      "options": [
+        "Trachea",
+        "Bronchi",
+        "Epiglottis",
+        "Esophagus"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The act of bringing air into and out of the lungs?",
+      "options": [
+        "Exhaling",
+        "Coughing",
+        "Breathing",
+        "Inhaling"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Breathing disorder characterized by coughing and wheezing.",
+      "options": [
+        "Emphysema",
+        "Asthma",
+        "Bronchitis",
+        "Smoker's Respiratory Syndrome"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Acute Respiratory Syndrome in children?",
+      "options": [
+        "Influenza",
+        "Allergic Rhinitis",
+        "Pertussis",
+        "Croup"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "A nosebleed?",
+      "options": [
+        "Epistaxis",
+        "Rhinorrhea",
+        "Sinusitis",
+        "Diphtheria"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Medical term for a runny nose?",
+      "options": [
+        "Pertussis",
+        "Sinusitis",
+        "Rhinorrhea",
+        "Dysphoria"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Inflammation of the Bronchial walls?",
+      "options": [
+        "Bronchorrhea",
+        "Bronchitis",
+        "Bronchioles",
+        "Bronchorrhagia"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Pain in the Pleura.",
+      "options": [
+        "Pleuralgia",
+        "Pleurisy",
+        "Pleuritis",
+        "Pleuroma"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Infection that attacks the lungs and results in coughing up blood.",
+      "options": [
+        "Hemothorax",
+        "Tuberculosis",
+        "Pneumorrhagia",
+        "Hemoptysis"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The 3 lobes of the right lung are..?",
+      "options": [
+        "Top, Middle, Bottom",
+        "1, 2, 3",
+        "uno, dos, tres",
+        "Superior, Middle, Inferior"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Inflammation of lungs where air sacs fill with pus and other liquid.",
+      "options": [
+        "Pneumonia",
+        "TB",
+        "Cystic Fibrosis",
+        "Pulmonary Edema"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Also known as Black Lung Disease.",
+      "options": [
+        "Silicosis",
+        "Byssinosis",
+        "Anthracosis",
+        "Asbestosis"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Genetic disorder in which the lungs are filled with thick mucus.",
+      "options": [
+        "Anoxia",
+        "Cystic Fibrosis",
+        "Pulmonary Fibrosis",
+        "Silicosis"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Another term for suffocation.",
+      "options": [
+        "Aphyxia",
+        "Anoxia",
+        "Airway Obstruction",
+        "Asphyxiation"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Visual examination of the Larynx.",
+      "options": [
+        "Bronchoscopy",
+        "Laryngoscopy",
+        "Laryngectomy",
+        "Laryngitis"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Medical term for mucus secreted in respiratory passages.",
+      "options": [
+        "Mucus",
+        "Cilia",
+        "Phlegm",
+        "Mucous"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Surgical reconstruction of the Nasal Septum.",
+      "options": [
+        "Septoplasty",
+        "Pharyngoplasty",
+        "Laryngoplasty",
+        "Sinusotomy"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "An opening on a body surface.",
+      "options": [
+        "Pore",
+        "Stoma",
+        "Lobe",
+        "Ventilator"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Surgical removal of the Larynx.",
+      "options": [
+        "Laryngectomy",
+        "Larngotomy",
+        "Laryngoplasty",
+        "Laryngalgia"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Suturing of the Trachea.",
+      "options": [
+        "Tracheostomy",
+        "Tracheotomy",
+        "Tracheorrhaphy",
+        "Tracheoplasty"
+      ],
+      "answer": 2
+    }
+  ]
+}

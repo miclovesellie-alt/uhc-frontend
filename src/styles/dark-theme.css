@@ -1,0 +1,176 @@
+/* ── Dark Theme Variables ──
+   Applied when <body class="dark-theme"> is set by UserContext.
+   Overrides the :root vars defined in dashboard.css, quiz.css, profile.css etc.
+─────────────────────────────────────────── */
+
+body.dark-theme {
+  /* Backgrounds */
+  --bg-page:      #0f172a;
+  --bg-card:      #1e293b;
+  --bg-input:     #263347;
+  --bg-hover:     #334155;
+
+  /* Accent colours stay the same */
+  --accent:       #4255ff;
+  --accent-hover: #3345ee;
+  --accent-pale:  rgba(66, 85, 255, 0.18);
+  --accent-green-pale: rgba(16, 185, 129, 0.15);
+
+  /* Text */
+  --text-heading: #f1f5f9;
+  --text-body:    #94a3b8;
+  --text-muted:   #64748b;
+  --text-label:   #cbd5e1;
+
+  /* Borders */
+  --border:       #334155;
+  --border-focus: #4255ff;
+
+  /* Shadows get darker */
+  --shadow-card:       0 2px 8px rgba(0,0,0,0.4);
+  --shadow-card-hover: 0 8px 24px rgba(0,0,0,0.5);
+}
+
+/* ── Topbar ── */
+body.dark-theme .dashboard-topbar {
+  background: rgba(15, 23, 42, 0.95);
+  border-bottom-color: #334155;
+}
+
+/* ── Sidebar ── */
+body.dark-theme .dashboard-sidebar {
+  background: rgba(15, 23, 42, 0.95);
+  border-right-color: #334155;
+}
+
+body.dark-theme .sidebar-profile-mini {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+/* ── Search input ── */
+body.dark-theme .topbar-search input {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+body.dark-theme .topbar-search input:focus {
+  background: #263347;
+  border-color: #4255ff;
+}
+
+/* ── Welcome banner ── */
+body.dark-theme .dash-welcome-banner {
+  background: linear-gradient(135deg, rgba(66,85,255,0.08), rgba(139,92,246,0.08)), #1e293b;
+  border-color: rgba(66,85,255,0.25);
+}
+
+/* ── Cards ── */
+body.dark-theme .dash-post-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+body.dark-theme .dash-post-action-btn {
+  background: #263347;
+  color: #94a3b8;
+}
+body.dark-theme .dash-post-action-btn:hover {
+  background: #334155;
+  color: #f1f5f9;
+}
+
+/* ── Modal ── */
+body.dark-theme .modal-content {
+  background: #1e293b;
+  color: #f1f5f9;
+}
+body.dark-theme .modal-content h3 {
+  color: #f1f5f9;
+}
+
+/* ── Stat cards ── */
+body.dark-theme .dash-stat-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+body.dark-theme .dash-stat-value { color: #f1f5f9; }
+body.dark-theme .dash-stat-label { color: #64748b; }
+
+/* ── Mobile bottom nav ── */
+body.dark-theme .uhc-bottom-nav {
+  background: rgba(15,23,42,0.97);
+  border-top-color: #334155;
+}
+
+/* ── Announcement banner ── */
+body.dark-theme .uhc-announcement {
+  background: linear-gradient(135deg, rgba(66,85,255,0.2), rgba(139,92,246,0.2));
+  border-color: rgba(66,85,255,0.4);
+  color: #a5b4fc;
+}
+
+/* ── Profile page dark ── */
+body.dark-theme .profile-page-v2 {
+  background: #0f172a;
+}
+body.dark-theme .profile-avatar-card,
+body.dark-theme .info-card-v2,
+body.dark-theme .stat-pill,
+body.dark-theme .leaderboard-row,
+body.dark-theme .settings-modal {
+  background: #1e293b;
+  border-color: #334155;
+}
+body.dark-theme .info-card-v2 label { color: #94a3b8; }
+body.dark-theme .info-card-v2 p,
+body.dark-theme .info-card-v2 input,
+body.dark-theme .info-card-v2 select {
+  color: #f1f5f9;
+  background: #263347;
+  border-color: #334155;
+}
+
+/* ── Quiz dark ── */
+body.dark-theme .quiz-page-wrap { background: #0f172a; }
+body.dark-theme .quiz-card {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+body.dark-theme .quiz-opt {
+  background: #263347;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+body.dark-theme .quiz-opt:hover { background: #334155; }
+body.dark-theme .quiz-opt.correct { background: rgba(16,185,129,0.15); border-color: #10b981; }
+body.dark-theme .quiz-opt.wrong   { background: rgba(239,68,68,0.12); border-color: #ef4444; }
+
+/* ── Library dark ── */
+body.dark-theme .library-wrapper { background: #0f172a; }
+body.dark-theme .book-card,
+body.dark-theme .course-card-classic {
+  background: #1e293b;
+  border-color: #334155;
+}
+body.dark-theme .book-title,
+body.dark-theme .course-card-info h3 { color: #f1f5f9; }
+body.dark-theme .book-author { color: #94a3b8; }
+
+/* ── Streak stats widget dark ── */
+body.dark-theme .uhc-stats-bar {
+  background: #1e293b;
+  border-color: #334155;
+}
+body.dark-theme .uhc-stats-bar__item {
+  border-color: #334155;
+}
+
+/* ── Search page dark ── */
+body.dark-theme .search-page-wrap { background: #0f172a; }
+body.dark-theme .search-result-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+body.dark-theme .search-result-card:hover { background: #263347; }

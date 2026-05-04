@@ -1,0 +1,472 @@
+{
+  "questions": [
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Type II diabetes is characterized by all EXCEPT:",
+      "options": ["Obesity", "Slow progression", "Insulin secretion problem", "Cells insensitive to insulin"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "All are symptoms of diabetes EXCEPT:",
+      "options": ["Glucosuria", "Hyperthyroidism", "Hyperglycemia", "Dehydration"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Short acting insulin used in sliding scale is:",
+      "options": ["Regular", "Ultralente", "Lantus", "NPH"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Type I onset is characterized by all EXCEPT:",
+      "options": ["Weight loss", "Ketosis", "Insulin resistance", "Rapid onset"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "All are diabetes complications EXCEPT:",
+      "options": ["Nephropathy", "Atherosclerosis", "Neuropathy", "Gastric ulcers"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Diabetic diet for Type I EXCEPT:",
+      "options": ["Low GI foods", "Complex carbs", "Low carb diet", "Limited sugar"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Carbohydrates in Type I diet are:",
+      "options": [
+        "Divided into meals/snacks",
+        "3 meals only",
+        "Coordinated with insulin",
+        "Both A and C"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Most common lipid elevated in diabetes:",
+      "options": ["Total cholesterol", "HDL", "LDL", "Triglycerides"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Goal of diabetes therapy EXCEPT:",
+      "options": ["Control glucose", "Prevent complications", "Sedentary lifestyle", "Stabilize glucose"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Type I treatment components EXCEPT:",
+      "options": ["Sleep", "Insulin", "Diet", "Exercise"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Type II diabetics should eat at least:",
+      "options": ["2 meals", "3 meals", "4 meals", "5 meals"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Hyperglycemia EXCEPT is caused by:",
+      "options": ["Illness", "Too little insulin", "Too little food", "High sugar intake"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Main cause of death in diabetes:",
+      "options": ["Infections", "Atherosclerosis", "Gangrene", "Neuropathy"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "High fiber diet helps:",
+      "options": ["Increase glucose spikes", "Reduce insulin sensitivity", "Improve glucose control", "Cause diabetes"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Fat calories in diabetic diet should be:",
+      "options": [
+        "Equal saturated and unsaturated",
+        "Mainly unsaturated fats",
+        "Mainly saturated fats",
+        "Only saturated fats"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Eat regular snacks applies to:",
+      "options": ["Type I", "Type II", "Both", "None"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Reduce calories applies to:",
+      "options": ["Type I", "Type II", "Healthy adults", "Athletes"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Meals at regular times apply to:",
+      "options": ["Type I", "Type II", "Both", "None"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Hypoglycemia symptom is:",
+      "options": ["Glucosuria", "Thirst", "Irritability", "Weight gain"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Normal fasting blood glucose:",
+      "options": ["50–160", "50–100", "70–99", "70–180"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Long-term glucose test:",
+      "options": ["GTT", "HbA1c", "FBS", "Urine test"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Type I needs insulin because:",
+      "options": ["Resistance", "High insulin", "No insulin production", "Digestion of insulin"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Type II characteristics:",
+      "options": ["Lean", "Rapid onset", "Weight loss needed", "Ketosis resistant"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Diabetic patient advice during exercise:",
+      "options": [
+        "No extra food needed",
+        "Only 3 meals",
+        "Timing not important",
+        "Alcohol may cause hypoglycemia"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "NPH insulin hypoglycemia occurs:",
+      "options": ["2 hrs after", "Before lunch", "Before supper", "At bedtime"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Best hypoglycemia snack:",
+      "options": ["Chips", "Orange juice", "Crackers", "Gum"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Best strategy for low literacy diabetic patient:",
+      "options": [
+        "Strict exchange system",
+        "Plate method",
+        "Printed list",
+        "Join spa"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Type II diet EXCEPT:",
+      "options": ["More fish", "More exercise", "Unsaturated fats", "More starch"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Stress and diabetes statement:",
+      "options": [
+        "Both true",
+        "Both false",
+        "Only 1 true",
+        "Only 2 true"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Good diabetes understanding statement:",
+      "options": [
+        "No exercise if glucose 100–150",
+        "Fat raises glucose",
+        "Bedtime snack prevents hypoglycemia",
+        "Beans replace broccoli"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Best tool for hypoglycemia cause:",
+      "options": ["HbA1c", "Glucose log", "Triglycerides", "FBS"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Type II oral medication:",
+      "options": ["True", "False", "Sometimes", "None"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "First action for hypoglycemia:",
+      "options": ["Orange juice", "Call doctor", "Crackers", "Check blood sugar"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Priority in Type II management:",
+      "options": ["Physical activity", "Low fat diet", "Weight loss", "Low sodium diet"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Type II ketoacidosis risk:",
+      "options": ["True", "False", "Sometimes", "Unknown"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Cirrhosis symptom EXCEPT:",
+      "options": ["Varices", "Ascites", "Obesity", "Disorientation"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Hepatic coma protein diet:",
+      "options": ["True", "False", "High protein", "None"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Cirrhosis diet EXCEPT:",
+      "options": ["Protein restriction", "Calorie restriction", "Supplements", "Sodium restriction"],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Portal hypertension cause:",
+      "options": ["True", "False", "Sometimes", "Unknown"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Main cirrhosis cause:",
+      "options": ["Drugs", "Obesity", "Malnutrition", "Alcohol abuse"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Fatty liver accumulates:",
+      "options": ["Bile", "Alcohol waste", "Triglycerides", "Proteins"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Liver inflammation is:",
+      "options": ["Cirrhosis", "Pancreatitis", "Cholecystitis", "Hepatitis"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Hepatic encephalopathy diet:",
+      "options": [
+        "Increase protein",
+        "Restrict protein",
+        "Slow peristalsis drugs",
+        "Reduce BCAA restriction"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Liver dysfunction sign:",
+      "options": ["Ascites", "Edema", "Jaundice", "All"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Croissant counts as:",
+      "options": ["1 bread + 4 fats", "1 fruit + 6 fats", "1 bread + 6 fats", "1 fruit + 4 fats"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Vegetable group EXCEPT:",
+      "options": ["Potatoes", "Green beans", "Broccoli", "Tomatoes"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Pancreatitis causes steatorrhea:",
+      "options": ["True", "False", "Sometimes", "Unknown"],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Best Type II diabetic meal:",
+      "options": [
+        "High fat pie meal",
+        "Sugary breakfast",
+        "Balanced lean meal",
+        "Milkshake meal"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Carbohydrate exchanges in meal C:",
+      "options": ["1", "2", "3", "4"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Exchange count dinner:",
+      "options": [
+        "1 meat, 1 starch, 2 fruits, 1 fat",
+        "1 meat, 1 starch, 1 fruit, 1 fat",
+        "3 meat, 2 starch",
+        "3 meat, 1 starch"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Best diabetes management focus:",
+      "options": ["Snacks", "Low fat diet", "Weight loss", "Low sodium"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Ascites diet restriction:",
+      "options": ["Sodium", "Fluid", "Fat", "All"],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "HbA1c 9.0% indicates:",
+      "options": [
+        "Continue plan",
+        "Reduce carbs",
+        "Adjust insulin/diet/exercise",
+        "Intense exercise only"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Skipping lunch with insulin leads to:",
+      "options": [
+        "Morning hyperglycemia",
+        "Night hypoglycemia",
+        "Midday hyperglycemia",
+        "Midday hypoglycemia"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Low literacy diabetic education should focus on:",
+      "options": [
+        "Pictures exchange list",
+        "Avoid carbs",
+        "Consistency in carbs",
+        "Slow reading list"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Starch exchanges in meal:",
+      "options": ["3", "2", "5", "4"],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Dawn phenomenon is:",
+      "options": [
+        "Night hypoglycemia",
+        "Night hyperglycemia",
+        "Morning hypoglycemia",
+        "Morning hyperglycemia"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Hypoglycemia management:",
+      "options": [
+        "Sugar each meal",
+        "Protein meals",
+        "3 meals only no sugar",
+        "3 meals protein"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Gestational diabetes is:",
+      "options": [
+        "Diabetic pregnant woman",
+        "Diabetes during pregnancy",
+        "Obese pregnancy",
+        "After pregnancy"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Pancreatitis diagnosis:",
+      "options": [
+        "IBS",
+        "Diverticulosis",
+        "Acute pancreatitis",
+        "None"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Chronic pancreatitis cause:",
+      "options": [
+        "Alcohol abuse",
+        "Cystic fibrosis",
+        "Virus",
+        "Acute pancreatitis"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Genetic mucus disorder:",
+      "options": [
+        "Pancreatitis",
+        "Crohn’s disease",
+        "Celiac disease",
+        "Cystic fibrosis"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Nutrition & Diabetics",
+      "question": "Gall bladder disease diet:",
+      "options": ["High fiber", "Low fat", "Low sodium", "Fluid restriction"],
+      "answer": 1
+    }
+  ]
+}

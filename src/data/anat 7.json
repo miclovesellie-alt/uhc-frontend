@@ -1,0 +1,224 @@
+{
+  "questions": [
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the major types of tissue.",
+      "options": [
+        "Bone, connective, epithelial, and muscle",
+        "Bone, cartilage, muscle and nervous",
+        "Connective, epithelial, muscle and nervous",
+        "Cardiac, connective, epithelial and nervous"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Which of the following is NOT a function of epithelium?",
+      "options": [
+        "secretion",
+        "contraction",
+        "protection",
+        "absorption"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Which of the following is NOT a characteristic of epithelial tissue?",
+      "options": [
+        "binds and supports body parts",
+        "has cells that readily divide",
+        "has a basement membrane and a free surface",
+        "has tightly packed cells"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Epithelial tissue receives nutrients from the ______ the epithelial tissue.",
+      "options": [
+        "blood vessels associated with",
+        "cartilage tissue that surrounds",
+        "connective tissue beneath",
+        "muscle tissue beneath"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the major tissue type that consists of cells tightly packed and always has a free surface.",
+      "options": [
+        "Connective tissue",
+        "Epithelial tissue",
+        "Muscle tissue",
+        "Nervous tissue"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "A single layer of flattened cells describes ______ epithelial tissue.",
+      "options": [
+        "areolar",
+        "simple cuboidal",
+        "simple columnar",
+        "simple squamous"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Two or more layers of cube-shaped cells describes ______ epithelial tissue.",
+      "options": [
+        "simple cuboidal",
+        "simple columnar",
+        "stratified cuboidal",
+        "stratified columnar"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What type of epithelium is found in blood capillaries and lung alveoli where simple diffusion occurs?",
+      "options": [
+        "simple columnar",
+        "stratified squamous",
+        "simple squamous",
+        "transitional"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What type of epithelium makes up the outer layer of the skin where protection is important?",
+      "options": [
+        "simple cuboidal",
+        "stratified squamous",
+        "pseudostratified columnar",
+        "transitional"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Simple cuboidal epithelium is frequently found in",
+      "options": [
+        "the skin",
+        "the trachea",
+        "the urinary bladder",
+        "glands"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What type of epithelium is found lining most of the digestive tract?",
+      "options": [
+        "simple columnar",
+        "pseudostratified columnar",
+        "transitional",
+        "stratified squamous"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "The specialized cell that produces mucus is the",
+      "options": [
+        "parietal cell",
+        "goblet cell",
+        "endocrine cell",
+        "visceral cell"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Pseudostratified ciliated columnar epithelium lines most of the",
+      "options": [
+        "digestive tract",
+        "blood vessels",
+        "respiratory tract",
+        "cranial cavity"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "What epithelium is found in the urinary bladder that allows distention?",
+      "options": [
+        "transitional",
+        "simple squamous",
+        "stratified squamous",
+        "pseudostratified columnar"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the function of goblet cells.",
+      "options": [
+        "Aid in absorption",
+        "Move materials past cells",
+        "Provides a waterproof barrier",
+        "Secrete mucous"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the function of keratin.",
+      "options": [
+        "Aid in absorption",
+        "Move materials past cells",
+        "Provides a waterproof barrier",
+        "Secrete mucous"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the function of microvilli.",
+      "options": [
+        "Aid in absorption",
+        "Move materials past cells",
+        "Provides a waterproof barrier",
+        "Secrete mucous"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Describe connective tissue.",
+      "options": [
+        "Closely packed cells separated by a matrix consisting of fibers",
+        "Closely packed cells separated by keratin",
+        "Widely spaced cells separated by a matrix consisting of fibers",
+        "Widely spaced cells separated by keratin"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the types of fibers in connective tissue.",
+      "options": [
+        "Collagen, elastic and reticular",
+        "Collagen, elastic and keratin",
+        "Collagen, keratin and reticular",
+        "Elastic, keratin and reticular"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Anatomy & Physiology",
+      "question": "Identify the tissue also known as fat.",
+      "options": [
+        "loose connective tissue",
+        "adipose tissue",
+        "cartilage",
+        "fibrous connective tissue"
+      ],
+      "answer": 1
+    }
+  ]
+}
