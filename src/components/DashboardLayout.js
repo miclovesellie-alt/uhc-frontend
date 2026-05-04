@@ -7,7 +7,7 @@ import "../styles/dashboard.css";
 
 import {
   Home, BookOpen, ClipboardList, User, LogOut,
-  Search, BarChart2, ChevronRight, X, Bell
+  Search, BarChart2, ChevronRight, X, Bell, PenSquare, Trophy
 } from "lucide-react";
 
 function DashboardLayout() {
@@ -63,10 +63,12 @@ function DashboardLayout() {
 
 
   const navItems = [
-    { icon: <Home size={18} />, label: "Home", path: "/dashboard" },
-    { icon: <BookOpen size={18} />, label: "Library", path: "/library" },
-    { icon: <ClipboardList size={18} />, label: "Quiz", path: "/quiz" },
-    { icon: <BarChart2 size={18} />, label: "Progress", path: "/profile" },
+    { icon: <Home         size={18}/>, label: "Home",       path: "/dashboard" },
+    { icon: <BookOpen     size={18}/>, label: "Library",    path: "/library"   },
+    { icon: <ClipboardList size={18}/>, label: "Quiz",      path: "/quiz"      },
+    { icon: <PenSquare    size={18}/>, label: "Submit",     path: "/submit"    },
+    { icon: <Trophy       size={18}/>, label: "Ranks",      path: "/leaderboard" },
+    { icon: <BarChart2    size={18}/>, label: "Progress",   path: "/profile"   },
   ];
 
   return (

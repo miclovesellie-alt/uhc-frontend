@@ -41,10 +41,12 @@ import AdminFeed from "./admin/pages/AdminFeed";
 import AdminRecycleBin from "./admin/pages/AdminRecycleBin";
 import DuplicateQuestions from "./admin/pages/DuplicateQuestions";
 import AdminAnnouncements from "./admin/pages/AdminAnnouncements";
+import AdminPending from "./admin/pages/AdminPending";
 
 // ===== USER PAGES =====
 import Leaderboard from "./pages/Leaderboard";
 import QuizHistory from "./pages/QuizHistory";
+import Submit from "./pages/Submit";
 
 // ===== ADMIN LAYOUT =====
 import AdminLayout from "./admin/components/AdminLayout";
@@ -129,6 +131,7 @@ function AppRoutes() {
         <Route path="uploads"       element={<BulkUpload />} />
         <Route path="duplicates"    element={<DuplicateQuestions />} />
         <Route path="announcements" element={<AdminAnnouncements />} />
+        <Route path="pending"       element={<AdminPending />} />
       </Route>
 
       {/* ===== DASHBOARD LAYOUT WRAPPER ===== */}
@@ -168,6 +171,9 @@ function AppRoutes() {
 
         {/* ===== QUIZ HISTORY ===== */}
         <Route path="/quiz-history" element={<QuizHistory />} />
+
+        {/* ===== SUBMIT ===== */}
+        <Route path="/submit" element={<Submit />} />
       </Route>
 
       {/* ===== 404 ===== */}

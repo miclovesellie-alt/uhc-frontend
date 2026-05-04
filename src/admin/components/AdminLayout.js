@@ -6,22 +6,23 @@ import axios from "axios";
 import "../admin_styles/AdminLayout.css";
 import {
   LayoutDashboard, Users, HelpCircle, Upload,
-  Bell, Settings, LogOut, Menu, X, FileText, Shield, Library, Mail, Layout, Trash2, Megaphone
+  Bell, Settings, LogOut, Menu, X, FileText, Shield, Library, Mail, Layout, Trash2, Megaphone, Clock
 } from "lucide-react";
 
 const baseNavItems = [
-  { icon: <LayoutDashboard size={17} />, label: "Dashboard",     path: "/admin"                },
-  { icon: <Users          size={17} />, label: "Users",          path: "/admin/users"          },
-  { icon: <HelpCircle     size={17} />, label: "Questions",      path: "/admin/questions"      },
-  { icon: <Library        size={17} />, label: "Library",        path: "/admin/userlibrary"    },
-  { icon: <Layout         size={17} />, label: "Feed Manager",   path: "/admin/feed"           },
-  { icon: <Upload         size={17} />, label: "Bulk Upload",    path: "/admin/uploads"        },
-  { icon: <FileText       size={17} />, label: "Activity Logs",  path: "/admin/logs"           },
-  { icon: <Bell           size={17} />, label: "Notifications",  path: "/admin/notifications"  },
-  { icon: <Megaphone      size={17} />, label: "Announcements",  path: "/admin/announcements"  },
-  { icon: <Trash2         size={17} />, label: "Recycle Bin",    path: "/admin/recycle-bin"    },
-  { icon: <Mail           size={17} />, label: "Messages",       path: "/admin/messages"       },
-  { icon: <Settings       size={17} />, label: "Settings",       path: "/admin/settings"       },
+  { icon: <LayoutDashboard size={17} />, label: "Dashboard",      path: "/admin"                 },
+  { icon: <Users          size={17} />, label: "Users",           path: "/admin/users"           },
+  { icon: <HelpCircle     size={17} />, label: "Questions",       path: "/admin/questions"       },
+  { icon: <Library        size={17} />, label: "Library",         path: "/admin/userlibrary"     },
+  { icon: <Layout         size={17} />, label: "Feed Manager",    path: "/admin/feed"            },
+  { icon: <Upload         size={17} />, label: "Bulk Upload",     path: "/admin/uploads"         },
+  { icon: <Clock          size={17} />, label: "Pending Review",  path: "/admin/pending"         },
+  { icon: <FileText       size={17} />, label: "Activity Logs",   path: "/admin/logs"            },
+  { icon: <Bell           size={17} />, label: "Notifications",   path: "/admin/notifications"   },
+  { icon: <Megaphone      size={17} />, label: "Announcements",   path: "/admin/announcements"   },
+  { icon: <Trash2         size={17} />, label: "Recycle Bin",     path: "/admin/recycle-bin"     },
+  { icon: <Mail           size={17} />, label: "Messages",        path: "/admin/messages"        },
+  { icon: <Settings       size={17} />, label: "Settings",        path: "/admin/settings"        },
 ];
 
 export default function AdminLayout() {
