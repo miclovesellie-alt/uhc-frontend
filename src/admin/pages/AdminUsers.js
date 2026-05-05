@@ -66,6 +66,7 @@ export default function AdminUsers() {
   const [suspendReason, setSuspendReason] = useState("");
   const [selected, setSelected] = useState(new Set()); // bulk selection
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fetchUsers(); }, []);
 
   const fetchUsers = async () => {

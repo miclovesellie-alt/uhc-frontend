@@ -79,27 +79,7 @@ export default function AdminLayout() {
   const isActive = p => p === "/admin" ? location.pathname === "/admin" : location.pathname.startsWith(p);
   const pageTitle = navItems.find(n => isActive(n.path))?.label || "Admin";
 
-  const NavGroup = ({ paths, label }) => (
-    <>
-      {!collapsed && <div className="admin-nav-section" style={{marginTop:8}}>{label}</div>}
-      {navItems.filter(i => paths.includes(i.path)).map(item => (
-        <NavLink key={item.path} to={item.path} end={item.path==="/admin"}
-          className={() => isActive(item.path) ? "active" : ""}
-          onClick={() => setSidebarOpen(false)}
-          title={collapsed ? item.label : undefined}
-        >
-          {item.icon}
-          {!collapsed && <span style={{flex:1}}>{item.label}</span>}
-          {item.path==="/admin/pending" && pendingCount>0 && !collapsed && (
-            <span style={{background:"#ef4444",color:"white",fontSize:".65rem",fontWeight:700,padding:"1px 6px",borderRadius:10}}>{pendingCount}</span>
-          )}
-          {item.path==="/admin/notifications" && unreadCount>0 && !collapsed && (
-            <span style={{background:"#ef4444",color:"white",fontSize:".65rem",fontWeight:700,padding:"1px 6px",borderRadius:10}}>{unreadCount}</span>
-          )}
-        </NavLink>
-      ))}
-    </>
-  );
+
 
   return (
     <div className={`admin-wrapper ${adminTheme==="dark"?"admin-dark":""}`}>

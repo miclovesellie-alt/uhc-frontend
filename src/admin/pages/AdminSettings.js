@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Save, Eye, EyeOff, Moon, Sun, User, Shield, Copy, Check } from "lucide-react";
+import { Save, Eye, EyeOff, Moon, Sun, Copy, Check } from "lucide-react";
 import api from "../../api/api";
 import { UserContext } from "../../context/UserContext";
 import { useToast } from "../../hooks/useToast";
@@ -105,11 +105,7 @@ export default function AdminSettings() {
     } finally { setSavingProfile(false); }
   };
 
-  const saveSetting = async (key, value) => {
-    try {
-      await api.post("settings", { key, value });
-    } catch { showToast(`Failed to save ${key}`, "error"); }
-  };
+
 
   const saveSecurity = async () => {
     try {
