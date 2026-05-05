@@ -2,12 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import api from "../../api/api";
 import { Search, Shield, RefreshCw } from "lucide-react";
+import { useToast } from "../../hooks/useToast";
 
-const logAction = (action) => {
-  const logs = JSON.parse(localStorage.getItem("adminLogs") || "[]");
-  logs.unshift({ ts: new Date().toISOString(), action, by: "Superadmin" });
-  localStorage.setItem("adminLogs", JSON.stringify(logs.slice(0, 500)));
-};
+
 
 export default function AdminAdmins() {
   const { presence } = useOutletContext() || {};
@@ -15,13 +12,8 @@ export default function AdminAdmins() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
-  const [toast, setToast] = useState(null);
   const [confirmAction, setConfirmAction] = useState(null);
-
-  const showToast = (msg, type = "success") => {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 3000);
-  };
+  const { showToast, ToastEl } = useToast();
 
   useEffect(() => { fetchAdmins(); }, []);
 
@@ -38,7 +30,6 @@ export default function AdminAdmins() {
   const updateUser = async (data, label) => {
     try {
       await api.patch(`users/${selectedUser._id}`, data);
-      logAction(`${label}: ${selectedUser.name}`);
       showToast(`${label} successful`);
       setSelectedUser(null);
       setConfirmAction(null);
@@ -53,17 +44,7 @@ export default function AdminAdmins() {
 
   return (
     <div className="admin-page">
-      {/* Toast */}
-      {toast && (
-        <div style={{
-          position: "fixed", top: 70, right: 24, zIndex: 9999,
-          padding: "12px 20px", borderRadius: 12, fontWeight: 600, fontSize: ".875rem",
-          background: toast.type === "error" ? "#ef4444" : "#22c55e", color: "white",
-          boxShadow: "0 8px 24px rgba(0,0,0,0.3)", animation: "slideIn .2s ease"
-        }}>
-          {toast.msg}
-        </div>
-      )}
+      {ToastEl}
 
       {/* Header */}
       <div className="admin-section-header" style={{ marginBottom: 24 }}>

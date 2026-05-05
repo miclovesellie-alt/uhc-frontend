@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Trash2, Download, Search, RefreshCw } from "lucide-react";
 import api from "../../api/api";
+import { useToast } from "../../hooks/useToast";
+
 
 const ACTION_TYPES = ["All", "Added", "Edited", "Deleted", "Updated", "Enabled", "Disabled", "Cleared", "Promoted", "Demoted", "Banned", "Reset"];
 
@@ -8,12 +10,7 @@ export default function AdminLogs() {
   const [logs, setLogs] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
-  const [toast, setToast] = useState(null);
-
-  const showToast = (msg, type = "success") => {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 3000);
-  };
+  const { showToast, ToastEl } = useToast();
 
   const loadLogs = async () => {
     try {
@@ -34,18 +31,28 @@ export default function AdminLogs() {
     return matchSearch && matchFilter;
   });
 
-  const clearLogs = () => {
-    localStorage.removeItem("adminLogs");
-    setLogs([]);
-    showToast("All logs cleared");
+  const clearLogs = async () => {
+    if (!window.confirm("This will permanently delete all activity logs from the database. Continue?")) return;
+    try {
+      await api.delete("admin/activity/logs/clear");
+      setLogs([]);
+      showToast("All logs cleared from database");
+    } catch { showToast("Failed to clear logs", "error"); }
   };
 
   const exportCSV = () => {
-    const rows = [["Timestamp", "Action", "By"], ...logs.map(l => [l.ts, l.action, l.by])];
-    const csv = rows.map(r => r.join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
+    const rows = [["Timestamp","Action","Message","Performed By","Type"],
+      ...logs.map(l=>[
+        new Date(l.createdAt).toLocaleString(),
+        l.action||"—",
+        `"${(l.message||"").replace(/"/g,"'")}"`,
+        l.admin?.name||"System",
+        l.targetType||"System"
+      ])];
+    const csv = rows.map(r=>r.join(",")).join("\n");
+    const blob = new Blob([csv],{type:"text/csv"});
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href = url; a.download = "admin_logs.csv"; a.click();
+    const a = document.createElement("a"); a.href=url; a.download="admin_logs.csv"; a.click();
     URL.revokeObjectURL(url);
   };
 
@@ -74,9 +81,7 @@ export default function AdminLogs() {
 
   return (
     <div className="admin-page">
-      {toast && (
-        <div style={{ position: "fixed", top: 70, right: 24, zIndex: 9999, padding: "12px 20px", borderRadius: 12, fontWeight: 600, fontSize: ".875rem", background: toast.type === "error" ? "#ef4444" : "#22c55e", color: "white", boxShadow: "0 8px 24px rgba(0,0,0,0.3)" }}>{toast.msg}</div>
-      )}
+      {ToastEl}
 
       <div className="admin-section-header" style={{ marginBottom: 24 }}>
         <div>

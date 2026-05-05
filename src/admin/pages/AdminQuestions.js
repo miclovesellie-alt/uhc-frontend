@@ -2,12 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Plus, Search, Edit2, Trash2, BookOpen, ChevronDown, ChevronUp, Copy, AlertTriangle } from "lucide-react";
 import api from "../../api/api";
-
-const logAction = (action) => {
-  const logs = JSON.parse(localStorage.getItem("adminLogs") || "[]");
-  logs.unshift({ ts: new Date().toISOString(), action, by: "Admin" });
-  localStorage.setItem("adminLogs", JSON.stringify(logs.slice(0, 500)));
-};
+import { useToast } from "../../hooks/useToast";
 
 export default function AdminQuestions() {
   const location = useLocation();
@@ -38,14 +33,10 @@ export default function AdminQuestions() {
   const [newCourseName, setNewCourseName] = useState("");
   const [addingCourse, setAddingCourse] = useState(false);
   const [courseSearch, setCourseSearch] = useState("");
-  const [toast, setToast] = useState(null);
 
   const [newQ, setNewQ] = useState({ question: "", options: ["","","",""], answer: null, course: "", difficulty: "Medium", explanation: "" });
 
-  const showToast = (msg, type = "success") => {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 3000);
-  };
+  const { showToast, ToastEl } = useToast();
 
   useEffect(() => { fetchQuestions(); fetchCourses(); fetchCourseCounts(); }, []);
 
@@ -71,7 +62,8 @@ export default function AdminQuestions() {
   const fetchQuestions = async () => {
     setLoading(true);
     try {
-      const res = await api.get("admin/questions/?limit=1000");
+      // Increased limit to 50000 so that older questions aren't dropped
+      const res = await api.get("admin/questions/?limit=50000");
       let data = res.data;
       
       // Handle different response formats
@@ -150,10 +142,9 @@ export default function AdminQuestions() {
       await api.delete(`admin/questions/${deleteId}`);
       setQuestions(prev => prev.filter(q => q._id !== deleteId));
       setTotalCount(prev => prev - 1);
-      logAction(`Deleted question ID: ${deleteId}`);
       showToast("Question deleted");
       setDeleteId(null);
-      fetchCourseCounts(); // refresh real counts
+      fetchCourseCounts();
     } catch (err) { showToast("Delete failed", "error"); }
   };
 
@@ -163,7 +154,6 @@ export default function AdminQuestions() {
       await Promise.all([...selectedIds].map(id => api.delete(`admin/questions/${id}`)));
       setQuestions(prev => prev.filter(q => !selectedIds.has(q._id)));
       setTotalCount(prev => prev - selectedIds.size);
-      logAction(`Bulk deleted ${selectedIds.size} questions`);
       showToast(`${selectedIds.size} questions deleted`);
       setSelectedIds(new Set());
       setShowBulkConfirm(false);
@@ -190,7 +180,6 @@ export default function AdminQuestions() {
     try {
       const res = await api.put(`admin/questions/${editData._id}`, editData);
       setQuestions(prev => prev.map(q => q._id === res.data._id ? res.data : q));
-      logAction(`Edited question: "${editData.question?.slice(0, 40)}"`);
       showToast("Question updated");
       setEditModal(false);
     } catch (err) { showToast("Update failed", "error"); }
@@ -204,7 +193,6 @@ export default function AdminQuestions() {
     try {
       const res = await api.post("admin/questions", newQ);
       setQuestions(prev => [res.data, ...prev]);
-      logAction(`Added question: "${newQ.question?.slice(0, 40)}"`);
       showToast("Question added!");
       setShowAddModal(false);
       setNewQ({ question: "", options: ["","","",""], answer: null, course: "", difficulty: "Medium", explanation: "" });
@@ -217,7 +205,6 @@ export default function AdminQuestions() {
     try {
       const res = await api.post("courses", { name: newCourseName });
       setCoursesFromDB(prev => [...prev, res.data]);
-      logAction(`Added course: "${newCourseName}"`);
       showToast("Course added");
       setNewCourseName(""); setAddingCourse(false);
     } catch (err) { showToast("Course add failed", "error"); }
@@ -236,7 +223,6 @@ export default function AdminQuestions() {
       await api.delete(`courses/${encodeURIComponent(name)}`);
       setCoursesFromDB(prev => prev.filter(c => c.name !== name));
       setQuestions(prev => prev.map(q => q.course === name ? { ...q, course: "" } : q));
-      logAction(`Deleted course: "${name}"`);
       showToast("Course deleted");
     } catch (err) { showToast("Course delete failed", "error"); }
   };
@@ -262,18 +248,7 @@ export default function AdminQuestions() {
 
   return (
     <div className="admin-page">
-
-      {/* Toast */}
-      {toast && (
-        <div style={{
-          position: "fixed", top: 70, right: 24, zIndex: 9999,
-          padding: "12px 20px", borderRadius: 12, fontWeight: 600, fontSize: ".875rem",
-          background: toast.type === "error" ? "#ef4444" : "#22c55e", color: "white",
-          boxShadow: "0 8px 24px rgba(0,0,0,0.3)", animation: "slideIn .2s ease"
-        }}>
-          {toast.msg}
-        </div>
-      )}
+      {ToastEl}
 
       {/* Header */}
       <div className="admin-section-header" style={{ marginBottom: 12 }}>

@@ -651,3 +651,50 @@
 }
 .admin-wrapper.admin-dark .live-toast-title { color: #f1f5f9; }
 .admin-wrapper.admin-dark .live-toast-close:hover { background: #334155; }
+
+/* ===== SIDEBAR COLLAPSE TRANSITION ===== */
+.admin-sidebar {
+  transition: width 0.25s cubic-bezier(0.4,0,0.2,1);
+  overflow: hidden;
+}
+.admin-sidebar .admin-nav a,
+.admin-sidebar .admin-nav-logout button {
+  transition: padding 0.2s, justify-content 0.2s, background 0.18s, color 0.18s;
+}
+/* Collapsed: center icons, hide text */
+.sidebar-collapsed .admin-nav a span,
+.sidebar-collapsed .admin-logo h2,
+.sidebar-collapsed .admin-logo span {
+  display: none;
+}
+.sidebar-collapsed .admin-nav a {
+  justify-content: center;
+  padding: 10px 0;
+}
+
+/* ===== MISSING BADGE VARIANTS ===== */
+.admin-badge.gray   { background: rgba(100,116,139,0.1); color: #64748b; }
+.admin-badge.purple { background: rgba(139,92,246,0.12); color: #8b5cf6; }
+.admin-stat-icon.purple { background: rgba(139,92,246,0.12); }
+
+/* ===== ADMIN DARK: Settings cards ===== */
+.admin-wrapper.admin-dark .admin-btn.secondary {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+.admin-wrapper.admin-dark .admin-btn.secondary:hover {
+  background: #334155;
+}
+.admin-wrapper.admin-dark .admin-modal-overlay .admin-modal {
+  background: #1e293b;
+  border-color: #334155;
+}
+.admin-wrapper.admin-dark .admin-modal h3,
+.admin-wrapper.admin-dark .admin-modal p {
+  color: #f1f5f9;
+}
+
+/* ===== ADMIN PROFILE CARD (Settings page) hover ===== */
+.admin-profile-card-clickable { transition: background 0.15s; }
+.admin-profile-card-clickable:hover { background: var(--admin-accent-pale) !important; cursor: pointer; }

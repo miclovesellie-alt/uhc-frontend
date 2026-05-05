@@ -1,0 +1,270 @@
+{
+  "questions": [
+    {
+      "course": "Research Methodology",
+      "question": "Who defined “Research is a systematic, controlled, empirical and critical investigation of hypothetical relations among natural phenomena”?",
+      "options": ["Black and Champion", "Kerlinger", "Creswell", "L.V. Redman and A.V.H. Morry"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Which of the following research is also known as collaborative research?",
+      "options": ["Analytical Research", "Applied research", "Action research", "Descriptive research"],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Cross-sectional surveys are divided into two types, which are?",
+      "options": ["Exploratory and causal", "Functional and dysfunctional", "Relational and logic", "Descriptive and analytical"],
+      "answer": 3
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Which of the following is not a characteristic of longitudinal survey?",
+      "options": [
+        "Collecting data from same subjects over time",
+        "Observe variables repeatedly",
+        "Analyzing changes at both individual and group level",
+        "Get a snapshot of a group"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Research Methodology",
+      "question": "The notion of ‘thick description’ is related to?",
+      "options": ["Life history", "Case study", "Ethnography", "Content analysis"],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "What are the main purposes of data analysis?",
+      "options": ["Description, Scale construction, Relationship generation", "Only II and III", "Only I and IV", "All of the above"],
+      "answer": 3
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Which of the following is a programme used for thematic analysis?",
+      "options": ["MAXQDA", "ZylNDEX", "Develve", "Epi data"],
+      "answer": 0
+    },
+    {
+      "course": "Research Methodology",
+      "question": "“The discovery of grounded theory” was written by?",
+      "options": ["Alan Bryman", "Barney Glaser and Anselm Strauss", "Theodor Adorno", "Thorstein Veblen"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Structured interviews involve?",
+      "options": ["Predetermined questions", "Unstructured techniques", "Interview guide only", "All of the above"],
+      "answer": 0
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Primary step in social science research is?",
+      "options": ["Research design", "Hypothesis development", "Research problem formulation", "Project execution"],
+      "answer": 2
+    },
+
+    {
+      "course": "Research Methodology",
+      "question": "Definition of social research was given by?",
+      "options": ["Kerlinger", "P.V. Young", "Black and Champion", "Grinnell"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Pure research mainly refers to?",
+      "options": ["Problem solving", "Resolving issues", "Intellectual curiosity and theory development", "Applied solutions"],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "A survey collecting data at one point in time is called?",
+      "options": ["Longitudinal", "Correlational", "Pooled", "Cross-sectional"],
+      "answer": 3
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Study of culture providing detailed perspective is called?",
+      "options": ["Life history", "Ethnography", "Case study", "Content analysis"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "First sociological use of life histories credited to?",
+      "options": ["Polish Peasant in Europe and America", "Strategies for Social Research", "Social Construction of Reality", "Life Histories and Narratives"],
+      "answer": 0
+    },
+
+    {
+      "course": "Research Methodology",
+      "question": "Definition of content analysis given by?",
+      "options": ["Louis Worth", "Berelson", "Tonnies", "Kerlinger"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Example of probability sampling is?",
+      "options": ["Convenience sampling", "Purposive sampling", "Quota sampling", "Stratified random sampling"],
+      "answer": 3
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Metamorph, Orbis, Sonar are examples of?",
+      "options": ["Code-based builders", "Word processors", "Text retrievers", "Code-and-retrieve programs"],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Decisional research is also called?",
+      "options": ["Action research", "Pure research", "Applied research", "Explanatory research"],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Sciences are divided into?",
+      "options": ["Natural and human sciences", "Natural and social sciences", "Physical and natural sciences", "Physiological sciences"],
+      "answer": 1
+    },
+
+    {
+      "course": "Research Methodology",
+      "question": "Not a data collection method is?",
+      "options": ["Observation", "Schedules", "Interview", "Research question"],
+      "answer": 3
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Theory statements correctness includes?",
+      "options": ["I, II, III", "I, II, IV", "II, III, IV", "I, III, IV"],
+      "answer": 3
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Book distinguishing personal troubles and public issues is?",
+      "options": ["Sociological Imagination", "Power Elite", "White Collar", "New Men of Power"],
+      "answer": 0
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Not a longitudinal survey is?",
+      "options": ["Household panel", "Repeated panel", "Focus group panel", "Cohort panel"],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Ethno refers to?",
+      "options": ["Geography", "People or culture", "Social life", "Group"],
+      "answer": 1
+    },
+
+    {
+      "course": "Research Methodology",
+      "question": "Narrative life story method is?",
+      "options": ["Content analysis", "Ethnography", "Genealogy", "Life history method"],
+      "answer": 3
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Ogives are also called?",
+      "options": ["Cumulative frequency curves", "Frequency distributions", "Transcendental curves", "All of the above"],
+      "answer": 0
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Not quantitative analysis software is?",
+      "options": ["Epidata", "Salstat", "Kwalitan", "Openstat"],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Theory is defined as?",
+      "options": ["Research process", "Interpretivism", "Conceptualization", "Set of general assertions"],
+      "answer": 3
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Cross-sectional descriptive survey purpose is?",
+      "options": ["Trait measurement", "Factorial analysis", "Total survey design", "Pooled survey"],
+      "answer": 0
+    },
+
+    {
+      "course": "Research Methodology",
+      "question": "Research defined as organized inquiry by?",
+      "options": ["P V Young", "Emory", "C.A. Moser", "Robert Hertz"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Literature review means?",
+      "options": ["References", "Previous works overview", "Theory framework", "Hypothesis testing"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Key ethnography feature is?",
+      "options": ["Structured interview", "Nonparticipant observation", "Fieldwork", "Anywhere study"],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Histogram was introduced by?",
+      "options": ["Karl Pearson", "Robert Hertz", "Kerlinger", "Patrick Geddes"],
+      "answer": 0
+    },
+    {
+      "course": "Research Methodology",
+      "question": "SPSS expansion is?",
+      "options": [
+        "Statistical Practices for Social Science",
+        "Statistical Product for Social Science",
+        "Solution Package for Social Research",
+        "Statistical Package for Social Sciences"
+      ],
+      "answer": 3
+    },
+
+    {
+      "course": "Research Methodology",
+      "question": "Qualitative research method is?",
+      "options": ["Questionnaire", "Ethnography", "Surveys", "Structured observation"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Same sample over time survey is?",
+      "options": ["Cross-sectional", "Correlational", "Longitudinal", "All of the above"],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Case studies are?",
+      "options": [
+        "In-depth study of units",
+        "Large sample study",
+        "Life story",
+        "Research documentation"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Planned systematic problem study is?",
+      "options": ["Problem formulation", "Hypothesis", "Cross-sectional design", "Research"],
+      "answer": 3
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Applied research goal is?",
+      "options": [
+        "Solve practical problems",
+        "Test theories",
+        "Community partnership",
+        "No application"
+      ],
+      "answer": 0
+    }
+  ]
+}

@@ -1,0 +1,423 @@
+
+{
+  "questions": [
+    {
+      "course": "Research Methodology",
+      "question": "An image, perception or concept that is capable of measurement is called__________.",
+      "options": ["Scale", "Hypothesis", "Type", "Variable"],
+      "answer": 3
+    },
+    {
+      "course": "Research Methodology",
+      "question": "In order to pursue the research, which of the following is priorly required?",
+      "options": ["Developing a research design", "Formulating a research question", "Deciding about the data analysis procedure", "Formulating a research hypothesis"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "What are the conditions in which Type-I error occurs?",
+      "options": ["The null hypotheses get accepted even if it is false", "The null hypotheses get rejected even if it is true", "Both the null hypotheses as well as alternative hypotheses are rejected", "None of the above"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "How to judge the depth of any research?",
+      "options": ["By research title", "By research duration", "By research objectives", "By total expenditure on research"],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Which of the following is not the method of Research?",
+      "options": ["Survey", "Historical", "Observation", "Philosophical"],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Research is",
+      "options": ["Searching again and again", "Finding solution to any problem", "Working in a scientific way to search for truth of any problem", "None of the above"],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "In the process of conducting research ‘Formulation of Hypothesis” is followed by",
+      "options": ["Statement of Objectives", "Analysis of Data", "Selection of Research Tools", "Collection of Data"],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "The main objective of exploratory study is to acquire knowledge",
+      "options": ["Exploratory", "Descriptive", "Diagnostic", "Descriptive and Diagnostic"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Concerned with discovering and testing variables with respect to association or disassociation",
+      "options": ["Exploratory", "Descriptive", "Diagnostic", "Descriptive and diagnostic"],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "A bundle of meanings or characteristics associated with events, objects, conditions is called",
+      "options": ["Construct", "Definition", "Concept", "Variable"],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Concepts are __________ of Research",
+      "options": ["Guide", "Tools", "Methods", "Variables"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Concept is of two types",
+      "options": ["Abstract and Coherent", "Concrete and Coherent", "Abstract and Concrete", "None of the above"],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "A statement of the quantitative research question should",
+      "options": [
+        "Extend the statement of purpose by specifying the question",
+        "Help select participants and methods",
+        "Specify the variables of interest",
+        "All the above"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Why do you need to review existing literature?",
+      "options": [
+        "To make sure you have references",
+        "To increase word count",
+        "To find out what is already known",
+        "To help studying"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Unit of Analysis means",
+      "options": ["Main parameter", "Variables", "Sample", "Constructs"],
+      "answer": 0
+    },
+
+    {
+      "course": "Research Methodology",
+      "question": "A formal document presenting research objectives and design is called",
+      "options": ["Research design", "Research proposal", "Research hypothesis", "Research report"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Survey is a __________ study",
+      "options": ["Descriptive", "Fact finding", "Analytical", "Systematic"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "In a survey there is an enumerator and a",
+      "options": ["Guide", "Respondent", "Supervisor", "Messenger"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "The first purpose of a survey is to",
+      "options": ["Description", "Evaluation", "Preparation", "Provide Information"],
+      "answer": 3
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Questions with only two alternatives are called",
+      "options": ["Multiple choice", "Dichotomous", "Open ended", "Structured"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Core elements of a research process are",
+      "options": [
+        "Intro, Data collection, Analysis, Conclusion",
+        "Executive summary etc.",
+        "Research plan etc.",
+        "Intro, Literature, Methodology, Results, Conclusion"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Identifying causes and solutions is",
+      "options": ["Field study", "Diagnostic study", "Action study", "Pilot study"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Second step in problem formulation is",
+      "options": ["Statement of problem", "Understanding problem", "Survey", "Discussion"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Questionnaire is filled by",
+      "options": ["Respondent", "Everybody", "Enumerator", "None"],
+      "answer": 0
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Main problem in questionnaire is",
+      "options": ["Accessibility", "Anonymity", "Inability to provide info", "None"],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Longitudinal design means",
+      "options": [
+        "Far away study",
+        "Long reading study",
+        "Two cases study",
+        "Study over time to observe change"
+      ],
+      "answer": 3
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Research objectives when achieved",
+      "options": [
+        "Ensure profit",
+        "Ensure department viability",
+        "Provide information to solve problem",
+        "Are rarely achieved"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Wrong questionnaire is example of",
+      "options": ["Primary data issue", "Secondary data issue", "Both", "None"],
+      "answer": 0
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Company internal records are",
+      "options": ["Primary", "Secondary", "Both", "None"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Main difficulty in marketing research process is",
+      "options": [
+        "Developing plan",
+        "Research approach",
+        "Defining problem",
+        "Selecting agency"
+      ],
+      "answer": 2
+    },
+
+    {
+      "course": "Research Methodology",
+      "question": "Finite population uses which sampling?",
+      "options": ["Systematic", "Purposive", "Area", "None"],
+      "answer": 0
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Non-probability sampling is",
+      "options": ["Quota", "Cluster", "Systematic", "Stratified"],
+      "answer": 0
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Scale with natural zero is",
+      "options": ["Ratio", "Nominal", "Ordinal", "Interval"],
+      "answer": 0
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Cluster, stratified, systematic are",
+      "options": ["Direct", "Indirect", "Random", "Non-random"],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "List of sampling units is",
+      "options": ["Design", "Frame", "Population frame", "Cluster"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Split-half method tests",
+      "options": ["Stability", "Internal reliability", "Observer consistency", "Validity"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Sampling unit is",
+      "options": [
+        "Population",
+        "Basic unit of population",
+        "All elements",
+        "Method"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Not a non-random method is",
+      "options": ["Cluster", "Quota", "Convenience", "Accidental"],
+      "answer": 0
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Entire population study is",
+      "options": ["Sampling", "Census", "Population", "Bias"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "A sample is a subset of",
+      "options": ["Sample", "Population", "Statistic", "Parameter"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Random sampling is called",
+      "options": ["Availability", "Probation", "Probability", "Prospect"],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Direct comparison scale is",
+      "options": ["Ranking", "Rating", "Graphic", "None"],
+      "answer": 0
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Z test distribution is",
+      "options": [
+        "Normal if n>30",
+        "Poisson",
+        "t distribution",
+        "Other"
+      ],
+      "answer": 0
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Degree of freedom for paired t-test is",
+      "options": ["2n-1", "n-2", "2(n-1)", "n-1"],
+      "answer": 3
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Parametric test includes",
+      "options": ["Sign test", "Run test", "Kruskal Wallis", "Z-test"],
+      "answer": 3
+    },
+
+    {
+      "course": "Research Methodology",
+      "question": "SPSS stands for",
+      "options": [
+        "Statistical Predictions for Social Sciences",
+        "Sexual Preferences for Sixties",
+        "Statistical Package for Social Sciences",
+        "Sexual Performance Syndrome"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Final stage of research process is",
+      "options": ["Problem formulation", "Data collection", "Data analysis", "Report writing"],
+      "answer": 3
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Full research report is called",
+      "options": ["Thesis", "Summary", "Abstract", "Article"],
+      "answer": 0
+    },
+    {
+      "course": "Research Methodology",
+      "question": "First page of research report is",
+      "options": ["Appendix", "Bibliography", "Index", "Title page"],
+      "answer": 3
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Chi-square test is",
+      "options": ["Mean", "Multi-question test", "Statistical mistake", "Statistic"],
+      "answer": 3
+    },
+    {
+      "course": "Research Methodology",
+      "question": "ANOVA is",
+      "options": [
+        "Government body",
+        "Software",
+        "One-way variance analysis",
+        "Two-way variance analysis"
+      ],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Not part of research report is",
+      "options": ["Results", "Abstract", "Method", "Footnotes"],
+      "answer": 3
+    },
+    {
+      "course": "Research Methodology",
+      "question": "SPSS Data Viewer is",
+      "options": [
+        "Frequency table",
+        "Spreadsheet for data entry",
+        "Stat test dialog",
+        "Variable definition screen"
+      ],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Best chart for categories comparison is",
+      "options": ["Pie", "Column", "Line", "Dot"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Filtering in Excel means",
+      "options": ["Formula", "Sorting", "Filtering data", "Pivot"],
+      "answer": 2
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Excel functions start with",
+      "options": ["()", "=", "+", ">"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Auto feature in Excel is",
+      "options": ["Auto complete", "Auto fill", "Fill handle", "Sorting"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Default sheets in Excel are",
+      "options": ["1", "3", "5", "10"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Range B1 to E5 is written as",
+      "options": ["B1 - E5", "B1:E5", "B1 to E5", "B1$E5"],
+      "answer": 1
+    },
+    {
+      "course": "Research Methodology",
+      "question": "Chart for trends over time is",
+      "options": ["Pie", "Column", "Line", "Dot"],
+      "answer": 2
+    }
+  ]
+}
