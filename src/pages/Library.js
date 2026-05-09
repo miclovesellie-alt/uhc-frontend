@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useOutletContext } from "react-router-dom";
 import api from "../api/api";
-import { BookMarked, BookOpen, ChevronRight, ArrowLeft, GraduationCap, Bookmark, Search, X, Download, RefreshCw, ExternalLink } from "lucide-react";
+import { BookMarked, BookOpen, ChevronRight, ArrowLeft, GraduationCap, Bookmark, Search, X, Download, RefreshCw, ExternalLink, FileText } from "lucide-react";
 import { useToast } from "../components/Toast";
 import { toggleBookmark, getBookmarks } from "../utils/bookmarks";
 import { getFileUrl } from "../utils/config";
@@ -24,10 +24,10 @@ function DocModal({ book, onClose }) {
   const [loaded, setLoaded] = useState(false);
   const iframeRef = useRef();
 
-  // Google Docs Viewer for PDFs, Microsoft viewer for Office files
+  // Native browser viewer for PDFs, Microsoft viewer for Office files
   const viewerSrc = isOffice
     ? `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(rawUrl)}`
-    : `https://docs.google.com/viewer?url=${encodeURIComponent(rawUrl)}&embedded=true&t=${retry}`;
+    : rawUrl;
 
   // Track visit
   useEffect(() => { addLastVisited(book); }, [book]);
@@ -249,39 +249,40 @@ export default function Library() {
             )}
           </div>
         ) : (
-          <div className="library-books-grid">
+          <div className="document-list-container">
             {filteredBooks.length === 0 ? (
               <div className="text-center py-20" style={{gridColumn:"1/-1"}}>
                 <BookOpen size={48} style={{opacity:.2, marginBottom:16}}/>
-                <p style={{color:"var(--text-muted)"}}>No books found.</p>
+                <p style={{color:"var(--text-muted)"}}>No documents found.</p>
               </div>
-            ) : filteredBooks.map(book => (
-              <div key={book._id} className="book-card">
-                <div className="book-cover">
-                  {book.coverImage
-                    ? <img src={book.coverImage} alt={book.title}/>
-                    : <div className="book-cover-placeholder">
-                        <BookMarked size={50} strokeWidth={1.5}/>
-                        <span style={{fontSize:".65rem", fontWeight:800, marginTop:4}}>UHC</span>
-                      </div>
-                  }
-                </div>
-                <div className="book-info">
-                  <h3 className="book-title">{book.title}</h3>
-                  <p className="book-author">{book.author || "Unknown Author"}</p>
-                  <div className="book-actions" style={{display:"flex", gap:8}}>
-                    <button className="book-btn" style={{flex:1}} onClick={() => openReader(book)}>
-                      <BookOpen size={16}/> Open Reader
-                    </button>
-                    <button className="book-btn"
-                      onClick={() => handleBookmark(book)}
-                      style={{padding:"0 12px", background: bookmarkedBooks.has(String(book._id)) ? "var(--accent-pale)" : undefined, color: bookmarkedBooks.has(String(book._id)) ? "var(--accent)" : undefined}}>
-                      <Bookmark size={16} fill={bookmarkedBooks.has(String(book._id)) ? "currentColor" : "none"}/>
+            ) : filteredBooks.map(book => {
+              const rawUrl = getFileUrl(book.fileUrl || "");
+              const ext = (rawUrl.split("?")[0].match(/\.([a-z0-9]+)$/i)?.[1] || "pdf").toLowerCase();
+              const isOfficeDoc = ["ppt","pptx","doc","docx"].includes(ext);
+              
+              return (
+                <div key={book._id} className="document-list-item" onClick={() => openReader(book)}>
+                  <div className="doc-icon">
+                    <FileText size={28} color={isOfficeDoc ? "#2563eb" : "#ef4444"} strokeWidth={1.5} />
+                    <span className="doc-ext-badge">{ext.substring(0,3).toUpperCase()}</span>
+                  </div>
+                  <div className="doc-info">
+                    <h3 className="doc-title">{book.title}</h3>
+                    <p className="doc-author">{book.author || "Unknown Author"}</p>
+                  </div>
+                  <div className="doc-actions">
+                    <button className="doc-bookmark-btn"
+                      onClick={(e) => { e.stopPropagation(); handleBookmark(book); }}
+                      style={{
+                        background: bookmarkedBooks.has(String(book._id)) ? "var(--accent-pale)" : "transparent", 
+                        color: bookmarkedBooks.has(String(book._id)) ? "var(--accent)" : "var(--text-muted)"
+                      }}>
+                      <Bookmark size={20} fill={bookmarkedBooks.has(String(book._id)) ? "currentColor" : "none"}/>
                     </button>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

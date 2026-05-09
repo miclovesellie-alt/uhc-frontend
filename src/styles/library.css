@@ -173,106 +173,92 @@
 }
 
 
-.library-books-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 24px;
+/* ===== DOCUMENT LIST VIEW ===== */
+.document-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.book-card {
+.document-list-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
   background: white;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
-  overflow: hidden;
-  transition: all 0.3s;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.document-list-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--accent);
+}
+
+.doc-icon {
+  width: 48px;
+  height: 48px;
+  background: var(--bg-body);
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
-}
-
-.book-card:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--shadow-card-hover);
-}
-
-.book-cover {
-  width: 100%;
-  height: 180px;
-  background: linear-gradient(135deg, var(--accent-pale), #e0e7ff);
-  display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   position: relative;
-  overflow: hidden;
 }
 
-.book-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.book-cover-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  color: var(--accent);
-}
-
-.book-info {
-  padding: 20px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.book-course-badge {
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--accent);
-  margin-bottom: 8px;
-}
-
-.book-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--text-heading);
-  margin-bottom: 4px;
-  line-height: 1.4;
-}
-
-.book-author {
-  font-size: 0.85rem;
+.doc-ext-badge {
+  font-size: 0.55rem;
+  font-weight: 800;
+  margin-top: 2px;
   color: var(--text-muted);
-  margin-bottom: 16px;
 }
 
-.book-actions {
-  margin-top: auto;
+.doc-info {
+  flex: 1;
+  min-width: 0; /* for text overflow */
 }
 
-.book-btn {
-  width: 100%;
-  padding: 10px;
-  border-radius: var(--radius-sm);
-  border: none;
-  background: var(--bg-hover);
-  color: var(--text-heading);
+.doc-title {
+  margin: 0 0 4px 0;
+  font-size: 1rem;
   font-weight: 700;
-  font-size: 0.9rem;
+  color: var(--text-heading);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doc-author {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.doc-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.doc-bookmark-btn {
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
 }
 
-.book-btn:hover {
-  background: var(--accent);
-  color: white;
+.doc-bookmark-btn:hover {
+  background: var(--accent-pale) !important;
+  color: var(--accent) !important;
 }
 
 @media (max-width: 768px) {
@@ -280,7 +266,7 @@
   .library-header { gap: 16px; margin-bottom: 24px; }
   .library-title { font-size: 1.6rem; }
   .library-controls { flex-direction: column; align-items: flex-start; }
-  .library-topics-grid, .library-books-grid { grid-template-columns: 1fr; gap: 16px; }
+  .library-topics-grid { grid-template-columns: 1fr; gap: 16px; }
   .course-card-classic { padding: 16px; gap: 14px; }
   .course-card-icon { width: 48px; height: 48px; }
   .course-card-info h3 { font-size: 1rem; }
@@ -298,7 +284,7 @@
 .dark-theme .library-search-input,
 .dark-theme .course-pill,
 .dark-theme .course-card-classic,
-.dark-theme .book-card {
+.dark-theme .document-list-item {
   background: #1e293b;
   border-color: #334155;
 }
@@ -309,7 +295,7 @@
 
 .dark-theme .course-pill:hover,
 .dark-theme .course-card-classic:hover,
-.dark-theme .book-card:hover {
+.dark-theme .document-list-item:hover {
   border-color: var(--accent);
 }
 
@@ -329,12 +315,12 @@
   color: white;
 }
 
-.dark-theme .book-author {
+.dark-theme .doc-author {
   color: #94a3b8;
 }
 
-.dark-theme .book-cover {
-  background: linear-gradient(135deg, #1e293b, #0f172a);
+.dark-theme .doc-icon {
+  background: #0f172a;
 }
 
 .dark-theme .course-card-icon {
