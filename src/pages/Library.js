@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useOutletContext } from "react-router-dom";
 import api from "../api/api";
-import { BookMarked, BookOpen, ChevronRight, ArrowLeft, GraduationCap, Bookmark, Search, X, Download, RefreshCw, ExternalLink, FileText } from "lucide-react";
+import { BookOpen, ChevronRight, ArrowLeft, GraduationCap, Bookmark, Search, X, Download, RefreshCw, ExternalLink, FileText } from "lucide-react";
 import { useToast } from "../components/Toast";
 import { toggleBookmark, getBookmarks } from "../utils/bookmarks";
 import { getFileUrl } from "../utils/config";
