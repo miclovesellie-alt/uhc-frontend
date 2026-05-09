@@ -4,7 +4,7 @@ import api from "../api/api";
 import { BookOpen, ChevronRight, ArrowLeft, GraduationCap, Bookmark, Search, X, Download, RefreshCw, ExternalLink, FileText } from "lucide-react";
 import { useToast } from "../components/Toast";
 import { toggleBookmark, getBookmarks } from "../utils/bookmarks";
-import { getFileUrl } from "../utils/config";
+import BASE_URL, { getFileUrl } from "../utils/config";
 import "../styles/library.css";
 
 const LAST_VISITED_KEY = "uhc_last_visited_books";
@@ -24,10 +24,10 @@ function DocModal({ book, onClose }) {
   const [loaded, setLoaded] = useState(false);
   const iframeRef = useRef();
 
-  // Native browser viewer for PDFs, Microsoft viewer for Office files
+  // Native browser viewer for PDFs (via proxy to force inline disposition), Microsoft viewer for Office files
   const viewerSrc = isOffice
     ? `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(rawUrl)}`
-    : rawUrl;
+    : `${BASE_URL}/api/submissions/proxy-pdf?url=${encodeURIComponent(rawUrl)}`;
 
   // Track visit
   useEffect(() => { addLastVisited(book); }, [book]);
