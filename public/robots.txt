@@ -2,4 +2,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://www.uhcacadamy.com/sitemap.xml
+Sitemap: https://uhcacadamy.com/sitemap.xml
