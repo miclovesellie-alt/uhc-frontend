@@ -116,7 +116,17 @@ export default function PdfjsViewer({ url }) {
           });
         }
         
-        const doc = await window.pdfjsLib.getDocument({ url }).promise;
+        // Cloudinary and some other CDNs don't support HTTP 206 Partial Content range requests properly for PDFs,
+        // which causes pdf.js to throw "Failed to load pdf preview". 
+        // We must disable range requests and streaming to force it to download the whole file via a standard GET.
+        const secureUrl = url.replace("http://", "https://");
+        
+        const doc = await window.pdfjsLib.getDocument({ 
+          url: secureUrl,
+          disableRange: true,
+          disableStream: true,
+          disableAutoFetch: true
+        }).promise;
         if (active) {
           setPdfDoc(doc);
           setLoading(false);
@@ -151,7 +161,7 @@ export default function PdfjsViewer({ url }) {
       <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, background: "#f8fafc" }}>
         <div style={{ fontSize: "3rem" }}>⚠️</div>
         <div style={{ color: "#ef4444", fontWeight: 600 }}>Failed to load PDF preview</div>
-        <a href={url} download target="_blank" rel="noreferrer" style={{ padding: "8px 16px", background: "#4255ff", color: "white", textDecoration: "none", borderRadius: 8, fontWeight: 600 }}>
+        <a href={url.replace("http://", "https://")} download target="_blank" rel="noreferrer" style={{ padding: "8px 16px", background: "#4255ff", color: "white", textDecoration: "none", borderRadius: 8, fontWeight: 600 }}>
           Download File Instead
         </a>
       </div>
