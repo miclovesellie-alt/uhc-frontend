@@ -10,13 +10,6 @@ export default function BookViewer() {
   const navigate = useNavigate();
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-
-  useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
 
   useEffect(() => {
     api.get("library/books")
@@ -38,7 +31,7 @@ export default function BookViewer() {
   const directUrl = getFileUrl(rawUrl);
   const ext = getExt(directUrl) || getExt(rawUrl);
   const isPdf    = ext === "pdf";
-  const isOffice = ["ppt","pptx","doc","docx"].includes(ext);
+  const isOffice = ["doc","docx","txt"].includes(ext);
   const isMedia  = ["jpg","jpeg","png","gif","webp"].includes(ext);
   const isVideo  = ["mp4","webm","ogg"].includes(ext);
 
@@ -56,21 +49,7 @@ export default function BookViewer() {
       </div>
     );
 
-    // Mobile — open directly
-    if (isMobile && (isPdf || isOffice)) return (
-      <div className="unsupported-viewer">
-        <div style={{ fontSize:"4rem", marginBottom:8 }}>{isOffice ? "📊" : "📄"}</div>
-        <h2>Document Ready</h2>
-        <p>Tap below to open in your device's reader.</p>
-        <button className="viewer-action-btn primary large"
-          style={{ padding:"16px 32px", fontSize:"1.05rem", marginTop:8 }}
-          onClick={() => window.open(directUrl,"_blank")}>
-          Open Document 📖
-        </button>
-      </div>
-    );
-
-    // Desktop — Scribd style embedded iframe
+    // Desktop and Mobile — Scribd style embedded iframe
     if (isPdf || isOffice) {
       return (
         <div style={{ width:"100%", height:"100%", position:"relative", background: "#e2e8f0" }}>

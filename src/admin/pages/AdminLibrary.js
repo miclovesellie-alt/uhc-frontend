@@ -184,12 +184,12 @@ export default function AdminLibrary() {
             <form onSubmit={handleAddBook}>
               
               <div className="form-group">
-                <label>Select Document (PDF, Word, or PowerPoint)</label>
+                <label>Select Document (PDF, Word, or TXT)</label>
                 <div className="file-input-wrapper">
                   <input 
                     type="file" 
                     id="file-upload" 
-                    accept=".pdf,.doc,.docx,.ppt,.pptx"
+                    accept=".pdf,.doc,.docx,.txt"
                     onChange={e => setSelectedFile(e.target.files[0])} 
                     style={{ display: 'none' }}
                   />

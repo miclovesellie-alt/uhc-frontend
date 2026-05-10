@@ -18,7 +18,6 @@ function addLastVisited(book) {
 function InlineReader({ book }) {
   const rawUrl  = getFileUrl(book.fileUrl);
   const ext     = (rawUrl.split("?")[0].match(/\.([a-z0-9]+)$/i)?.[1] || "pdf").toLowerCase();
-  const isOffice = ["ppt","pptx","doc","docx"].includes(ext);
   const isMobile = window.innerWidth < 768;
   const [retry, setRetry] = useState(0);
   const [loaded, setLoaded] = useState(false);
@@ -45,35 +44,23 @@ function InlineReader({ book }) {
       </div>
 
       {/* Body */}
-      {isMobile ? (
-        <div style={{flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:20, padding:28, textAlign:"center"}}>
-          <div style={{fontSize:"3.5rem"}}>{isOffice ? "📊" : "📄"}</div>
-          <div style={{fontWeight:700, fontSize:"1.05rem", color:"var(--text,#0f172a)"}}>{book.title}</div>
-          <div style={{opacity:.65, fontSize:".82rem", color:"var(--text-muted,#64748b)"}}>Open this document in your device's reader</div>
-          <a href={rawUrl} target="_blank" rel="noreferrer"
-            style={{padding:"14px 32px", borderRadius:12, background:"#4255ff", color:"white", fontWeight:700, textDecoration:"none", fontSize:".95rem", display:"block", boxShadow:"0 4px 14px rgba(66,85,255,.3)"}}>
-            📖 Open Document
-          </a>
-        </div>
-      ) : (
-        <div style={{flex:1, position:"relative", background:"#e2e8f0"}}>
-          {!loaded && (
-            <div style={{position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", background:"#f8fafc", gap:16, zIndex:2}}>
-              <div style={{width:40, height:40, border:"3px solid #e2e8f0", borderTopColor:"#4255ff", borderRadius:"50%", animation:"spin .9s linear infinite"}}/>
-              <div style={{color:"var(--text-muted,#64748b)", fontSize:".85rem"}}>Loading document viewer...</div>
-            </div>
-          )}
-          <iframe
-            ref={iframeRef}
-            key={retry}
-            src={viewerSrc}
-            title={book.title}
-            onLoad={() => setLoaded(true)}
-            style={{width:"100%", height:"100%", border:"none", display:"block", minHeight:"600px"}}
-            allow="fullscreen"
-          />
-        </div>
-      )}
+      <div style={{flex:1, position:"relative", background:"#e2e8f0"}}>
+        {!loaded && (
+          <div style={{position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", background:"#f8fafc", gap:16, zIndex:2}}>
+            <div style={{width:40, height:40, border:"3px solid #e2e8f0", borderTopColor:"#4255ff", borderRadius:"50%", animation:"spin .9s linear infinite"}}/>
+            <div style={{color:"var(--text-muted,#64748b)", fontSize:".85rem"}}>Loading document viewer...</div>
+          </div>
+        )}
+        <iframe
+          ref={iframeRef}
+          key={retry}
+          src={viewerSrc}
+          title={book.title}
+          onLoad={() => setLoaded(true)}
+          style={{width:"100%", height:"100%", border:"none", display:"block", minHeight:"600px"}}
+          allow="fullscreen"
+        />
+      </div>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   );
