@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useOutletContext } from "react-router-dom";
 import api from "../api/api";
-import { BookOpen, ChevronRight, ArrowLeft, GraduationCap, Bookmark, Search, X, Download, RefreshCw, ExternalLink, FileText } from "lucide-react";
+import { BookOpen, ChevronRight, ArrowLeft, GraduationCap, Bookmark, Search, Download, RefreshCw, ExternalLink, FileText } from "lucide-react";
 import { useToast } from "../components/Toast";
 import { toggleBookmark, getBookmarks } from "../utils/bookmarks";
-import BASE_URL, { getFileUrl } from "../utils/config";
+import { getFileUrl } from "../utils/config";
 import "../styles/library.css";
 
 const LAST_VISITED_KEY = "uhc_last_visited_books";
