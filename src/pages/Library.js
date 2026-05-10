@@ -14,8 +14,8 @@ function addLastVisited(book) {
   localStorage.setItem(LAST_VISITED_KEY, JSON.stringify([book, ...prev].slice(0, 5)));
 }
 
-// ── Document Viewer Modal ─────────────────────────────────────
-function DocModal({ book, onClose }) {
+// ── Inline Document Reader ─────────────────────────────────────
+function InlineReader({ book }) {
   const rawUrl  = getFileUrl(book.fileUrl);
   const ext     = (rawUrl.split("?")[0].match(/\.([a-z0-9]+)$/i)?.[1] || "pdf").toLowerCase();
   const isOffice = ["ppt","pptx","doc","docx"].includes(ext);
@@ -24,64 +24,43 @@ function DocModal({ book, onClose }) {
   const [loaded, setLoaded] = useState(false);
   const iframeRef = useRef();
 
-  // Native browser viewer for PDFs (via proxy to force inline disposition), Microsoft viewer for Office files
-  const viewerSrc = isOffice
-    ? `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(rawUrl)}`
-    : `${BASE_URL}/api/submissions/proxy-pdf?url=${encodeURIComponent(rawUrl)}`;
-
-  // Track visit
-  useEffect(() => { addLastVisited(book); }, [book]);
-
-  const overlay = { position:"fixed", inset:0, zIndex:9999, display:"flex", flexDirection:"column", background:"#1e293b" };
-  const hdr = { display:"flex", alignItems:"center", gap:10, padding:"0 14px", height:52, flexShrink:0, background:"#0f172a", borderBottom:"1px solid rgba(255,255,255,0.08)" };
-  const btn = { display:"flex", alignItems:"center", gap:6, padding:"7px 12px", borderRadius:8, border:"1px solid rgba(255,255,255,0.15)", background:"rgba(255,255,255,0.07)", color:"white", fontWeight:600, fontSize:".78rem", cursor:"pointer", textDecoration:"none", whiteSpace:"nowrap" };
+  // Scribd format continuous scroll using Google Docs Viewer for both PDF and Office
+  const viewerSrc = `https://docs.google.com/gview?url=${encodeURIComponent(rawUrl)}&embedded=true`;
 
   return (
-    <div style={overlay}>
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: "calc(100vh - 200px)", border: "1px solid var(--border,#e2e8f0)", borderRadius: 12, overflow: "hidden", background: "#f8fafc", marginTop: 16 }}>
       {/* Header */}
-      <div style={hdr}>
-        <button onClick={onClose} style={{...btn, padding:"7px 8px"}}><X size={16}/></button>
+      <div style={{ display:"flex", alignItems:"center", gap:10, padding:"0 14px", height:52, flexShrink:0, background:"#fff", borderBottom:"1px solid var(--border,#e2e8f0)" }}>
         <div style={{flex:1, minWidth:0}}>
-          <div style={{color:"white", fontWeight:700, fontSize:".85rem", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{book.title}</div>
-          <div style={{color:"rgba(255,255,255,.4)", fontSize:".7rem"}}>{book.course}{book.author ? ` · ${book.author}` : ""}</div>
+          <div style={{fontWeight:700, fontSize:".85rem", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", color: "var(--text,#0f172a)"}}>{book.title}</div>
+          <div style={{color:"var(--text-muted,#64748b)", fontSize:".7rem"}}>{book.course}{book.author ? ` · ${book.author}` : ""}</div>
         </div>
         {!isMobile && (
-          <button style={btn} onClick={() => { setLoaded(false); setRetry(r => r+1); }} title="Reload">
+          <button style={{padding:"6px 12px", borderRadius:6, border:"1px solid var(--border,#e2e8f0)", background:"#fff", cursor:"pointer", fontSize:".75rem", display:"flex", alignItems:"center", gap:6, color:"var(--text,#0f172a)"}} onClick={() => { setLoaded(false); setRetry(r => r+1); }} title="Reload">
             <RefreshCw size={13}/> Reload
           </button>
         )}
-        <a href={rawUrl} target="_blank" rel="noreferrer" style={btn}><ExternalLink size={13}/> Open tab</a>
-        <a href={rawUrl} download target="_blank" rel="noreferrer" style={{...btn, background:"#4255ff", border:"none"}}><Download size={13}/> Download</a>
+        <a href={rawUrl} target="_blank" rel="noreferrer" style={{padding:"6px 12px", borderRadius:6, border:"1px solid var(--border,#e2e8f0)", background:"#fff", cursor:"pointer", fontSize:".75rem", textDecoration:"none", color:"var(--text,#0f172a)", display:"flex", alignItems:"center", gap:6}}><ExternalLink size={13}/> Open tab</a>
+        <a href={rawUrl} download target="_blank" rel="noreferrer" style={{padding:"6px 12px", borderRadius:6, border:"none", background:"#4255ff", color:"white", cursor:"pointer", fontSize:".75rem", textDecoration:"none", display:"flex", alignItems:"center", gap:6}}><Download size={13}/> Download</a>
       </div>
 
       {/* Body */}
       {isMobile ? (
-        // Mobile — iframes are unreliable on iOS/Android, just one clean button
-        <div style={{flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", color:"white", gap:20, padding:28, textAlign:"center"}}>
+        <div style={{flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:20, padding:28, textAlign:"center"}}>
           <div style={{fontSize:"3.5rem"}}>{isOffice ? "📊" : "📄"}</div>
-          <div style={{fontWeight:700, fontSize:"1.05rem"}}>{book.title}</div>
-          <div style={{opacity:.55, fontSize:".82rem"}}>Open this document in your device's reader</div>
+          <div style={{fontWeight:700, fontSize:"1.05rem", color:"var(--text,#0f172a)"}}>{book.title}</div>
+          <div style={{opacity:.65, fontSize:".82rem", color:"var(--text-muted,#64748b)"}}>Open this document in your device's reader</div>
           <a href={rawUrl} target="_blank" rel="noreferrer"
-            style={{padding:"16px 36px", borderRadius:14, background:"#4255ff", color:"white", fontWeight:800, textDecoration:"none", fontSize:"1rem", boxShadow:"0 8px 28px rgba(66,85,255,.4)", display:"block"}}>
+            style={{padding:"14px 32px", borderRadius:12, background:"#4255ff", color:"white", fontWeight:700, textDecoration:"none", fontSize:".95rem", display:"block", boxShadow:"0 4px 14px rgba(66,85,255,.3)"}}>
             📖 Open Document
-          </a>
-          <a href={rawUrl} download target="_blank" rel="noreferrer"
-            style={{opacity:.55, color:"rgba(255,255,255,.7)", fontSize:".78rem", textDecoration:"underline"}}>
-            ⬇ Download instead
           </a>
         </div>
       ) : (
-        // Desktop — Google Docs / Microsoft viewer iframe
-        <div style={{flex:1, position:"relative"}}>
-          {/* Spinner while loading */}
+        <div style={{flex:1, position:"relative", background:"#e2e8f0"}}>
           {!loaded && (
-            <div style={{position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", background:"#1e293b", color:"white", gap:16, zIndex:2}}>
-              <div style={{width:44, height:44, border:"4px solid rgba(255,255,255,.1)", borderTopColor:"#4255ff", borderRadius:"50%", animation:"spin .9s linear infinite"}}/>
-              <div style={{opacity:.65, fontSize:".85rem"}}>Loading document…</div>
-              <div style={{opacity:.4, fontSize:".75rem", textAlign:"center", maxWidth:280}}>
-                If it takes too long,{" "}
-                <a href={rawUrl} target="_blank" rel="noreferrer" style={{color:"#60a5fa"}}>open directly ↗</a>
-              </div>
+            <div style={{position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", background:"#f8fafc", gap:16, zIndex:2}}>
+              <div style={{width:40, height:40, border:"3px solid #e2e8f0", borderTopColor:"#4255ff", borderRadius:"50%", animation:"spin .9s linear infinite"}}/>
+              <div style={{color:"var(--text-muted,#64748b)", fontSize:".85rem"}}>Loading document viewer...</div>
             </div>
           )}
           <iframe
@@ -90,7 +69,7 @@ function DocModal({ book, onClose }) {
             src={viewerSrc}
             title={book.title}
             onLoad={() => setLoaded(true)}
-            style={{width:"100%", height:"100%", border:"none", display:"block"}}
+            style={{width:"100%", height:"100%", border:"none", display:"block", minHeight:"600px"}}
             allow="fullscreen"
           />
         </div>
@@ -145,6 +124,8 @@ export default function Library() {
 
   const openReader = (book) => {
     setOpenBook(book);
+    setView("reader");
+    addLastVisited(book);
     // Refresh last-visited list after modal records it
     setTimeout(() => setLastVisited(getLastVisited()), 300);
   };
@@ -181,19 +162,25 @@ export default function Library() {
   );
 
   return (
-    <>
-      {openBook && <DocModal book={openBook} onClose={() => setOpenBook(null)} />}
-
       <div className="library-wrapper">
         <div className="library-header">
           <div style={{display:"flex", alignItems:"center", gap:16}}>
-            {view === "books" && (
+            {(view === "books" || view === "reader") && (
               <button className="viewer-back-btn" style={{width:36, height:36}}
-                onClick={() => { setView("courses"); setActiveCourse(null); setLocalSearch(""); }}>
+                onClick={() => { 
+                  if (view === "reader") {
+                    setView(activeCourse ? "books" : "courses");
+                    setOpenBook(null);
+                  } else {
+                    setView("courses"); 
+                    setActiveCourse(null); 
+                    setLocalSearch(""); 
+                  }
+                }}>
                 <ArrowLeft size={18}/>
               </button>
             )}
-            <h1 className="library-title">{view === "courses" ? "Explore Courses" : activeCourse}</h1>
+            <h1 className="library-title">{view === "courses" ? "Explore Courses" : view === "reader" ? "Document Viewer" : activeCourse}</h1>
           </div>
           <div style={{position:"relative", minWidth:200, maxWidth:320}}>
             <Search size={15} style={{position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", color:"var(--text-muted)", opacity:.5}}/>
@@ -221,7 +208,9 @@ export default function Library() {
           </div>
         )}
 
-        {view === "courses" ? (
+        {view === "reader" && openBook ? (
+          <InlineReader book={openBook} />
+        ) : view === "courses" ? (
           <div className="library-topics-grid">
             {courses.filter(c => c.toLowerCase().includes(combinedSearch)).map(course => {
               const pct = courseProgress(course);
@@ -286,6 +275,5 @@ export default function Library() {
           </div>
         )}
       </div>
-    </>
   );
 }
