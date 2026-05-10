@@ -17,7 +17,6 @@ function addLastVisited(book) {
 // ── Inline Document Reader ─────────────────────────────────────
 function InlineReader({ book }) {
   const rawUrl  = getFileUrl(book.fileUrl);
-  const ext     = (rawUrl.split("?")[0].match(/\.([a-z0-9]+)$/i)?.[1] || "pdf").toLowerCase();
   const isMobile = window.innerWidth < 768;
   const [retry, setRetry] = useState(0);
   const [loaded, setLoaded] = useState(false);
