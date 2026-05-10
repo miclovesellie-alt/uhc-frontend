@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../api/api";
 import { ArrowLeft, Download, BookOpen } from "lucide-react";
-import { getFileUrl } from "../utils/config";
+import BASE_URL, { getFileUrl } from "../utils/config";
 import "../styles/BookViewer.css";
 
 export default function BookViewer() {
@@ -35,7 +35,9 @@ export default function BookViewer() {
   const isMedia  = ["jpg","jpeg","png","gif","webp"].includes(ext);
   const isVideo  = ["mp4","webm","ogg"].includes(ext);
 
-  const viewerSrc = `https://docs.google.com/gview?url=${encodeURIComponent(directUrl)}&embedded=true`;
+  const viewerSrc = isPdf 
+    ? `${BASE_URL}/api/submissions/proxy-pdf?url=${encodeURIComponent(directUrl)}`
+    : `https://docs.google.com/gview?url=${encodeURIComponent(directUrl)}&embedded=true`;
 
   const renderContent = () => {
     if (isMedia) return (

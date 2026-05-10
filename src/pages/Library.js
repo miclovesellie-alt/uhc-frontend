@@ -4,7 +4,7 @@ import api from "../api/api";
 import { BookOpen, ChevronRight, ArrowLeft, GraduationCap, Bookmark, Search, Download, RefreshCw, ExternalLink, FileText } from "lucide-react";
 import { useToast } from "../components/Toast";
 import { toggleBookmark, getBookmarks } from "../utils/bookmarks";
-import { getFileUrl } from "../utils/config";
+import BASE_URL, { getFileUrl } from "../utils/config";
 import "../styles/library.css";
 
 const LAST_VISITED_KEY = "uhc_last_visited_books";
@@ -22,8 +22,13 @@ function InlineReader({ book }) {
   const [loaded, setLoaded] = useState(false);
   const iframeRef = useRef();
 
-  // Scribd format continuous scroll using Google Docs Viewer for both PDF and Office
-  const viewerSrc = `https://docs.google.com/gview?url=${encodeURIComponent(rawUrl)}&embedded=true`;
+  const isPdf = rawUrl.toLowerCase().includes(".pdf");
+  
+  // Use backend proxy for PDFs to ensure browser's native PDF viewer loads them flawlessly.
+  // Use Google Docs viewer for DOC/DOCX/TXT files.
+  const viewerSrc = isPdf 
+    ? `${BASE_URL}/api/submissions/proxy-pdf?url=${encodeURIComponent(rawUrl)}`
+    : `https://docs.google.com/gview?url=${encodeURIComponent(rawUrl)}&embedded=true`;
 
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: "calc(100vh - 200px)", border: "1px solid var(--border,#e2e8f0)", borderRadius: 12, overflow: "hidden", background: "#f8fafc", marginTop: 16 }}>
