@@ -56,7 +56,7 @@ export default function BookViewer() {
     if (isPdf) {
       return (
         <div style={{ width:"100%", height:"100%", position:"relative", background: "#e2e8f0" }}>
-          <PdfjsViewer url={`${BASE_URL}/api/submissions/proxy-pdf?url=${encodeURIComponent(directUrl)}`} />
+          <PdfjsViewer url={directUrl} />
         </div>
       );
     }

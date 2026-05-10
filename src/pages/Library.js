@@ -51,7 +51,7 @@ function InlineReader({ book }) {
       {/* Body */}
       <div style={{flex:1, position:"relative", background:"#e2e8f0"}}>
         {isPdf ? (
-          <PdfjsViewer url={`${BASE_URL}/api/submissions/proxy-pdf?url=${encodeURIComponent(rawUrl)}`} />
+          <PdfjsViewer url={rawUrl} />
         ) : (
           <>
             {!loaded && (
