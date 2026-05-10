@@ -5,6 +5,7 @@ import { BookOpen, ChevronRight, ArrowLeft, GraduationCap, Bookmark, Search, Dow
 import { useToast } from "../components/Toast";
 import { toggleBookmark, getBookmarks } from "../utils/bookmarks";
 import BASE_URL, { getFileUrl } from "../utils/config";
+import PdfjsViewer from "../components/PdfjsViewer";
 import "../styles/library.css";
 
 const LAST_VISITED_KEY = "uhc_last_visited_books";
@@ -49,21 +50,27 @@ function InlineReader({ book }) {
 
       {/* Body */}
       <div style={{flex:1, position:"relative", background:"#e2e8f0"}}>
-        {!loaded && (
-          <div style={{position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", background:"#f8fafc", gap:16, zIndex:2}}>
-            <div style={{width:40, height:40, border:"3px solid #e2e8f0", borderTopColor:"#4255ff", borderRadius:"50%", animation:"spin .9s linear infinite"}}/>
-            <div style={{color:"var(--text-muted,#64748b)", fontSize:".85rem"}}>Loading document viewer...</div>
-          </div>
+        {isPdf ? (
+          <PdfjsViewer url={`${BASE_URL}/api/submissions/proxy-pdf?url=${encodeURIComponent(rawUrl)}`} />
+        ) : (
+          <>
+            {!loaded && (
+              <div style={{position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", background:"#f8fafc", gap:16, zIndex:2}}>
+                <div style={{width:40, height:40, border:"3px solid #e2e8f0", borderTopColor:"#4255ff", borderRadius:"50%", animation:"spin .9s linear infinite"}}/>
+                <div style={{color:"var(--text-muted,#64748b)", fontSize:".85rem"}}>Loading document viewer...</div>
+              </div>
+            )}
+            <iframe
+              ref={iframeRef}
+              key={retry}
+              src={viewerSrc}
+              title={book.title}
+              onLoad={() => setLoaded(true)}
+              style={{width:"100%", height:"100%", border:"none", display:"block", minHeight:"600px"}}
+              allow="fullscreen"
+            />
+          </>
         )}
-        <iframe
-          ref={iframeRef}
-          key={retry}
-          src={viewerSrc}
-          title={book.title}
-          onLoad={() => setLoaded(true)}
-          style={{width:"100%", height:"100%", border:"none", display:"block", minHeight:"600px"}}
-          allow="fullscreen"
-        />
       </div>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>

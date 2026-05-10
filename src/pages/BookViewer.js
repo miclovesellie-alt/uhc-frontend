@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import api from "../api/api";
 import { ArrowLeft, Download, BookOpen } from "lucide-react";
 import BASE_URL, { getFileUrl } from "../utils/config";
+import PdfjsViewer from "../components/PdfjsViewer";
 import "../styles/BookViewer.css";
 
 export default function BookViewer() {
@@ -51,8 +52,15 @@ export default function BookViewer() {
       </div>
     );
 
-    // Desktop and Mobile — Scribd style embedded iframe
-    if (isPdf || isOffice) {
+    // Desktop and Mobile — Scribd style embedded viewer
+    if (isPdf) {
+      return (
+        <div style={{ width:"100%", height:"100%", position:"relative", background: "#e2e8f0" }}>
+          <PdfjsViewer url={`${BASE_URL}/api/submissions/proxy-pdf?url=${encodeURIComponent(directUrl)}`} />
+        </div>
+      );
+    }
+    if (isOffice) {
       return (
         <div style={{ width:"100%", height:"100%", position:"relative", background: "#e2e8f0" }}>
           <iframe
