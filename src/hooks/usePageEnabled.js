@@ -4,25 +4,21 @@ import api from "../api/api";
 /**
  * Returns { disabled: bool, loading: bool } for a given settings key.
  * Uses the public GET /settings/:key endpoint — no auth needed.
- * Result is cached in memory for the lifetime of the page.
+ *
+ * Pass bypass=true (e.g. for admin users) to skip the check entirely.
+ * No in-memory cache — always fetches fresh so toggles take effect immediately.
  */
-const cache = {};
-
-export function usePageEnabled(key) {
-  const [disabled, setDisabled] = useState(cache[key] ?? false);
-  const [loading,  setLoading]  = useState(!(key in cache));
+export function usePageEnabled(key, bypass = false) {
+  const [disabled, setDisabled] = useState(false);
+  const [loading,  setLoading]  = useState(!bypass);
 
   useEffect(() => {
-    if (key in cache) { setDisabled(cache[key]); setLoading(false); return; }
+    if (bypass) { setDisabled(false); setLoading(false); return; }
     api.get(`settings/${key}`)
-      .then(r => {
-        const val = r.data?.value ?? false;
-        cache[key] = val;
-        setDisabled(val);
-      })
-      .catch(() => { cache[key] = false; })
+      .then(r  => setDisabled(r.data?.value ?? false))
+      .catch(() => setDisabled(false))
       .finally(() => setLoading(false));
-  }, [key]);
+  }, [key, bypass]);
 
   return { disabled, loading };
 }

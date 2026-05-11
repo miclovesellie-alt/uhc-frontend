@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useOutletContext } from "react-router-dom";
+import { UserContext } from "../context/UserContext";
 import api from "../api/api";
 import { ArrowLeft, BookOpen, Search, Download, ExternalLink, GraduationCap } from "lucide-react";
 import { useToast } from "../components/Toast";
@@ -74,7 +75,9 @@ function BookCard({ book, bookmarked, onOpen, onBookmark }) {
 
 /* ── Main Library ─────────────────────────────────────────────── */
 export default function Library() {
-  const { disabled, loading: checkingFlag } = usePageEnabled("disableLibrary");
+  const { user } = useContext(UserContext);
+  const isAdmin = user?.role === "admin" || user?.role === "superadmin";
+  const { disabled, loading: checkingFlag } = usePageEnabled("disableLibrary", isAdmin);
   const { searchQuery } = useOutletContext();
   const toast = useToast();
 

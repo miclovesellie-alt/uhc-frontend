@@ -59,6 +59,7 @@ export default function LandingPage() {
   const [leaders,         setLeaders]          = useState(LEADERS_FALLBACK);
   const [contactForm,     setContactForm]      = useState({ name:"", email:"", message:"" });
   const [contactStatus,   setContactStatus]    = useState(null);
+  const [siteContact,     setSiteContact]      = useState({ email:"boafokyei3@gmail.com", phone:"", whatsapp:"+233598173019", facebook:"", instagram:"", tiktok:"", twitter:"", youtube:"" });
 
   // Quiz
   const [course,   setCourse]   = useState(0);
@@ -82,6 +83,10 @@ export default function LandingPage() {
     }).catch(()=>{});
     api.get("settings/heroImageUrl").then(r => {
       if (r.data?.value) setHeroImage(r.data.value);
+    }).catch(()=>{});
+    api.get("settings/contactInfo").then(r => {
+      if (r.data?.value && typeof r.data.value === "object")
+        setSiteContact(prev => ({ ...prev, ...r.data.value }));
     }).catch(()=>{});
   }, []);
 
@@ -364,7 +369,17 @@ export default function LandingPage() {
         <div className="footer-content">
           <div className="footer-contact">
             <h3>Contact Us</h3>
-            <p>Email: <strong>boafokyei3@gmail.com</strong><br/>WhatsApp: <strong>+233 598 173 019</strong></p>
+            {siteContact.email && <p>Email: <strong>{siteContact.email}</strong></p>}
+            {siteContact.phone && <p>Phone: <strong>{siteContact.phone}</strong></p>}
+            {siteContact.whatsapp && <p>WhatsApp: <a href={`https://wa.me/${siteContact.whatsapp.replace(/\D/g,'')}`} target="_blank" rel="noreferrer" style={{color:"#10b981",fontWeight:700}}>{siteContact.whatsapp}</a></p>}
+            {/* Social icons row */}
+            <div style={{ display:"flex", gap:10, flexWrap:"wrap", marginTop:10 }}>
+              {siteContact.facebook  && <a href={siteContact.facebook}  target="_blank" rel="noreferrer" style={{textDecoration:"none",fontSize:".8rem",padding:"5px 12px",borderRadius:99,background:"rgba(255,255,255,.1)",color:"white",fontWeight:600}}>Facebook</a>}
+              {siteContact.instagram && <a href={siteContact.instagram} target="_blank" rel="noreferrer" style={{textDecoration:"none",fontSize:".8rem",padding:"5px 12px",borderRadius:99,background:"rgba(255,255,255,.1)",color:"white",fontWeight:600}}>Instagram</a>}
+              {siteContact.tiktok    && <a href={siteContact.tiktok}    target="_blank" rel="noreferrer" style={{textDecoration:"none",fontSize:".8rem",padding:"5px 12px",borderRadius:99,background:"rgba(255,255,255,.1)",color:"white",fontWeight:600}}>TikTok</a>}
+              {siteContact.twitter   && <a href={siteContact.twitter}   target="_blank" rel="noreferrer" style={{textDecoration:"none",fontSize:".8rem",padding:"5px 12px",borderRadius:99,background:"rgba(255,255,255,.1)",color:"white",fontWeight:600}}>Twitter/X</a>}
+              {siteContact.youtube   && <a href={siteContact.youtube}   target="_blank" rel="noreferrer" style={{textDecoration:"none",fontSize:".8rem",padding:"5px 12px",borderRadius:99,background:"rgba(255,255,255,.1)",color:"white",fontWeight:600}}>YouTube</a>}
+            </div>
             {contactStatus === "success" && <div style={{ color:"#10b981", fontSize:".83rem", marginBottom:10, fontWeight:600 }}>✓ Message sent!</div>}
             {contactStatus === "error"   && <div style={{ color:"#ef4444", fontSize:".83rem", marginBottom:10, fontWeight:600 }}>✕ Failed. Please try again.</div>}
             <form className="footer-contact-form" onSubmit={handleContact}>

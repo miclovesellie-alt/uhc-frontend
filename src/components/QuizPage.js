@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Flag, BookOpen, CheckCircle, Clock, AlertTriangle, Search } from "lucide-react";
 import { UserContext } from "../context/UserContext";
@@ -58,7 +58,9 @@ const loadQ = async (course, limit) => {
    MAIN COMPONENT
 ══════════════════════════════════════ */
 export default function QuizPage() {
-  const { disabled: quizDisabled, loading: checkingQuizFlag } = usePageEnabled("disableQuiz");
+  const { user } = useContext(UserContext);
+  const isAdmin = user?.role === "admin" || user?.role === "superadmin";
+  const { disabled: quizDisabled, loading: checkingQuizFlag } = usePageEnabled("disableQuiz", isAdmin);
   const toast    = useToast();
   const userId   = localStorage.getItem("userId");
   const storeKey = `activeQuiz_${userId}`;
