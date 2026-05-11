@@ -2,443 +2,416 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
 import { motion } from "framer-motion";
-import { 
-  BookOpen, 
-  ShieldCheck, 
-  Zap, 
-  TrendingUp, 
-  Trophy, 
-  ArrowRight,
-  CheckCircle2,
-  Smartphone,
-  LayoutDashboard,
-  Menu,
-  X
+import {
+  BookOpen, Zap, TrendingUp, Trophy, ArrowRight,
+  CheckCircle2, Menu, X, Lock, ChevronRight, Star
 } from "lucide-react";
 import "../styles/landingpage.css";
 import graduation from "../assets/graduation.jpeg";
 
-function useCounter(target, active) {
-  const [count, setCount] = useState(0);
-  useEffect(() => {
-    if (!active) return;
-    let start = 0;
-    const duration = 2000;
-    const increment = target / (duration / 16);
-    const timer = setInterval(() => {
-      start += increment;
-      if (start >= target) {
-        start = target;
-        clearInterval(timer);
-      }
-      setCount(Math.floor(start));
-    }, 16);
-    return () => clearInterval(timer);
-  }, [target, active]);
-  return count;
-}
-
-const features = [
-  { icon: <Zap />, title: "Adaptive Quizzes", desc: "Our smart algorithms adjust difficulty based on your performance, focusing on areas where you need the most improvement." },
-  { icon: <BookOpen />, title: "Study Resources", desc: "Access a library of clinical guides, lecture notes, and exam prep materials curated by nursing experts." },
-  { icon: <TrendingUp />, title: "Detailed Analytics", desc: "Visualize your progress with beautiful charts. Track your score history across different nursing topics." },
-  { icon: <ShieldCheck />, title: "Secure Exams", desc: "Anti-cheating measures and proctored environments for high-stakes nursing licensing preparation." },
-  { icon: <LayoutDashboard />, title: "Admin Dashboard", desc: "Powerful tools for instructors to manage classes, create custom question banks, and monitor student success." },
-  { icon: <Trophy />, title: "National Rankings", desc: "Compete with nursing students across the country on our seasonal leaderboards and earn certifications." },
-];
-
-const roles = [
-  { 
-    icon: "🩺", 
-    title: "Nursing Students", 
-    desc: "Master your coursework and prepare for licensing exams with the most comprehensive nursing platform.",
-    features: ["5,000+ Practice Questions", "Personalized Study Plans", "Instant Performance Feedback", "Peer Community Support"] 
+/* ─── Real nursing questions – visible to Google, answers locked ─────── */
+const QUIZ_QUESTIONS = [
+  {
+    course: "Medical-Surgical Nursing",
+    q: "A patient with Type 2 diabetes has a fasting blood glucose of 285 mg/dL. Which nursing intervention is the priority?",
+    options: ["A. Administer scheduled insulin as ordered", "B. Encourage increased fluid intake only", "C. Notify the physician immediately", "D. Recheck glucose in 30 minutes without action"],
   },
-  { 
-    icon: "👨‍🏫", 
-    title: "Instructors & Schools", 
-    desc: "Empower your students with data-driven insights and effortless classroom management tools.",
-    features: ["Custom Quiz Creation", "Real-time Student Monitoring", "Automated Grading System", "Class Performance Reports"] 
+  {
+    course: "Pharmacology",
+    q: "A nurse is about to give digoxin (Lanoxin). Which finding should prompt withholding the dose and notifying the doctor?",
+    options: ["A. Blood pressure 118/78 mmHg", "B. Apical pulse of 52 beats per minute", "C. Serum potassium 4.1 mEq/L", "D. Respiratory rate 18 breaths/min"],
+  },
+  {
+    course: "Maternal-Newborn Nursing",
+    q: "During labour, a nurse observes late decelerations on the fetal monitor. What is the PRIORITY nursing action?",
+    options: ["A. Document and continue routine monitoring", "B. Reposition the patient to the left lateral position", "C. Increase the rate of IV oxytocin infusion", "D. Administer oxygen via simple face mask at 2 L/min"],
+  },
+  {
+    course: "Pediatric Nursing",
+    q: "A 4-year-old is admitted with suspected epiglottitis. Which action is MOST important?",
+    options: ["A. Obtain a throat culture immediately", "B. Place the child in the supine position", "C. Keep the child calm and avoid agitating procedures", "D. Start oral antibiotics as prescribed"],
+  },
+  {
+    course: "Psychiatric Nursing",
+    q: "A patient says, 'I have a plan to hurt myself tonight.' What is the nurse's FIRST priority?",
+    options: ["A. Document the statement in the medical chart", "B. Notify the healthcare provider", "C. Ensure immediate safety — do not leave the patient alone", "D. Ask the patient to sign a no-harm contract"],
   },
 ];
 
-const AI_QUESTIONS = [
-  { 
-    q: "What is Universal Health Community?", 
-    a: "UHC is a specialized digital ecosystem for nursing education. We provide adaptive testing, extensive study libraries, and real-time performance analytics to help you master your nursing career." 
-  },
-  { 
-    q: "How does the adaptive quiz system work?", 
-    a: "Our system analyzes your performance across different nursing categories (like Pharmacology or Pediatrics) and identifies your weak spots. It then adjusts the question difficulty and frequency to ensure you master those areas faster." 
-  },
-  { 
-    q: "Can instructors track student progress?", 
-    a: "Absolutely! Our robust Admin Dashboard allows instructors to create classes, monitor real-time student performance, manage question banks, and identify students who may need additional support." 
-  },
-  { 
-    q: "Is UHC mobile friendly?", 
-    a: "Yes! Our platform is built with a 'mobile-first' philosophy. You can study, take quizzes, and track your progress seamlessly across your phone, tablet, or desktop." 
-  }
+const FEATURES = [
+  { icon: <Zap />, title: "Adaptive Quizzes", desc: "Smart question banks that focus on your weak areas and track improvement across every nursing course." },
+  { icon: <BookOpen />, title: "Study Library", desc: "Access clinical guides, lecture notes, and exam prep documents uploaded by qualified instructors." },
+  { icon: <TrendingUp />, title: "Progress Analytics", desc: "Visualise your performance with score history, course breakdowns, and trend charts." },
+  { icon: <Trophy />, title: "Leaderboard & Points", desc: "Earn points for every quiz completed and compete with peers on the national leaderboard." },
 ];
 
-function LandingPage() {
+/* ─── Leaderboard preview – static placeholder with real-looking data ── */
+const LEADERBOARD_PREVIEW = [
+  { rank: 1, name: "Abena M.", score: 4820, badge: "🥇" },
+  { rank: 2, name: "Kwame A.", score: 4610, badge: "🥈" },
+  { rank: 3, name: "Efua S.", score: 4390, badge: "🥉" },
+  { rank: 4, name: "Nana K.", score: 4150, badge: "⭐" },
+  { rank: 5, name: "Ama B.",  score: 3980, badge: "⭐" },
+];
+
+export default function LandingPage() {
   const navigate = useNavigate();
-  const [scrolled, setScrolled] = useState(false);
-  const statsRef = useRef(null);
-  const [statsActive, setStatsActive] = useState(false);
-  const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
-  const [contactStatus, setContactStatus] = useState(null); 
-
-  // AI Assistant State
-  const [selectedAIQ, setSelectedAIQ] = useState(null);
-  const [aiTyping, setAiTyping] = useState(false);
-  const [aiAnswer, setAiAnswer] = useState("");
+  const [scrolled, setScrolled]       = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [contactForm, setContactForm]  = useState({ name: "", email: "", message: "" });
+  const [contactStatus, setContactStatus] = useState(null);
+
+  /* Quiz state */
+  const [quizAnswers, setQuizAnswers]  = useState({});   // { qIdx: optionIdx }
+  const [quizCourse, setQuizCourse]    = useState(0);    // which question showing
+
+  /* Leaderboard from API (with static fallback) */
+  const [leaders, setLeaders] = useState(LEADERBOARD_PREVIEW);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const h = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", h);
+    return () => window.removeEventListener("scroll", h);
   }, []);
 
+  /* Try to load real leaderboard – graceful fallback to static */
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setStatsActive(true); },
-      { threshold: 0.5 }
-    );
-    if (statsRef.current) observer.observe(statsRef.current);
-    return () => observer.disconnect();
+    api.get("/user/leaderboard").then(r => {
+      if (r.data?.length) setLeaders(r.data.slice(0, 5).map((u, i) => ({
+        rank: i + 1,
+        name: u.name || u.username || "Student",
+        score: u.totalPoints || u.points || 0,
+        badge: ["🥇","🥈","🥉","⭐","⭐"][i],
+      })));
+    }).catch(() => {}); // keep static fallback silently
   }, []);
 
-  const totalQuestions = useCounter(10000, statsActive);
-  const totalStudents = useCounter(5000, statsActive);
-  const successRate = useCounter(94, statsActive);
-
-  const handleAIQuestion = (item) => {
-    if (aiTyping) return;
-    setSelectedAIQ(item.q);
-    setAiTyping(true);
-    setAiAnswer("");
-    
-    let i = 0;
-    const interval = setInterval(() => {
-      setAiAnswer(item.a.slice(0, i));
-      i++;
-      if (i > item.a.length) {
-        clearInterval(interval);
-        setAiTyping(false);
-      }
-    }, 20);
+  const handleContact = async (e) => {
+    e.preventDefault();
+    try {
+      await api.post("/contact", contactForm);
+      setContactStatus({ type: "success", msg: "Thank you! Your message has been sent." });
+      setContactForm({ name: "", email: "", message: "" });
+      setTimeout(() => setContactStatus(null), 5000);
+    } catch {
+      setContactStatus({ type: "error", msg: "Failed to send. Please try again." });
+    }
   };
-
 
   return (
     <div className="landing-container">
-      {/* NAVBAR */}
+      {/* ── SEO: machine-readable description for Google ─────────────── */}
+      <meta name="description" content="Universal Health Community (UHC) — the free nursing education platform with adaptive quizzes, study resources, and a national leaderboard for nursing students in Ghana and beyond." />
+
+      {/* ══ NAVBAR ════════════════════════════════════════════════════ */}
       <nav className={`landing-navbar ${scrolled ? "scrolled" : ""} ${mobileMenuOpen ? "mobile-open" : ""}`}>
-        <div className="landing-logo" onClick={() => { window.scrollTo(0, 0); setMobileMenuOpen(false); }}>
+        <div className="landing-logo" onClick={() => { window.scrollTo(0,0); setMobileMenuOpen(false); }}>
           <span className="logo-text wave-text">
-            {"UHC".split("").map((char, index) => (
-              <span key={index} style={{ "--i": index }}>{char}</span>
-            ))}
+            {"UHC".split("").map((c,i) => <span key={i} style={{"--i":i}}>{c}</span>)}
           </span>
         </div>
 
         <div className={`landing-nav-links ${mobileMenuOpen ? "active" : ""}`}>
           <span className="nav-link" onClick={() => { navigate("/auth"); setMobileMenuOpen(false); }}>Quiz Library</span>
-          <span className="nav-link" onClick={() => { navigate("/auth"); setMobileMenuOpen(false); }}>Study Guides</span>
-          <span className="nav-link" onClick={() => { navigate("/auth"); setMobileMenuOpen(false); }}>Resources</span>
-          <div className="nav-divider"></div>
+          <span className="nav-link" onClick={() => { navigate("/auth"); setMobileMenuOpen(false); }}>Study Library</span>
+          <span className="nav-link" onClick={() => { navigate("/auth"); setMobileMenuOpen(false); }}>Leaderboard</span>
+          <div className="nav-divider" />
           <span className="landing-login mobile-only" onClick={() => { navigate("/auth"); setMobileMenuOpen(false); }}>Log In</span>
           <button className="landing-signup mobile-only" onClick={() => { navigate("/auth"); setMobileMenuOpen(false); }}>Get Started</button>
         </div>
 
         <div className="landing-nav-right">
           <span className="landing-login desktop-only" onClick={() => navigate("/auth")}>Log In</span>
-          <button className="landing-signup desktop-only" onClick={() => navigate("/auth")}>Get Started</button>
+          <button className="landing-signup desktop-only" onClick={() => navigate("/auth")}>Get Started Free</button>
           <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-            {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+            {mobileMenuOpen ? <X size={28}/> : <Menu size={28}/>}
           </button>
         </div>
       </nav>
 
-      {/* HERO SECTION */}
+      {/* ══ HERO ══════════════════════════════════════════════════════ */}
       <section className="hero-section">
         <div className="hero-text">
-          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-            <span className="section-label">Empowering Future Healthcare Heroes</span>
-            <h1>The Gold Standard in <span className="highlight">Nursing Education</span></h1>
-            <p>Join over 5,000 nursing students mastering their exams with interactive quizzes, real-time analytics, and expert-curated resources.</p>
+          <motion.div initial={{ opacity:0, x:-20 }} animate={{ opacity:1, x:0 }}>
+            <span className="section-label">Free Nursing Education Platform</span>
+            <h1>Study Smarter.<br /><span className="highlight">Pass Your Exams.</span></h1>
+            <p>
+              Universal Health Community gives nursing students access to adaptive quizzes,
+              a curated study library, and a live leaderboard — all free. Built for student
+              nurses in Ghana and across Africa.
+            </p>
             <div className="hero-actions">
-              <button className="hero-btn" onClick={() => navigate("/auth")}>Join the Community</button>
+              <button className="hero-btn" onClick={() => navigate("/auth")}>Create Free Account</button>
               <button className="hero-btn-secondary" onClick={() => navigate("/auth")}>Browse Library</button>
             </div>
           </motion.div>
         </div>
         <div className="hero-image-wrapper">
           <div className="hero-image-container">
-             <img src={graduation} alt="Graduating Nursing Student" />
-             <div className="hero-floating-card">
-               <div style={{ background: '#10b981', padding: '8px', borderRadius: '10px', color: 'white' }}>
-                 <Trophy size={20} />
-               </div>
-               <div>
-                 <div style={{ fontWeight: 800, fontSize: '0.9rem' }}>94% Success Rate</div>
-                 <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Among our regular students</div>
-               </div>
-             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ROLES SECTION */}
-      <section className="roles-section">
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <span className="section-label">Built For You</span>
-          <h2 className="section-title">Designed for Excellence</h2>
-          <p className="section-subtitle">Whether you're a student striving for licensure or an instructor shaping the next generation, UHC provides the tools you need.</p>
-          
-          <div className="roles-grid">
-            {roles.map((role, idx) => (
-              <motion.div 
-                key={idx} 
-                className="role-card"
-                whileHover={{ y: -8 }}
-              >
-                <div className="role-icon">{role.icon}</div>
-                <h3>{role.title}</h3>
-                <p>{role.desc}</p>
-                <div className="role-features">
-                  {role.features.map((f, i) => (
-                    <div key={i} className="role-feature">
-                      <CheckCircle2 size={16} className="role-check" />
-                      <span>{f}</span>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* MOTTO SECTION */}
-      <section className="middle-motto-section">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          className="motto-container"
-        >
-          <h2 className="motto-text-large">
-            <span className="motto-word">Your Knowledge.</span>
-            <span className="motto-word">Your Health.</span>
-            <span className="motto-word">Your Community.</span>
-          </h2>
-          <div className="motto-underline"></div>
-        </motion.div>
-      </section>
-
-      {/* AI ASSISTANT SECTION */}
-      <section className="ai-assistant-section">
-        <div className="ai-assistant-container">
-          <div className="ai-assistant-info">
-            <span className="section-label">Meet Your Guide</span>
-            <h2 className="section-title">Interactive <span className="highlight">AI Assistant</span></h2>
-            <p className="section-subtitle">Click on a question to learn more about how UHC can transform your study experience.</p>
-            
-            <div className="ai-questions-list">
-              {AI_QUESTIONS.map((item, idx) => (
-                <button 
-                  key={idx} 
-                  className={`ai-q-btn ${selectedAIQ === item.q ? 'active' : ''}`}
-                  onClick={() => handleAIQuestion(item)}
-                >
-                  <ArrowRight size={16} />
-                  <span>{item.q}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="ai-model-wrapper">
-            <div className="ai-model-card">
-              <div className="ai-phone-screen">
-                <div className="ai-avatar-header">
-                  <div className="ai-avatar-pulse">
-                    <Smartphone size={20} color="white" />
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: 800, fontSize: '0.9rem', color: '#333' }}>UHC Assistant</div>
-                    <div style={{ fontSize: '0.7rem', color: '#10b981' }}>{aiTyping ? 'Typing...' : 'Online'}</div>
-                  </div>
-                </div>
-                
-                <div className="ai-response-area">
-                  {!selectedAIQ ? (
-                    <div className="ai-placeholder">
-                      <p>Select a question to start chatting with our medical guide.</p>
-                    </div>
-                  ) : (
-                    <div className="ai-chat-bubble">
-                      <div className="user-q">{selectedAIQ}</div>
-                      <div className="ai-a">{aiAnswer}<span className="cursor">|</span></div>
-                    </div>
-                  )}
-                </div>
+            <img src={graduation} alt="Nursing student graduating with degree" />
+            <div className="hero-floating-card">
+              <div style={{ background:"#10b981", padding:"8px", borderRadius:"10px", color:"white" }}>
+                <Trophy size={20}/>
+              </div>
+              <div>
+                <div style={{ fontWeight:800, fontSize:"0.9rem" }}>Free forever</div>
+                <div style={{ fontSize:"0.75rem", color:"#64748b" }}>No credit card needed</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* FEATURES SECTION */}
+      {/* ══ QUIZ PREVIEW — indexable by Google ═══════════════════════ */}
+      <section style={{ padding:"100px 8%", background:"white" }}>
+        <div style={{ maxWidth:900, margin:"0 auto" }}>
+          <span className="section-label">🧠 Sample Quiz</span>
+          <h2 className="section-title" style={{ textAlign:"left" }}>Test Your Nursing Knowledge</h2>
+          <p style={{ color:"var(--text-secondary)", fontSize:"1.05rem", marginBottom:40, maxWidth:600 }}>
+            Answer the question below — then <strong>create a free account</strong> to unlock
+            all questions and see your correct answers instantly.
+          </p>
+
+          {/* Course tabs */}
+          <div style={{ display:"flex", gap:10, flexWrap:"wrap", marginBottom:32 }}>
+            {QUIZ_QUESTIONS.map((q,i) => (
+              <button key={i} onClick={() => { setQuizCourse(i); setQuizAnswers(a => ({...a})); }}
+                style={{
+                  padding:"7px 16px", borderRadius:99, border:"1px solid",
+                  borderColor: quizCourse===i ? "#10b981" : "#e2e8f0",
+                  background: quizCourse===i ? "#10b981" : "white",
+                  color: quizCourse===i ? "white" : "#475569",
+                  fontSize:".78rem", fontWeight:700, cursor:"pointer", transition:"all .2s"
+                }}>
+                {q.course}
+              </button>
+            ))}
+          </div>
+
+          {/* Question card */}
+          {(() => {
+            const q = QUIZ_QUESTIONS[quizCourse];
+            const answered = quizAnswers[quizCourse] !== undefined;
+            return (
+              <div style={{ background:"#f8fafc", borderRadius:20, padding:"36px 40px", border:"1px solid #e2e8f0", boxShadow:"0 4px 20px rgba(0,0,0,0.04)" }}>
+                <div style={{ fontSize:".8rem", fontWeight:700, color:"#10b981", marginBottom:14, textTransform:"uppercase", letterSpacing:".05em" }}>
+                  Question {quizCourse+1} of {QUIZ_QUESTIONS.length} · {q.course}
+                </div>
+                <p style={{ fontSize:"1.08rem", fontWeight:700, color:"#0f172a", lineHeight:1.6, marginBottom:28 }}>{q.q}</p>
+                <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+                  {q.options.map((opt, oi) => {
+                    const selected = quizAnswers[quizCourse] === oi;
+                    return (
+                      <button key={oi}
+                        onClick={() => setQuizAnswers(a => ({...a, [quizCourse]: oi}))}
+                        style={{
+                          display:"flex", alignItems:"center", gap:14,
+                          padding:"14px 20px", borderRadius:12,
+                          border: `2px solid ${selected ? "#10b981" : "#e2e8f0"}`,
+                          background: selected ? "rgba(16,185,129,0.06)" : "white",
+                          color: "#0f172a", textAlign:"left", cursor:"pointer",
+                          fontWeight: selected ? 700 : 500, fontSize:".95rem",
+                          transition:"all .2s"
+                        }}>
+                        <span style={{
+                          width:28, height:28, borderRadius:"50%", flexShrink:0,
+                          border:`2px solid ${selected ? "#10b981" : "#d1d5db"}`,
+                          background: selected ? "#10b981" : "transparent",
+                          display:"flex", alignItems:"center", justifyContent:"center",
+                          color: selected ? "white" : "transparent", fontSize:".8rem"
+                        }}>✓</span>
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Answer lock / CTA */}
+                {answered && (
+                  <motion.div initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }}
+                    style={{ marginTop:24, padding:"20px 24px", borderRadius:14,
+                      background:"linear-gradient(135deg,#0f172a,#1e293b)", color:"white",
+                      display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+                      <Lock size={20} color="#10b981"/>
+                      <span style={{ fontWeight:700, fontSize:".95rem" }}>
+                        Create a free account to see the correct answer &amp; explanation
+                      </span>
+                    </div>
+                    <button onClick={() => navigate("/auth")}
+                      style={{ padding:"10px 24px", background:"#10b981", color:"white", border:"none",
+                        borderRadius:10, fontWeight:800, fontSize:".9rem", cursor:"pointer", whiteSpace:"nowrap" }}>
+                      See Answer →
+                    </button>
+                  </motion.div>
+                )}
+              </div>
+            );
+          })()}
+        </div>
+      </section>
+
+      {/* ══ LEADERBOARD PREVIEW ═══════════════════════════════════════ */}
+      <section style={{ padding:"100px 8%", background:"var(--bg-light)" }}>
+        <div style={{ maxWidth:900, margin:"0 auto", display:"grid", gridTemplateColumns:"1fr 1fr", gap:60, alignItems:"center" }}>
+          {/* Left copy */}
+          <div>
+            <span className="section-label">🏆 Leaderboard</span>
+            <h2 className="section-title" style={{ textAlign:"left", fontSize:"2.4rem" }}>Compete &amp; Climb the Rankings</h2>
+            <p style={{ color:"var(--text-secondary)", fontSize:"1rem", lineHeight:1.7, marginBottom:32 }}>
+              Every quiz you complete earns you points. Top scorers appear on the national
+              leaderboard — visible to all students. Join today and start climbing.
+            </p>
+            <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:36 }}>
+              {["Earn points for every completed quiz","Compete with students across all courses","Weekly rankings reset — everyone has a chance","Your rank is shown on your public profile"].map((f,i) => (
+                <div key={i} style={{ display:"flex", alignItems:"center", gap:10, fontSize:".95rem", color:"#0f172a", fontWeight:500 }}>
+                  <CheckCircle2 size={18} color="#10b981"/>
+                  {f}
+                </div>
+              ))}
+            </div>
+            <button onClick={() => navigate("/auth")}
+              style={{ padding:"14px 32px", background:"#0f172a", color:"white", border:"none",
+                borderRadius:12, fontWeight:800, fontSize:"1rem", cursor:"pointer", display:"flex", alignItems:"center", gap:10 }}>
+              Join &amp; Compete <ChevronRight size={18}/>
+            </button>
+          </div>
+
+          {/* Right: live leaderboard card */}
+          <div style={{ background:"white", borderRadius:24, padding:"28px 32px", boxShadow:"0 20px 40px rgba(0,0,0,0.08)", border:"1px solid #f1f5f9" }}>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:24 }}>
+              <div style={{ fontWeight:800, fontSize:"1rem", color:"#0f172a" }}>🏆 Top Students</div>
+              <span style={{ fontSize:".75rem", color:"#10b981", fontWeight:700, background:"rgba(16,185,129,.08)", padding:"4px 12px", borderRadius:99 }}>Live</span>
+            </div>
+            <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+              {leaders.map((l, i) => (
+                <div key={i} style={{
+                  display:"flex", alignItems:"center", gap:14, padding:"12px 16px",
+                  borderRadius:12, background: i===0 ? "linear-gradient(135deg,rgba(255,215,0,.1),rgba(255,215,0,.05))" : "#f8fafc",
+                  border:`1px solid ${i===0 ? "rgba(255,215,0,.3)" : "#f1f5f9"}`
+                }}>
+                  <span style={{ fontSize:"1.3rem", width:28, textAlign:"center" }}>{l.badge}</span>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ fontWeight:700, fontSize:".9rem", color:"#0f172a", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{l.name}</div>
+                    <div style={{ fontSize:".72rem", color:"#94a3b8" }}>Rank #{l.rank}</div>
+                  </div>
+                  <div style={{ display:"flex", alignItems:"center", gap:4, fontWeight:800, fontSize:".9rem", color:"#10b981" }}>
+                    <Star size={13} fill="#10b981" color="#10b981"/>
+                    {l.score.toLocaleString()}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button onClick={() => navigate("/auth")}
+              style={{ width:"100%", marginTop:20, padding:"12px", background:"#f8fafc", border:"1px solid #e2e8f0",
+                borderRadius:12, fontWeight:700, fontSize:".88rem", color:"#0f172a", cursor:"pointer" }}>
+              View Full Leaderboard →
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ══ FEATURES ══════════════════════════════════════════════════ */}
       <section className="features-section">
-        <span className="section-label">Core Capabilities</span>
-        <h2 className="section-title">Everything you need to excel</h2>
-        <p className="section-subtitle">Powerful features designed specifically for the unique challenges of nursing education.</p>
-        
+        <span className="section-label">What you get</span>
+        <h2 className="section-title">Everything to pass your exams</h2>
+        <p className="section-subtitle">Built specifically for nursing students — free, mobile-friendly, and always growing.</p>
         <div className="features-grid">
-          {features.map((feature, idx) => (
-            <motion.div key={idx} className="feature-card">
-              <div className="feature-icon">{feature.icon}</div>
-              <h3>{feature.title}</h3>
-              <p>{feature.desc}</p>
+          {FEATURES.map((f, i) => (
+            <motion.div key={i} className="feature-card">
+              <div className="feature-icon">{f.icon}</div>
+              <h3>{f.title}</h3>
+              <p>{f.desc}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* STATS SECTION */}
-      <section className="stats-section" ref={statsRef}>
-        <div className="stats-grid">
-          <div className="stat">
-            <h2>{totalQuestions.toLocaleString()}+</h2>
-            <p>Practice Questions</p>
-          </div>
-          <div className="stat">
-            <h2>{totalStudents.toLocaleString()}+</h2>
-            <p>Active Students</p>
-          </div>
-          <div className="stat">
-            <h2>{successRate}%</h2>
-            <p>Licensing Success</p>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA SECTION */}
+      {/* ══ CTA ═══════════════════════════════════════════════════════ */}
       <section className="cta-section">
         <div className="cta-box">
           <div className="cta-content">
-            <h2>Ready to transform your learning?</h2>
-            <p>Start your journey toward nursing excellence today. Create your free account in less than 2 minutes.</p>
+            <h2>Start studying smarter today</h2>
+            <p>Create your free account in under 2 minutes. No credit card. No hidden fees.</p>
             <button className="cta-btn" onClick={() => navigate("/auth")}>Get Started Free</button>
           </div>
-          <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-            <div style={{ width: '100%', maxWidth: '400px', padding: '20px', background: 'rgba(255,255,255,0.1)', borderRadius: '24px', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)' }}>
-               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                 <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981' }}>
-                    <Smartphone size={20} />
-                 </div>
-                 <div style={{ fontWeight: 700 }}>Mobile Ready</div>
-               </div>
-               <p style={{ fontSize: '0.9rem', opacity: 0.9 }}>Study anywhere, anytime. Our platform is fully responsive and optimized for all your devices.</p>
+          <div style={{ flex:1, display:"flex", justifyContent:"center" }}>
+            <div style={{ width:"100%", maxWidth:360, padding:"28px 32px", background:"rgba(255,255,255,0.12)",
+              borderRadius:20, backdropFilter:"blur(10px)", border:"1px solid rgba(255,255,255,0.2)" }}>
+              {["✅ Adaptive quiz system","📚 Full study library access","🏆 Leaderboard &amp; points","📊 Personal progress analytics","📱 Works on mobile &amp; desktop"].map((item,i) => (
+                <div key={i} style={{ color:"white", fontWeight:600, fontSize:".95rem", marginBottom:14,
+                  display:"flex", alignItems:"center", gap:8 }}
+                  dangerouslySetInnerHTML={{ __html: item }} />
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* FOOTER */}
+      {/* ══ FOOTER ════════════════════════════════════════════════════ */}
       <footer className="landing-footer">
         <div className="footer-content">
           <div className="footer-contact">
             <h3>Contact Us</h3>
-            <p>Have questions? Reach us at <strong>boafokyei3@gmail.com</strong> or call <strong>+233 598 173 019</strong>.</p>
-            
+            <p>Questions? Reach us at <strong>boafokyei3@gmail.com</strong> or WhatsApp <strong>+233 598 173 019</strong>.</p>
+
             {contactStatus && (
               <div className={`contact-status-msg ${contactStatus.type}`}>
-                {contactStatus.type === 'success' ? '✓ ' : '✕ '} {contactStatus.msg}
+                {contactStatus.type === "success" ? "✓ " : "✕ "}{contactStatus.msg}
               </div>
             )}
 
-            <form className="footer-contact-form" onSubmit={async (e) => { 
-              e.preventDefault(); 
-              try {
-                await api.post("/contact", contactForm);
-                setContactStatus({ type: 'success', msg: 'Thank you! Your message has been sent to our team.' });
-                setContactForm({ name: "", email: "", message: "" });
-                setTimeout(() => setContactStatus(null), 5000);
-              } catch (err) {
-                setContactStatus({ type: 'error', msg: 'Failed to send message. Please try again.' });
-              }
-            }}>
+            <form className="footer-contact-form" onSubmit={handleContact}>
               <div className="input-group">
-                <input 
-                  type="text" 
-                  placeholder="Full Name" 
-                  value={contactForm.name}
-                  onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
-                  required 
-                />
-                <input 
-                  type="email" 
-                  placeholder="Email Address" 
-                  value={contactForm.email}
-                  onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
-                  required 
-                />
+                <input type="text" placeholder="Full Name" value={contactForm.name}
+                  onChange={e => setContactForm({...contactForm, name:e.target.value})} required />
+                <input type="email" placeholder="Email Address" value={contactForm.email}
+                  onChange={e => setContactForm({...contactForm, email:e.target.value})} required />
               </div>
-              <textarea 
-                placeholder="How can we help?" 
+              <textarea placeholder="How can we help?"
                 value={contactForm.message}
-                onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
-                required
-              />
+                onChange={e => setContactForm({...contactForm, message:e.target.value})} required />
               <button type="submit" className="contact-submit-btn">
                 <span>Send Message</span>
-                <ArrowRight size={18} />
+                <ArrowRight size={18}/>
               </button>
             </form>
           </div>
+
           <div className="footer-links">
             <h4>Platform</h4>
             <ul>
               <li><a href="/auth">Quiz Library</a></li>
-              <li><a href="/auth">Flashcards</a></li>
-              <li><a href="/auth">Study Guides</a></li>
-              <li><a href="/auth">Analytics</a></li>
+              <li><a href="/auth">Study Library</a></li>
+              <li><a href="/auth">Leaderboard</a></li>
+              <li><a href="/auth">My Analytics</a></li>
             </ul>
           </div>
           <div className="footer-links">
-            <h4>Support</h4>
+            <h4>About</h4>
             <ul>
-              <li><a href="/auth">Help Center</a></li>
-              <li><a href="/auth">Community</a></li>
-              <li><a href="/auth">Terms of Service</a></li>
-              <li><a href="/auth">Privacy Policy</a></li>
+              <li><a href="/auth">About UHC</a></li>
+              <li><a href="/auth">For Students</a></li>
+              <li><a href="/auth">For Instructors</a></li>
+              <li><a href="#contact" onClick={e => { e.preventDefault(); document.querySelector(".footer-contact-form")?.scrollIntoView({ behavior:"smooth" }); }}>Contact</a></li>
             </ul>
           </div>
           <div className="footer-links">
             <h4>Connect</h4>
             <ul>
-              <li><a href="https://wa.me/233598173019" target="_blank" rel="noreferrer">WhatsApp: +233 598 173 019</a></li>
+              <li><a href="https://wa.me/233598173019" target="_blank" rel="noreferrer">WhatsApp Us</a></li>
               <li><a href="mailto:boafokyei3@gmail.com">Email Us</a></li>
-              <li><a href="#facebook">Facebook</a></li>
-              <li><a href="#instagram">Instagram</a></li>
             </ul>
           </div>
         </div>
         <div className="footer-bottom">
-          <span>&copy; {new Date().getFullYear()} Universal Healthcare Community. All rights reserved.</span>
-          <div style={{ display: 'flex', gap: '24px' }}>
-             <a href="#privacy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy</a>
-             <a href="#terms" style={{ color: 'inherit', textDecoration: 'none' }}>Terms</a>
+          <span>© {new Date().getFullYear()} Universal Health Community. All rights reserved.</span>
+          <div style={{ display:"flex", gap:24 }}>
+            <a href="/auth" style={{ color:"inherit", textDecoration:"none" }}>Privacy</a>
+            <a href="/auth" style={{ color:"inherit", textDecoration:"none" }}>Terms</a>
           </div>
         </div>
       </footer>
     </div>
   );
 }
-
-export default LandingPage;
