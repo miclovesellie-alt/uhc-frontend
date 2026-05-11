@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import React, { useState, useEffect, useContext } from "react";
+import { useOutletContext } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 import { getFileUrl } from "../utils/config";
 import api from "../api/api";
@@ -8,31 +8,10 @@ import "../styles/dashboard.css";
 import { useToast } from "./Toast";
 import { toggleBookmark, getBookmarks } from "../utils/bookmarks";
 
-import fbLogo from "../assets/fb.webp";
-import igLogo from "../assets/ig.webp";
-import snapLogo from "../assets/snapchat.webp";
-import tikLogo from "../assets/tik.webp";
-import gmailLogo from "../assets/gmail.webp";
+
 
 const healthEmojis = ["🫀","🧠","🩺","💊","🩻","🩹","🏥","🔬","🧬","💉"];
 function rnd(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-
-const HEALTH_TIPS = [
-  "💧 Drink at least 8 glasses of water daily to stay hydrated.",
-  "🛌 Adults need 7-9 hours of sleep for optimal health.",
-  "🚶 Walking 30 minutes a day reduces cardiovascular risk by 35%.",
-  "🥦 Eat 5 portions of fruit and vegetables every day.",
-  "🧠 Mental health is just as important as physical health.",
-  "🩺 Schedule regular check-ups even when you feel healthy.",
-  "🧼 Proper handwashing prevents 80% of infectious diseases.",
-  "🧘 10 minutes of deep breathing daily reduces cortisol levels.",
-  "💊 Never self-medicate — always consult a healthcare professional.",
-  "🌞 15 minutes of sunlight daily boosts your Vitamin D levels.",
-  "🏃 Regular exercise improves mood, memory and sleep quality.",
-  "🦷 Brush twice daily — oral health affects your heart health.",
-];
-// Pick a consistent tip per calendar day
-const getDailyTip = () => HEALTH_TIPS[new Date().getDate() % HEALTH_TIPS.length];
 
 
 
@@ -40,8 +19,6 @@ export default function FYP({ refresh }) {
   const { user, setUser } = useContext(UserContext);
   const toast = useToast();
   const { searchQuery } = useOutletContext();
-  const navigate = useNavigate();
-  const logoDropdownRef = useRef();
 
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +34,6 @@ export default function FYP({ refresh }) {
   const [flaggedPosts, setFlaggedPosts] = useState(
     () => new Set(JSON.parse(localStorage.getItem('uhc_flagged') || '[]'))
   );
-  const [tipDismissed, setTipDismissed] = useState(() => localStorage.getItem('uhc_tip_dismissed') === new Date().toDateString());
 
   const toggleExpand = (postId) => {
     setExpandedPosts(prev => ({ ...prev, [postId]: !prev[postId] }));
@@ -187,8 +163,6 @@ export default function FYP({ refresh }) {
       alert(err.response?.data?.message || "Failed to post comment");
     }
   };
-
-  const toggleLogoMenu = () => logoDropdownRef.current?.classList.toggle("active");
 
   const flagPost = async (postId) => {
     if (flaggedPosts.has(postId)) { toast("Already flagged", "info"); return; }
