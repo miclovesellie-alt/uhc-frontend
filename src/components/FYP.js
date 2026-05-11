@@ -201,85 +201,8 @@ export default function FYP({ refresh }) {
     } catch { toast("Could not flag post", "error"); }
   };
 
-  const firstName = user?.name?.split(" ")[0] || "there";
-
   return (
-    <div style={{ maxWidth: 860, margin: "0 auto" }}>
-      {/* ── Daily Health Tip ── */}
-      {!tipDismissed && (
-        <div style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 16px", borderRadius:14, background:"linear-gradient(135deg,rgba(66,85,255,.08),rgba(16,185,129,.06))", border:"1px solid rgba(66,85,255,.18)", marginBottom:18, position:"relative" }}>
-          <span style={{ fontSize:"1.5rem", flexShrink:0 }}>💡</span>
-          <div style={{ flex:1, fontSize:".85rem", color:"var(--text-body,#374151)", lineHeight:1.5 }}>
-            <strong style={{ color:"var(--accent,#4255ff)" }}>Today's Health Tip: </strong>{getDailyTip()}
-          </div>
-          <button onClick={() => { setTipDismissed(true); localStorage.setItem('uhc_tip_dismissed', new Date().toDateString()); }}
-            style={{ background:"none", border:"none", cursor:"pointer", color:"var(--text-muted)", fontSize:"1.1rem", flexShrink:0, padding:4 }}>✕</button>
-        </div>
-      )}
-      {/* ── Welcome banner ── */}
-      <div className="dash-welcome-banner">
-        <div className="dash-welcome-text">
-          <h2>Welcome back, {firstName} 👋</h2>
-          <p>Continue your nursing education journey. You're making great progress!</p>
-        </div>
-        <div className="dash-welcome-actions">
-          <button className="dash-action-btn secondary" onClick={() => navigate("/library")}>
-            📚 Study Library
-          </button>
-          <button className="dash-action-btn primary" onClick={() => navigate("/quiz")}>
-            🎯 Take a Quiz
-          </button>
-        </div>
-      </div>
-
-
-
-      {/* ── Quick Stats Bar ── */}
-      <div className="uhc-stats-bar">
-        {[
-          { icon: '🔥', label: 'Streak', value: `${user?.streak || 0} days` },
-          { icon: '⭐', label: 'Points', value: (user?.points || 0).toLocaleString() },
-          { icon: '📝', label: 'Quizzes', value: (() => { try { return JSON.parse(localStorage.getItem(`quizHistory_${localStorage.getItem('userId')}`) || '[]').length; } catch { return 0; } })() },
-          { icon: '🔖', label: 'Saved', value: getBookmarks('post').length + getBookmarks('book').length },
-        ].map(s => (
-          <div key={s.label} className="uhc-stats-bar__item">
-            <span className="uhc-stats-bar__icon">{s.icon}</span>
-            <span className="uhc-stats-bar__value">{s.value}</span>
-            <span className="uhc-stats-bar__label">{s.label}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* ── Feed header ── */}
-      <div className="dash-section-header">
-        <span className="dash-section-title">📰 Health Feed</span>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <div style={{ position: "relative" }}>
-            <button
-              className="dash-action-btn secondary community-btn"
-              style={{ padding: "6px 14px", fontSize: ".8rem" }}
-              onClick={toggleLogoMenu}
-            >
-              🌐 Community
-            </button>
-            <div className="logo-dropdown" ref={logoDropdownRef}>
-              {[
-                { href: "https://www.facebook.com/share/17jdo77dP8/",    src: fbLogo,   label: "Facebook"  },
-                { href: "https://www.instagram.com",                      src: igLogo,   label: "Instagram" },
-                { href: "https://snapchat.com/t/xDlg1SmQ",               src: snapLogo, label: "Snapchat"  },
-                { href: "https://www.tiktok.com/@psychedout____",         src: tikLogo,  label: "TikTok"    },
-                { href: "mailto:unihealthplatform@gmail.com",             src: gmailLogo,label: "Email Us"  },
-              ].map(({ href, src, label }) => (
-                <a key={label} href={href} target="_blank" rel="noopener noreferrer">
-                  <img src={src} alt={label} className="dropdown-icon" />
-                  <span>{label}</span>
-                </a>
-              ))}
-            </div>
-          </div>
-          {/* Create Post button removed from here as per user request */}
-        </div>
-      </div>
+    <div style={{ maxWidth: 640, margin: "0 auto" }}>
 
       {/* ── Post Feed ── */}
       <div className="dash-feed-column" style={{ display: 'flex', flexDirection: 'column', gap: '28px', maxWidth: '640px', margin: '0 auto 40px auto' }}>

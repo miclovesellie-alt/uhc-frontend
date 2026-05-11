@@ -1,58 +1,34 @@
-// Vercel Serverless Function — always warm, zero cold starts, same domain as frontend
-// Routes: GET /api/proxy-pdf?url=ENCODED_URL
-const https = require("https");
-const http  = require("http");
-
-module.exports = (req, res) => {
-  const { url } = req.query;
-
-  // Allow CORS preflight
+// Vercel Serverless Function — /api/proxy-pdf?url=ENCODED_URL
+// Uses fetch() instead of https.get() so Cloudinary CDN redirects are followed automatically.
+module.exports = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   if (req.method === "OPTIONS") return res.status(200).end();
 
-  if (!url) return res.status(400).json({ error: "No URL provided" });
+  const { url } = req.query;
+  if (!url) return res.status(400).json({ error: "Missing url parameter" });
 
-  let decoded;
   try {
-    decoded = decodeURIComponent(url);
-  } catch {
-    return res.status(400).json({ error: "Invalid URL encoding" });
-  }
+    const decoded = decodeURIComponent(url).replace("http://", "https://");
 
-  // ── Detect Content-Type from URL path (Cloudinary sends octet-stream for raw uploads)
-  const urlPath = decoded.toLowerCase().split("?")[0];
-  let contentType = "application/pdf"; // safe default
-  if (urlPath.endsWith(".pptx") || urlPath.includes("/pptx"))
-    contentType = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
-  else if (urlPath.endsWith(".ppt"))
-    contentType = "application/vnd.ms-powerpoint";
-  else if (urlPath.endsWith(".docx"))
-    contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-  else if (urlPath.endsWith(".doc"))
-    contentType = "application/msword";
+    // fetch() follows 301/302 redirects automatically — critical for Cloudinary CDN URLs
+    const upstream = await fetch(decoded, {
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; UHC-Proxy/1.0)" },
+    });
 
-  const protocol = decoded.startsWith("https") ? https : http;
-
-  const proxyReq = protocol.get(decoded, (proxyRes) => {
-    // Force correct Content-Type — never trust Cloudinary's application/octet-stream
-    res.setHeader("Content-Type", contentType);
-    res.setHeader("Content-Disposition", "inline");
-    res.setHeader("X-Frame-Options", "ALLOWALL");
-    if (proxyRes.headers["content-length"]) {
-      res.setHeader("Content-Length", proxyRes.headers["content-length"]);
+    if (!upstream.ok) {
+      return res.status(upstream.status).json({ error: `Upstream returned ${upstream.status}` });
     }
-    res.status(proxyRes.statusCode || 200);
-    proxyRes.pipe(res);
-  });
 
-  proxyReq.setTimeout(25000, () => {
-    proxyReq.destroy();
-    if (!res.headersSent) res.status(504).json({ error: "Upstream timeout" });
-  });
+    // Force application/pdf regardless of what Cloudinary sends (octet-stream)
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", "inline");
+    res.setHeader("Cache-Control", "public, max-age=3600");
 
-  proxyReq.on("error", (err) => {
+    const buffer = Buffer.from(await upstream.arrayBuffer());
+    return res.status(200).send(buffer);
+  } catch (err) {
     console.error("proxy-pdf error:", err.message);
-    if (!res.headersSent) res.status(502).json({ error: "Failed to fetch document" });
-  });
+    return res.status(502).json({ error: err.message });
+  }
 };
