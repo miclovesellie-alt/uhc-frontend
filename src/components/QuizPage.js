@@ -6,6 +6,7 @@ import { useToast } from "./Toast";
 import "../styles/quiz.css";
 import api from "../api/api";
 import coursesTopics from "../data/courses_topics.json";
+import { usePageEnabled, MaintenanceScreen } from "../hooks/usePageEnabled";
 
 /* ── Book Loader ── */
 const BookLoader = ({ text = "Loading…" }) => (
@@ -57,6 +58,7 @@ const loadQ = async (course, limit) => {
    MAIN COMPONENT
 ══════════════════════════════════════ */
 export default function QuizPage() {
+  const { disabled: quizDisabled, loading: checkingQuizFlag } = usePageEnabled("disableQuiz");
   const toast    = useToast();
   const userId   = localStorage.getItem("userId");
   const storeKey = `activeQuiz_${userId}`;
@@ -267,6 +269,9 @@ export default function QuizPage() {
   const q = questions[idx];
   const finalScore = answers.filter((a, i) => a === questions[i]?.answer).length;
   const pct = questions.length ? Math.round((finalScore / questions.length) * 100) : 0;
+
+  if (checkingQuizFlag) return null;
+  if (quizDisabled) return <MaintenanceScreen pageName="Quiz / Questions" />;
 
   return (
     <div className={`quiz-page-wrap ${noSS && stage === "quiz" ? "no-screenshot-mode" : ""}`}>

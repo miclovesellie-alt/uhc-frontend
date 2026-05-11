@@ -56,6 +56,9 @@ export default function AdminSettings() {
   const [globalAnnouncement, setGlobalAnnouncement] = useState("");
   const [allowGuestAccess, setAllowGuestAccess] = useState(false);
   const [disableFeed, setDisableFeed] = useState(false);
+  // Superadmin feature flags
+  const [disableQuiz, setDisableQuiz] = useState(false);
+  const [disableLibrary, setDisableLibrary] = useState(false);
 
   // Contact & Social
   const [contactInfo, setContactInfo] = useState({ email:"",phone:"",whatsapp:"",facebook:"",tiktok:"",instagram:"",twitter:"",youtube:"" });
@@ -72,7 +75,7 @@ export default function AdminSettings() {
   useEffect(() => {
     const load = async () => {
       try {
-        const keys = ["noScreenshot","maintenanceMode","quizTimer","registrationOpen","globalAnnouncement","allowGuestAccess","disableFeed","contactInfo"];
+        const keys = ["noScreenshot","maintenanceMode","quizTimer","registrationOpen","globalAnnouncement","allowGuestAccess","disableFeed","disableQuiz","disableLibrary","contactInfo"];
         const results = await Promise.allSettled(keys.map(k => api.get(`settings/${k}`)));
         const map = {};
         results.forEach((r, i) => { if (r.status==="fulfilled" && r.value.data?.value != null) map[keys[i]] = r.value.data.value; });
@@ -83,6 +86,8 @@ export default function AdminSettings() {
         if (map.globalAnnouncement != null) setGlobalAnnouncement(map.globalAnnouncement);
         if (map.allowGuestAccess != null) setAllowGuestAccess(map.allowGuestAccess);
         if (map.disableFeed != null) setDisableFeed(map.disableFeed);
+        if (map.disableQuiz != null) setDisableQuiz(map.disableQuiz);
+        if (map.disableLibrary != null) setDisableLibrary(map.disableLibrary);
         if (map.contactInfo) setContactInfo(prev => ({ ...prev, ...map.contactInfo }));
       } catch {}
     };
@@ -124,6 +129,8 @@ export default function AdminSettings() {
         api.post("settings", { key:"registrationOpen", value:registrationOpen }),
         api.post("settings", { key:"allowGuestAccess", value:allowGuestAccess }),
         api.post("settings", { key:"disableFeed", value:disableFeed }),
+        api.post("settings", { key:"disableQuiz", value:disableQuiz }),
+        api.post("settings", { key:"disableLibrary", value:disableLibrary }),
         api.post("settings", { key:"globalAnnouncement", value:globalAnnouncement }),
       ]);
       showToast("System settings saved");
@@ -295,6 +302,20 @@ export default function AdminSettings() {
         <Toggle checked={registrationOpen} onChange={setRegistrationOpen} icon="📝" label="Open Registration" desc="Allow new users to sign up"/>
         <Toggle checked={allowGuestAccess} onChange={setAllowGuestAccess} icon="👀" label="Allow Guest Access" desc="Allow unregistered users to view public resources"/>
         <Toggle checked={disableFeed} onChange={setDisableFeed} icon="🔇" label="Disable Social Feed" desc="Hide the community feed from all users temporarily"/>
+
+        {/* Superadmin-only: page toggles */}
+        {user?.role === "superadmin" && (
+          <>
+            <div style={{margin:"16px 0 10px",fontSize:".75rem",fontWeight:700,color:"var(--admin-muted)",textTransform:"uppercase",letterSpacing:".06em"}}>⭐ Superadmin — Page Controls</div>
+            <Toggle checked={disableQuiz} onChange={setDisableQuiz} icon="🧠" label="Disable Quiz / Questions Page" desc="Shows a 'under development' screen to all users on the Quiz page"/>
+            <Toggle checked={disableLibrary} onChange={setDisableLibrary} icon="📚" label="Disable Library Page" desc="Shows a 'under development' screen to all users on the Library page"/>
+            {(disableQuiz || disableLibrary) && (
+              <div style={{padding:"10px 14px",background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.25)",borderRadius:10,fontSize:".8rem",color:"#d97706",marginTop:6}}>
+                ⚠️ {[disableQuiz&&"Quiz",disableLibrary&&"Library"].filter(Boolean).join(" & ")} page{disableQuiz&&disableLibrary?"s are":" is"} currently <strong>disabled</strong> for all users.
+              </div>
+            )}
+          </>
+        )}
         <div style={{marginTop:16}}>
           <label style={{fontSize:".78rem",color:"var(--admin-muted)",fontWeight:600,display:"block",marginBottom:6}}>GLOBAL ANNOUNCEMENT BANNER</label>
           <input className="admin-input" style={{width:"100%",boxSizing:"border-box"}} placeholder="e.g., Server maintenance scheduled for midnight..." value={globalAnnouncement} onChange={e=>setGlobalAnnouncement(e.target.value)}/>

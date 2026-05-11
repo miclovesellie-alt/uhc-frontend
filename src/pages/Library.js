@@ -6,6 +6,7 @@ import { useToast } from "../components/Toast";
 import { toggleBookmark, getBookmarks } from "../utils/bookmarks";
 import BASE_URL, { getFileUrl } from "../utils/config";
 import PdfjsViewer from "../components/PdfjsViewer";
+import { usePageEnabled, MaintenanceScreen } from "../hooks/usePageEnabled";
 import "../styles/library.css";
 
 const LAST_VISITED_KEY = "uhc_last_visited_books";
@@ -97,6 +98,7 @@ function BookSkeleton() {
 
 // ── Main Library ─────────────────────────────────────────────
 export default function Library() {
+  const { disabled, loading: checkingFlag } = usePageEnabled("disableLibrary");
   const toast = useToast();
   const { searchQuery } = useOutletContext();
   const [books, setBooks]         = useState([]);
@@ -132,11 +134,12 @@ export default function Library() {
   };
 
   useEffect(() => {
+    if (disabled) return;
     Promise.all([api.get("library/books"), api.get("library/courses")])
       .then(([b, c]) => { setBooks(b.data); setCourses(c.data); })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [disabled]);
 
   const getBookCount = (name) => books.filter(b => b.course === name).length;
 
@@ -153,6 +156,9 @@ export default function Library() {
     const s = b.title.toLowerCase().includes(combinedSearch) || b.author?.toLowerCase().includes(combinedSearch);
     return s && (activeCourse ? b.course === activeCourse : true);
   });
+
+  if (checkingFlag) return null;
+  if (disabled) return <MaintenanceScreen pageName="Study Library" />;
 
   if (loading) return (
     <div className="library-wrapper">
