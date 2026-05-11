@@ -58,9 +58,6 @@ const loadQ = async (course, limit) => {
    MAIN COMPONENT
 ══════════════════════════════════════ */
 export default function QuizPage() {
-  const { user } = useContext(UserContext);
-  const isAdmin = user?.role === "admin" || user?.role === "superadmin";
-  const { disabled: quizDisabled, loading: checkingQuizFlag } = usePageEnabled("disableQuiz", isAdmin);
   const toast    = useToast();
   const userId   = localStorage.getItem("userId");
   const storeKey = `activeQuiz_${userId}`;
@@ -93,7 +90,9 @@ export default function QuizPage() {
   const [showNav, setShowNav]           = useState(false);
   const [timeLeft, setTimeLeft]         = useState(45);
   const [blurred, setBlurred]           = useState(false);
-  const { user, setUser } = React.useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
+  const isAdmin = user?.role === "admin" || user?.role === "superadmin";
+  const { disabled: quizDisabled, loading: checkingQuizFlag } = usePageEnabled("disableQuiz", isAdmin);
   const timerRef = useRef(null);
 
   const [showReportModal, setShowReportModal] = useState(false);
