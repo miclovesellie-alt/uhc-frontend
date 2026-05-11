@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from "react";
 
 /**
- * Simplest possible reliable PDF viewer.
+ * PDF/Document Viewer
  *
- * Flow:
- *   1. fetch() the file through the Vercel proxy (same domain, sets Content-Type:
- *      application/pdf server-side — bypasses Cloudinary octet-stream issue)
- *   2. Wrap the bytes in a Blob with explicit type "application/pdf"
- *   3. createObjectURL() → same-origin URL
- *   4. <iframe src={blobUrl}> — browsers ALWAYS render same-origin
- *      application/pdf iframes in their built-in PDF viewer. No exceptions.
+ * Strategy (in order):
+ *  1. Cloudinary URLs (res.cloudinary.com) → direct <iframe> — browser makes a
+ *     navigation request (no CORS), Chrome/Firefox render .pdf URLs natively even
+ *     if content-type is octet-stream.
+ *  2. Any other URL → proxy blob via Vercel serverless function /api/proxy-pdf
+ *     which re-serves the file with Content-Type: application/pdf.
+ *  3. If both fail → show download / open-tab buttons.
+ *
+ * The "Switch viewer" button lets the user manually toggle between the two modes.
  */
-function proxyUrl(rawUrl) {
+const isCloudinary = (url) => url && url.includes("res.cloudinary.com");
+
+function buildProxyUrl(rawUrl) {
   const s = rawUrl.replace("http://", "https://");
   if (window.location.hostname === "localhost")
     return `http://localhost:5000/api/submissions/proxy-pdf?url=${encodeURIComponent(s)}`;
@@ -19,18 +23,23 @@ function proxyUrl(rawUrl) {
 }
 
 export default function PdfjsViewer({ url }) {
+  const secure   = url ? url.replace("http://", "https://") : "";
+  // Cloudinary → direct; others → proxy blob
+  const initMode = isCloudinary(secure) ? "direct" : "proxy";
+
+  const [mode,    setMode]    = useState(initMode);
   const [blobUrl, setBlobUrl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState(false);
+  const [retries, setRetries] = useState(0);
 
-  const secure = url ? url.replace("http://", "https://") : "";
-
+  /* ── Proxy-blob mode ─────────────────────────────────────── */
   useEffect(() => {
-    if (!secure) return;
+    if (!secure || mode !== "proxy") return;
     let objectUrl = null;
     setLoading(true); setError(false); setBlobUrl(null);
 
-    fetch(proxyUrl(secure))
+    fetch(buildProxyUrl(secure))
       .then(r => { if (!r.ok) throw new Error(r.status); return r.blob(); })
       .then(blob => {
         objectUrl = URL.createObjectURL(new Blob([blob], { type: "application/pdf" }));
@@ -40,9 +49,19 @@ export default function PdfjsViewer({ url }) {
       .catch(() => { setError(true); setLoading(false); });
 
     return () => { if (objectUrl) URL.revokeObjectURL(objectUrl); };
-  }, [secure]);
+  }, [secure, mode, retries]);
+
+  /* ── Direct mode just sets loading=false once ────────────── */
+  useEffect(() => {
+    if (mode === "direct") { setLoading(false); setError(false); }
+  }, [mode]);
 
   if (!url) return null;
+
+  const switchMode = () => {
+    setMode(m => m === "direct" ? "proxy" : "direct");
+    setLoading(true); setError(false); setBlobUrl(null);
+  };
 
   return (
     <div style={{ width:"100%", height:"100%", display:"flex", flexDirection:"column", minHeight:560 }}>
@@ -50,15 +69,22 @@ export default function PdfjsViewer({ url }) {
       {/* ── Top bar ── */}
       <div style={{ display:"flex", alignItems:"center", gap:8, padding:"7px 12px",
         background:"#f1f5f9", borderBottom:"1px solid #e2e8f0", flexShrink:0, flexWrap:"wrap" }}>
-        <span style={{ fontSize:".72rem", color:"#64748b", flex:1 }}>📄 Document viewer</span>
+        <span style={{ fontSize:".7rem", color:"#94a3b8", flex:1 }}>
+          {mode === "direct" ? "🔗 Direct view" : "🔄 Proxy view"}
+        </span>
+        <button onClick={switchMode}
+          style={{ padding:"4px 10px", borderRadius:6, border:"1px solid #e2e8f0",
+            background:"white", cursor:"pointer", fontSize:".73rem", color:"#475569", fontWeight:600 }}>
+          Switch viewer
+        </button>
         <a href={secure} target="_blank" rel="noreferrer"
-          style={{ padding:"5px 12px", borderRadius:6, border:"1px solid #e2e8f0",
-            background:"white", color:"#0f172a", textDecoration:"none", fontSize:".75rem", fontWeight:600 }}>
+          style={{ padding:"4px 10px", borderRadius:6, border:"1px solid #e2e8f0",
+            background:"white", color:"#0f172a", textDecoration:"none", fontSize:".73rem", fontWeight:600 }}>
           🔗 Open tab
         </a>
         <a href={secure} download target="_blank" rel="noreferrer"
-          style={{ padding:"5px 12px", borderRadius:6, border:"none",
-            background:"#10b981", color:"white", textDecoration:"none", fontSize:".75rem", fontWeight:600 }}>
+          style={{ padding:"4px 10px", borderRadius:6, border:"none",
+            background:"#10b981", color:"white", textDecoration:"none", fontSize:".73rem", fontWeight:600 }}>
           ⬇️ Download
         </a>
       </div>
@@ -66,8 +92,8 @@ export default function PdfjsViewer({ url }) {
       {/* ── Body ── */}
       <div style={{ flex:1, position:"relative", background:"#525659" }}>
 
-        {/* Loading */}
-        {loading && !error && (
+        {/* Spinner */}
+        {loading && (
           <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column",
             alignItems:"center", justifyContent:"center", background:"#f8fafc", gap:16, zIndex:2 }}>
             <div style={{ width:40, height:40, border:"3px solid #e2e8f0",
@@ -78,32 +104,53 @@ export default function PdfjsViewer({ url }) {
         )}
 
         {/* Error */}
-        {error && (
+        {error && !loading && (
           <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column",
             alignItems:"center", justifyContent:"center", background:"#f8fafc",
-            gap:16, padding:24, textAlign:"center", zIndex:2 }}>
+            gap:14, padding:24, textAlign:"center", zIndex:2 }}>
             <div style={{ fontSize:"2.5rem" }}>📄</div>
-            <div style={{ fontWeight:700, color:"#ef4444", fontSize:"1rem" }}>Could not load document</div>
-            <div style={{ color:"#64748b", fontSize:".85rem", maxWidth:300, lineHeight:1.6 }}>
-              The file may be unavailable. Open it directly or download it below.
+            <div style={{ fontWeight:700, color:"#ef4444" }}>Could not load document</div>
+            <div style={{ color:"#64748b", fontSize:".83rem", maxWidth:320, lineHeight:1.6 }}>
+              The file may be unavailable or stored on an old server.
+              Try switching the viewer mode or open/download directly.
             </div>
             <div style={{ display:"flex", gap:10, flexWrap:"wrap", justifyContent:"center" }}>
+              <button onClick={switchMode}
+                style={{ padding:"8px 16px", background:"#f1f5f9", border:"1px solid #e2e8f0",
+                  borderRadius:8, fontWeight:600, cursor:"pointer", fontSize:".83rem" }}>
+                Switch Viewer
+              </button>
               <a href={secure} target="_blank" rel="noreferrer"
-                style={{ padding:"9px 18px", background:"#f1f5f9", color:"#0f172a",
+                style={{ padding:"8px 16px", background:"white", color:"#0f172a",
                   border:"1px solid #e2e8f0", borderRadius:8, fontWeight:600,
-                  textDecoration:"none", fontSize:".85rem" }}>🔗 Open in Browser</a>
+                  textDecoration:"none", fontSize:".83rem" }}>🔗 Open in Browser</a>
               <a href={secure} download target="_blank" rel="noreferrer"
-                style={{ padding:"9px 18px", background:"#10b981", color:"white",
+                style={{ padding:"8px 16px", background:"#10b981", color:"white",
                   border:"none", borderRadius:8, fontWeight:600,
-                  textDecoration:"none", fontSize:".85rem" }}>⬇️ Download</a>
+                  textDecoration:"none", fontSize:".83rem" }}>⬇️ Download</a>
             </div>
           </div>
         )}
 
-        {/* PDF rendered from blob URL — same-origin → always works */}
-        {blobUrl && (
-          <iframe src={blobUrl} title="PDF Viewer"
-            style={{ width:"100%", height:"100%", minHeight:520, border:"none", display:"block" }}/>
+        {/* Direct iframe (Cloudinary URLs) */}
+        {mode === "direct" && !error && (
+          <iframe
+            key={`direct-${retries}`}
+            src={secure}
+            title="Document viewer"
+            onLoad={() => setLoading(false)}
+            onError={() => { setError(true); setLoading(false); }}
+            style={{ width:"100%", height:"100%", minHeight:520, border:"none", display:"block" }}
+          />
+        )}
+
+        {/* Blob iframe (proxy mode) */}
+        {mode === "proxy" && blobUrl && (
+          <iframe
+            src={blobUrl}
+            title="Document viewer"
+            style={{ width:"100%", height:"100%", minHeight:520, border:"none", display:"block" }}
+          />
         )}
       </div>
     </div>

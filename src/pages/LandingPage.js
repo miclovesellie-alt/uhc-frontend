@@ -62,6 +62,9 @@ export default function LandingPage() {
   const [phase, setPhase]               = useState("quiz"); // "quiz" | "done"
   const [advancing, setAdvancing]       = useState(false);
 
+  // Hero image (changeable by superadmin)
+  const [heroImage, setHeroImage] = useState(graduation);
+
   // Leaderboard
   const [leaders, setLeaders] = useState(LEADERBOARD_PREVIEW);
 
@@ -78,6 +81,10 @@ export default function LandingPage() {
         score: u.totalPoints || u.points || 0,
         badge: ["🥇","🥈","🥉","⭐","⭐"][i],
       })));
+    }).catch(() => {});
+    // Fetch custom hero image
+    api.get("settings/heroImageUrl").then(r => {
+      if (r.data?.value) setHeroImage(r.data.value);
     }).catch(() => {});
   }, []);
 
@@ -158,7 +165,7 @@ export default function LandingPage() {
         </div>
         <div className="hero-image-wrapper">
           <div className="hero-image-container">
-            <img src={graduation} alt="Nursing student graduating" />
+            <img src={heroImage} alt="Nursing student graduating" onError={e => { e.target.onerror=null; e.target.src=graduation; }} />
             <div className="hero-floating-card">
               <div style={{ background:"#10b981", padding:"8px", borderRadius:"10px", color:"white" }}><Trophy size={20}/></div>
               <div>
