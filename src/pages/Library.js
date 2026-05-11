@@ -23,7 +23,10 @@ function InlineReader({ book }) {
   const [loaded, setLoaded] = useState(false);
   const iframeRef = useRef();
 
-  const isPdf = rawUrl.toLowerCase().includes(".pdf");
+  // Check URL extension AND book.fileType — Cloudinary sometimes omits the
+  // extension in the URL when a file is stored as a raw resource type.
+  const urlExt = (rawUrl.toLowerCase().split("?")[0].match(/\.([a-z0-9]+)$/i)?.[1] || "").toLowerCase();
+  const isPdf = urlExt === "pdf" || book.fileType === "pdf" || (!urlExt && !book.fileType);
   
   // Use backend proxy for PDFs to ensure browser's native PDF viewer loads them flawlessly.
   // Use Google Docs viewer for DOC/DOCX/TXT files.

@@ -30,9 +30,10 @@ export default function BookViewer() {
 
   const rawUrl = book.fileUrl;
   const directUrl = getFileUrl(rawUrl);
-  const ext = getExt(directUrl) || getExt(rawUrl);
+  // Prefer URL-derived extension, then fall back to the DB field
+  const ext = getExt(directUrl) || getExt(rawUrl) || book.fileType || "pdf";
   const isPdf    = ext === "pdf";
-  const isOffice = ["doc","docx","txt"].includes(ext);
+  const isOffice = ["doc","docx","txt","ppt","pptx"].includes(ext);
   const isMedia  = ["jpg","jpeg","png","gif","webp"].includes(ext);
   const isVideo  = ["mp4","webm","ogg"].includes(ext);
 

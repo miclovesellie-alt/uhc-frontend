@@ -93,52 +93,92 @@ function PdfPage({ pdfDoc, pageNum }) {
   );
 }
 
+// ─── Backend proxy base (mirrors config.js logic) ──────────────────────────
+const API_BASE = window.location.hostname === "localhost"
+  ? "http://localhost:5000"
+  : "https://uhc-backend.onrender.com";
+
+/**
+ * Build the fetch URL for pdf.js.
+ * External URLs (Cloudinary raw files) are routed through the backend proxy
+ * which adds proper CORS + Content-Type headers, preventing the browser from
+ * blocking the cross-origin request that causes "Failed to load PDF preview".
+ */
+function buildFetchUrl(rawUrl) {
+  const secure = rawUrl.replace("http://", "https://");
+  const isExternal =
+    secure.startsWith("https://") &&
+    !secure.startsWith(window.location.origin);
+  if (!isExternal) return secure;
+  return `${API_BASE}/api/submissions/proxy-pdf?url=${encodeURIComponent(secure)}`;
+}
+
 export default function PdfjsViewer({ url }) {
   const [pdfDoc, setPdfDoc] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState(null); // null | Error object
   const [renderedPages, setRenderedPages] = useState([]);
-  
+  const [retryCount, setRetryCount] = useState(0);
+
+  const secureUrl = url ? url.replace("http://", "https://") : "";
+
   useEffect(() => {
+    if (!url) return;
     let active = true;
+    setPdfDoc(null);
+    setLoading(true);
+    setError(null);
+    setRenderedPages([]);
+
     const loadPdf = async () => {
       try {
+        // ── 1. Load pdf.js from CDN (once) ───────────────────────────────
         if (!window.pdfjsLib) {
           await new Promise((res, rej) => {
             const script = document.createElement("script");
             script.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
             script.onload = () => {
-              window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+              window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+                "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
               res();
             };
-            script.onerror = rej;
+            script.onerror = () => rej(new Error("Failed to load pdf.js from CDN"));
             document.head.appendChild(script);
           });
+        } else if (!window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
+          // Ensure worker is always configured even if lib was pre-loaded
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+            "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
         }
-        
-        // Cloudinary and some other CDNs don't support HTTP 206 Partial Content range requests properly for PDFs,
-        // which causes pdf.js to throw "Failed to load pdf preview". 
-        // We must disable range requests and streaming to force it to download the whole file via a standard GET.
-        const secureUrl = url.replace("http://", "https://");
-        
-        const doc = await window.pdfjsLib.getDocument({ 
-          url: secureUrl,
-          disableRange: true,
-          disableStream: true,
-          disableAutoFetch: true
+
+        // ── 2. Route external URLs through the backend proxy ─────────────
+        // Cloudinary raw-file URLs don't include CORS headers that allow
+        // JavaScript fetches from other origins. The proxy (running on the
+        // same Render instance as the API) fetches the file server-side and
+        // pipes it back with Access-Control-Allow-Origin: * set, so pdf.js
+        // can read the bytes without the browser blocking the request.
+        const fetchUrl = buildFetchUrl(url);
+
+        const doc = await window.pdfjsLib.getDocument({
+          url: fetchUrl,
+          disableRange: true,     // Force full-file GET — Cloudinary doesn't
+          disableStream: true,    // support HTTP 206 range requests reliably
+          disableAutoFetch: true,
         }).promise;
+
         if (active) {
           setPdfDoc(doc);
           setLoading(false);
         }
       } catch (err) {
         console.error("PDF load error:", err);
-        if (active) { setError(true); setLoading(false); }
+        if (active) { setError(err); setLoading(false); }
       }
     };
+
     loadPdf();
     return () => { active = false; };
-  }, [url]);
+  }, [url, retryCount]);
 
   useEffect(() => {
     if (!pdfDoc) return;
@@ -158,12 +198,37 @@ export default function PdfjsViewer({ url }) {
 
   if (error) {
     return (
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, background: "#f8fafc" }}>
-        <div style={{ fontSize: "3rem" }}>⚠️</div>
-        <div style={{ color: "#ef4444", fontWeight: 600 }}>Failed to load PDF preview</div>
-        <a href={url.replace("http://", "https://")} download target="_blank" rel="noreferrer" style={{ padding: "8px 16px", background: "#4255ff", color: "white", textDecoration: "none", borderRadius: 8, fontWeight: 600 }}>
-          Download File Instead
-        </a>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, background: "#f8fafc", padding: "32px 16px", textAlign: "center" }}>
+        <div style={{ fontSize: "3rem" }}>📄</div>
+        <div style={{ color: "#ef4444", fontWeight: 700, fontSize: "1rem" }}>Could not render PDF preview</div>
+        <div style={{ color: "#64748b", fontSize: ".82rem", maxWidth: 340, lineHeight: 1.6 }}>
+          The document couldn't be displayed inline. You can open it directly in your browser or download it.
+        </div>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
+          <button
+            onClick={() => setRetryCount(c => c + 1)}
+            style={{ padding: "9px 18px", background: "#f1f5f9", color: "#0f172a", border: "1px solid #e2e8f0", borderRadius: 8, fontWeight: 600, cursor: "pointer", fontSize: ".85rem" }}
+          >
+            🔄 Retry
+          </button>
+          <a
+            href={secureUrl}
+            target="_blank"
+            rel="noreferrer"
+            style={{ padding: "9px 18px", background: "#f1f5f9", color: "#0f172a", border: "1px solid #e2e8f0", borderRadius: 8, fontWeight: 600, textDecoration: "none", fontSize: ".85rem" }}
+          >
+            🔗 Open in Browser
+          </a>
+          <a
+            href={secureUrl}
+            download
+            target="_blank"
+            rel="noreferrer"
+            style={{ padding: "9px 18px", background: "#4255ff", color: "white", border: "none", borderRadius: 8, fontWeight: 600, textDecoration: "none", fontSize: ".85rem", cursor: "pointer" }}
+          >
+            ⬇️ Download
+          </a>
+        </div>
       </div>
     );
   }
