@@ -793,28 +793,41 @@ html,body,#root{height:auto!important;min-height:100%;overflow-x:hidden!importan
   .ai-model-card { transform: scale(0.9); transform-origin: top center; }
 }
 
-/* ── Quiz & Leaderboard sections (added May 2026) ──────────────── */
-@media (max-width: 768px) {
-  /* Quiz section */
-  section .section-title[style] { font-size: 1.9rem !important; }
-
-  /* Leaderboard two-col → single col */
-  section > div[style*="grid-template-columns:1fr 1fr"] {
-    grid-template-columns: 1fr !important;
-    gap: 40px !important;
-  }
-
-  /* CTA checklist */
-  .cta-box > div:last-child { display: none; }
+/* ═══ Quiz Section ══════════════════════════════════════════════ */
+.quiz-section { padding: 100px 8%; background: white; }
+.quiz-card    { background: #f8fafc; border-radius: 20px; padding: 36px 40px; border: 1px solid #e2e8f0; box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
+.quiz-courses { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 32px; }
+.quiz-lock-bar {
+  margin-top: 24px; padding: 20px 24px; border-radius: 14px;
+  background: linear-gradient(135deg,#0f172a,#1e293b); color: white;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
 }
 
-@media (max-width: 600px) {
-  /* Quiz card padding */
-  section div[style*="padding:\"36px 40px\""] {
-    padding: 24px 20px !important;
-  }
-  /* Leaderboard card */
-  section div[style*="padding:\"28px 32px\""] {
-    padding: 20px 18px !important;
-  }
+/* ═══ Leaderboard Section ═══════════════════════════════════════ */
+.lb-section { padding: 100px 8%; background: var(--bg-light); }
+.lb-grid {
+  max-width: 900px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+}
+.lb-card {
+  background: white; border-radius: 24px; padding: 28px 32px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08); border: 1px solid #f1f5f9;
+}
+
+/* ═══ Responsive overrides for new sections ═════════════════════ */
+@media (max-width: 860px) {
+  .lb-grid { grid-template-columns: 1fr; gap: 40px; }
+  .lb-section { padding: 60px 5%; }
+}
+
+@media (max-width: 768px) {
+  .quiz-section { padding: 60px 5%; }
+  .quiz-card { padding: 24px 18px; }
+  .quiz-lock-bar { flex-direction: column; align-items: flex-start; }
+  .quiz-lock-bar button { width: 100%; text-align: center; }
+}
+
+@media (max-width: 480px) {
+  .quiz-courses { gap: 8px; }
+  .lb-card { padding: 18px 14px; }
 }

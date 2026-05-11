@@ -163,7 +163,7 @@ export default function LandingPage() {
       </section>
 
       {/* ══ QUIZ PREVIEW — indexable by Google ═══════════════════════ */}
-      <section style={{ padding:"100px 8%", background:"white" }}>
+      <section className="quiz-section">
         <div style={{ maxWidth:900, margin:"0 auto" }}>
           <span className="section-label">🧠 Sample Quiz</span>
           <h2 className="section-title" style={{ textAlign:"left" }}>Test Your Nursing Knowledge</h2>
@@ -173,7 +173,7 @@ export default function LandingPage() {
           </p>
 
           {/* Course tabs */}
-          <div style={{ display:"flex", gap:10, flexWrap:"wrap", marginBottom:32 }}>
+          <div className="quiz-courses">
             {QUIZ_QUESTIONS.map((q,i) => (
               <button key={i} onClick={() => { setQuizCourse(i); setQuizAnswers(a => ({...a})); }}
                 style={{
@@ -193,7 +193,7 @@ export default function LandingPage() {
             const q = QUIZ_QUESTIONS[quizCourse];
             const answered = quizAnswers[quizCourse] !== undefined;
             return (
-              <div style={{ background:"#f8fafc", borderRadius:20, padding:"36px 40px", border:"1px solid #e2e8f0", boxShadow:"0 4px 20px rgba(0,0,0,0.04)" }}>
+              <div className="quiz-card">
                 <div style={{ fontSize:".8rem", fontWeight:700, color:"#10b981", marginBottom:14, textTransform:"uppercase", letterSpacing:".05em" }}>
                   Question {quizCourse+1} of {QUIZ_QUESTIONS.length} · {q.course}
                 </div>
@@ -229,9 +229,7 @@ export default function LandingPage() {
                 {/* Answer lock / CTA */}
                 {answered && (
                   <motion.div initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }}
-                    style={{ marginTop:24, padding:"20px 24px", borderRadius:14,
-                      background:"linear-gradient(135deg,#0f172a,#1e293b)", color:"white",
-                      display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
+                    className="quiz-lock-bar">
                     <div style={{ display:"flex", alignItems:"center", gap:12 }}>
                       <Lock size={20} color="#10b981"/>
                       <span style={{ fontWeight:700, fontSize:".95rem" }}>
@@ -252,8 +250,8 @@ export default function LandingPage() {
       </section>
 
       {/* ══ LEADERBOARD PREVIEW ═══════════════════════════════════════ */}
-      <section style={{ padding:"100px 8%", background:"var(--bg-light)" }}>
-        <div style={{ maxWidth:900, margin:"0 auto", display:"grid", gridTemplateColumns:"1fr 1fr", gap:60, alignItems:"center" }}>
+      <section className="lb-section">
+        <div className="lb-grid">
           {/* Left copy */}
           <div>
             <span className="section-label">🏆 Leaderboard</span>
@@ -278,7 +276,7 @@ export default function LandingPage() {
           </div>
 
           {/* Right: live leaderboard card */}
-          <div style={{ background:"white", borderRadius:24, padding:"28px 32px", boxShadow:"0 20px 40px rgba(0,0,0,0.08)", border:"1px solid #f1f5f9" }}>
+          <div className="lb-card">
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:24 }}>
               <div style={{ fontWeight:800, fontSize:"1rem", color:"#0f172a" }}>🏆 Top Students</div>
               <span style={{ fontSize:".75rem", color:"#10b981", fontWeight:700, background:"rgba(16,185,129,.08)", padding:"4px 12px", borderRadius:99 }}>Live</span>
