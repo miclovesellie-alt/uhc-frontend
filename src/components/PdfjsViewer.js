@@ -31,7 +31,7 @@ export default function PdfjsViewer({ url }) {
   const [blobUrl, setBlobUrl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState(false);
-  const [retries, setRetries] = useState(0);
+  const [retries] = useState(0);
 
   /* ── Proxy-blob mode ─────────────────────────────────────── */
   useEffect(() => {
