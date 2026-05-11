@@ -93,24 +93,36 @@ function PdfPage({ pdfDoc, pageNum }) {
   );
 }
 
-// ─── Backend proxy base (mirrors config.js logic) ──────────────────────────
-const API_BASE = window.location.hostname === "localhost"
-  ? "http://localhost:5000"
-  : "https://uhc-backend.onrender.com";
-
 /**
  * Build the fetch URL for pdf.js.
- * External URLs (Cloudinary raw files) are routed through the backend proxy
- * which adds proper CORS + Content-Type headers, preventing the browser from
- * blocking the cross-origin request that causes "Failed to load PDF preview".
+ *
+ * Problem: Cloudinary raw-file URLs are served with Content-Type:
+ * application/octet-stream, so browsers show a blank page when opening them
+ * directly, and pdf.js cannot render them.
+ *
+ * Solution: Route all external URLs through a proxy that re-serves the bytes
+ * with Content-Type: application/pdf and Access-Control-Allow-Origin: *.
+ *
+ * - Production  → /api/proxy-pdf   (Vercel serverless fn — same domain, always
+ *                                   warm, zero cold-start, no CORS issue)
+ * - Development → localhost:5000/api/submissions/proxy-pdf  (Express backend)
  */
 function buildFetchUrl(rawUrl) {
   const secure = rawUrl.replace("http://", "https://");
+  const isLocal = window.location.hostname === "localhost";
   const isExternal =
     secure.startsWith("https://") &&
     !secure.startsWith(window.location.origin);
-  if (!isExternal) return secure;
-  return `${API_BASE}/api/submissions/proxy-pdf?url=${encodeURIComponent(secure)}`;
+
+  if (!isExternal) return secure; // already same-origin, no proxy needed
+
+  if (isLocal) {
+    // Local dev: Express backend proxy
+    return `http://localhost:5000/api/submissions/proxy-pdf?url=${encodeURIComponent(secure)}`;
+  }
+  // Production: Vercel serverless function — same domain as the frontend,
+  // so there is no CORS preflight and no cold-start delay.
+  return `${window.location.origin}/api/proxy-pdf?url=${encodeURIComponent(secure)}`;
 }
 
 export default function PdfjsViewer({ url }) {
