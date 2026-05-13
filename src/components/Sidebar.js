@@ -32,8 +32,8 @@ function Sidebar({ user, onEditProfile, onDonate, onLogout, onHome, onServices, 
         </div>
 
         <div className="sidebar-card">
-          <h4>Library</h4>
-          <button onClick={() => navigate("/library")}>Open Library</button>
+          <h4>Study Hub</h4>
+          <button onClick={() => navigate("/library")}>Open Study Hub</button>
         </div>
 
         <div className="sidebar-card">

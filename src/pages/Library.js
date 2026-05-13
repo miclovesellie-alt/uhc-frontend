@@ -1,244 +1,341 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { useOutletContext } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 import api from "../api/api";
-import { ArrowLeft, BookOpen, Search, Download, ExternalLink, GraduationCap } from "lucide-react";
+import {
+  GraduationCap, Search, RotateCcw, ExternalLink, BookOpen,
+  Layers, Link2, ChevronDown, ChevronUp, Play, FileText, Wrench, HelpCircle
+} from "lucide-react";
 import { useToast } from "../components/Toast";
-import { toggleBookmark, getBookmarks } from "../utils/bookmarks";
-import { getFileUrl } from "../utils/config";
-import PdfjsViewer from "../components/PdfjsViewer";
 import { usePageEnabled, MaintenanceScreen } from "../hooks/usePageEnabled";
-import "../styles/library.css";
+import "../styles/StudyHub.css";
 
-/* ── Skeleton ─────────────────────────────────────────────────── */
-function Skeleton() {
+/* ════════════════════════════════════════════════════════
+   STORAGE HELPER — track studied cards per session
+════════════════════════════════════════════════════════ */
+const STORAGE_KEY = "uhc_studied_cards";
+function getStudied()     { try { return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]")); } catch { return new Set(); } }
+function saveStudied(set) { localStorage.setItem(STORAGE_KEY, JSON.stringify([...set])); }
+
+/* ════════════════════════════════════════════════════════
+   SKELETON LOADER
+════════════════════════════════════════════════════════ */
+function SkeletonGrid({ count = 6 }) {
   return (
-    <div style={{ borderRadius:14, overflow:"hidden", border:"1px solid #e2e8f0", background:"#f8fafc" }}>
-      <div style={{ height:160, background:"linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%)",
-        backgroundSize:"200% 100%", animation:"shimmer 1.4s infinite" }}/>
-      <div style={{ padding:"12px 14px", display:"flex", flexDirection:"column", gap:8 }}>
-        <div style={{ height:13, borderRadius:8, background:"#e2e8f0", width:"75%" }}/>
-        <div style={{ height:11, borderRadius:8, background:"#e2e8f0", width:"50%" }}/>
-        <div style={{ height:32, borderRadius:10, background:"#e2e8f0", marginTop:4 }}/>
-      </div>
-      <style>{`@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}`}</style>
+    <div className="sh-flashcard-grid">
+      {[...Array(count)].map((_, i) => <div key={i} className="sh-skeleton" />)}
     </div>
   );
 }
 
-/* ── Book Card ────────────────────────────────────────────────── */
-function BookCard({ book, bookmarked, onOpen, onBookmark }) {
-  const cover = book.coverUrl ? getFileUrl(book.coverUrl) : null;
+/* ════════════════════════════════════════════════════════
+   EMPTY STATE
+════════════════════════════════════════════════════════ */
+function EmptyState({ icon, title, sub }) {
   return (
-    <div style={{ borderRadius:14, overflow:"hidden", border:"1px solid #e2e8f0",
-      background:"white", display:"flex", flexDirection:"column",
-      boxShadow:"0 2px 8px rgba(0,0,0,0.04)", transition:"box-shadow .18s" }}
-      onMouseEnter={e=>e.currentTarget.style.boxShadow="0 6px 20px rgba(0,0,0,0.09)"}
-      onMouseLeave={e=>e.currentTarget.style.boxShadow="0 2px 8px rgba(0,0,0,0.04)"}>
+    <div className="sh-empty">
+      <div className="sh-empty-icon">{icon}</div>
+      <div className="sh-empty-title">{title}</div>
+      <div className="sh-empty-sub">{sub}</div>
+    </div>
+  );
+}
 
-      {/* Cover */}
-      <div style={{ height:160, background:"linear-gradient(135deg,#e0f2fe,#dbeafe)",
-        display:"flex", alignItems:"center", justifyContent:"center",
-        position:"relative", overflow:"hidden" }}>
-        {cover
-          ? <img src={cover} alt={book.title} onError={e=>e.target.style.display="none"}
-              style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}/>
-          : <BookOpen size={40} color="#93c5fd"/>
-        }
-        <button onClick={()=>onBookmark(book)}
-          style={{ position:"absolute", top:8, right:8, background:"rgba(255,255,255,.85)",
-            border:"none", borderRadius:"50%", width:30, height:30, cursor:"pointer",
-            display:"flex", alignItems:"center", justifyContent:"center",
-            fontSize:"1rem", backdropFilter:"blur(6px)" }}>
-          {bookmarked ? "🔖" : "🏷️"}
-        </button>
-      </div>
+/* ════════════════════════════════════════════════════════
+   FLASHCARD  (flip effect)
+════════════════════════════════════════════════════════ */
+function FlashCard({ card, studied, onToggleStudied }) {
+  const [flipped, setFlipped] = useState(false);
 
-      {/* Info */}
-      <div style={{ padding:"12px 14px", flex:1, display:"flex", flexDirection:"column", gap:4 }}>
-        <div style={{ fontWeight:700, fontSize:".88rem", color:"#0f172a",
-          overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{book.title}</div>
-        {book.author && <div style={{ fontSize:".73rem", color:"#64748b" }}>{book.author}</div>}
-        <div style={{ marginTop:"auto", paddingTop:10 }}>
-          <button onClick={()=>onOpen(book)}
-            style={{ width:"100%", padding:"9px 0", borderRadius:10, border:"none",
-              background:"#10b981", color:"white", fontWeight:700,
-              fontSize:".82rem", cursor:"pointer", display:"flex",
-              alignItems:"center", justifyContent:"center", gap:7 }}>
-            <BookOpen size={14}/> Read
-          </button>
+  return (
+    <div
+      className={`sh-fc-scene${flipped ? " flipped" : ""}`}
+      onClick={() => setFlipped(f => !f)}
+      title="Click to flip"
+    >
+      <div className="sh-fc-card">
+
+        {/* ── FRONT ── */}
+        <div className="sh-fc-front">
+          <div className="sh-fc-front-top">
+            <span className="sh-fc-emoji">{card.emoji || "🃏"}</span>
+            <span className="sh-fc-course-badge">{card.course}</span>
+          </div>
+          <div className="sh-fc-question">{card.question}</div>
+          {card.hint && <div className="sh-fc-hint">💡 {card.hint}</div>}
+          <div className="sh-fc-footer">
+            <span className="sh-fc-flip-hint"><RotateCcw size={11} /> Tap to reveal</span>
+            <button
+              className={`sh-fc-studied-btn${studied ? " studied" : ""}`}
+              onClick={e => { e.stopPropagation(); onToggleStudied(card._id); }}
+            >
+              {studied ? "✓ Studied" : "Mark studied"}
+            </button>
+          </div>
+        </div>
+
+        {/* ── BACK ── */}
+        <div className="sh-fc-back">
+          <div className="sh-fc-back-label">✦ Answer</div>
+          <div className="sh-fc-answer">{card.answer}</div>
+          <div className="sh-fc-back-footer">Tap again to flip back</div>
         </div>
       </div>
     </div>
   );
 }
 
-/* ── Main Library ─────────────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════
+   NOTE CARD  (expandable body)
+════════════════════════════════════════════════════════ */
+function NoteCard({ note }) {
+  const [expanded, setExpanded] = useState(false);
+  const PREVIEW_LEN = 200;
+  const isLong = (note.body || "").length > PREVIEW_LEN;
+
+  return (
+    <div className="sh-note-card" style={{ "--note-color": note.color || "#10b981" }}>
+      <div className="sh-note-header">
+        <span className="sh-note-emoji">{note.emoji || "📝"}</span>
+        <span className="sh-note-title">{note.title}</span>
+        <span className="sh-note-course-badge" style={{ background: `${note.color || "#10b981"}18`, color: note.color || "#10b981" }}>
+          {note.course}
+        </span>
+      </div>
+      <div className="sh-note-body">
+        {expanded || !isLong ? note.body : note.body.slice(0, PREVIEW_LEN) + "…"}
+      </div>
+      {isLong && (
+        <button className="sh-note-expand-btn" onClick={() => setExpanded(e => !e)}>
+          {expanded ? <><ChevronUp size={13} style={{ verticalAlign: "middle" }} /> Show less</> : <><ChevronDown size={13} style={{ verticalAlign: "middle" }} /> Read more</>}
+        </button>
+      )}
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════
+   RESOURCE CARD
+════════════════════════════════════════════════════════ */
+const TYPE_META = {
+  video:   { label: "Video",   icon: <Play size={11} />,      cls: "sh-res-type-video"   },
+  article: { label: "Article", icon: <FileText size={11} />,  cls: "sh-res-type-article" },
+  tool:    { label: "Tool",    icon: <Wrench size={11} />,    cls: "sh-res-type-tool"    },
+  other:   { label: "Other",   icon: <HelpCircle size={11} />,cls: "sh-res-type-other"   },
+};
+
+function ResourceCard({ resource }) {
+  const meta = TYPE_META[resource.type] || TYPE_META.other;
+  return (
+    <a
+      className="sh-res-card"
+      href={resource.url}
+      target="_blank"
+      rel="noreferrer"
+    >
+      <span className={`sh-res-type-badge ${meta.cls}`}>
+        {meta.icon} {meta.label}
+      </span>
+      <div className="sh-res-title">{resource.title}</div>
+      {resource.description && <div className="sh-res-desc">{resource.description}</div>}
+      <span className="sh-res-course-badge">{resource.course}</span>
+      <span className="sh-res-link-row">
+        <ExternalLink size={12} /> Open resource
+      </span>
+    </a>
+  );
+}
+
+/* ════════════════════════════════════════════════════════
+   MAIN STUDY HUB PAGE
+════════════════════════════════════════════════════════ */
 export default function Library() {
-  const { user } = useContext(UserContext);
-  const isAdmin = user?.role === "admin" || user?.role === "superadmin";
+  const { user }  = useContext(UserContext);
+  const isAdmin   = user?.role === "admin" || user?.role === "superadmin";
   const { disabled, loading: checkingFlag } = usePageEnabled("disableLibrary", isAdmin);
   const { searchQuery } = useOutletContext();
   const toast = useToast();
 
-  const [books,       setBooks]       = useState([]);
-  const [courses,     setCourses]     = useState([]);
-  const [loading,     setLoading]     = useState(true);
-  const [activeCourse,setActiveCourse]= useState(null); // null = show all courses
-  const [openBook,    setOpenBook]    = useState(null); // book being read
-  const [localSearch, setLocalSearch] = useState("");
-  const [bookmarked,  setBookmarked]  = useState(
-    () => new Set(getBookmarks("book").map(b => String(b._id)))
-  );
+  /* ── Data ── */
+  const [flashcards, setFlashcards] = useState([]);
+  const [notes,      setNotes]      = useState([]);
+  const [resources,  setResources]  = useState([]);
+  const [courses,    setCourses]    = useState([]);
+  const [loading,    setLoading]    = useState(true);
 
-  useEffect(() => {
+  /* ── UI state ── */
+  const [activeTab,    setActiveTab]    = useState("flashcards"); // flashcards | notes | resources
+  const [activeCourse, setActiveCourse] = useState(null);         // null = All
+  const [localSearch,  setLocalSearch]  = useState("");
+  const [studiedSet,   setStudiedSet]   = useState(() => getStudied());
+
+  /* ── Fetch ── */
+  const fetchAll = useCallback(() => {
     if (disabled) return;
-    Promise.all([api.get("library/books"), api.get("library/courses")])
-      .then(([b, c]) => { setBooks(b.data); setCourses(c.data); })
-      .catch(() => toast("Failed to load library", "error"))
-      .finally(() => setLoading(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled]);
+    setLoading(true);
+    api.get("studyhub/all")
+      .then(r => {
+        const { flashcards: fc = [], notes: n = [], resources: res = [] } = r.data;
+        setFlashcards(fc);
+        setNotes(n);
+        setResources(res);
 
-  const handleBookmark = (book) => {
-    const added = toggleBookmark("book", book);
-    setBookmarked(prev => {
+        // Derive unique courses from all content
+        const allCourses = new Set([
+          ...fc.map(x => x.course),
+          ...n.map(x => x.course),
+          ...res.map(x => x.course),
+        ]);
+        setCourses([...allCourses].filter(Boolean).sort());
+      })
+      .catch(() => toast("Failed to load Study Hub", "error"))
+      .finally(() => setLoading(false));
+  }, [disabled, toast]);
+
+  useEffect(() => { fetchAll(); }, [fetchAll]);
+
+  /* ── Studied toggle ── */
+  const toggleStudied = useCallback((id) => {
+    setStudiedSet(prev => {
       const next = new Set(prev);
-      added ? next.add(String(book._id)) : next.delete(String(book._id));
+      if (next.has(id)) { next.delete(id); toast("Removed from studied", "info"); }
+      else              { next.add(id);    toast("Marked as studied ✓", "success"); }
+      saveStudied(next);
       return next;
     });
-    toast(added ? "🔖 Saved!" : "Removed from saved", added ? "success" : "info");
-  };
+  }, [toast]);
 
+  /* ── Early returns ── */
   if (checkingFlag) return null;
-  if (disabled) return <MaintenanceScreen pageName="Study Library" />;
+  if (disabled)     return <MaintenanceScreen pageName="Study Hub" />;
 
-  /* ─── READER VIEW ─── */
-  if (openBook) {
-    const rawUrl = getFileUrl(openBook.fileUrl);
-    const secure = rawUrl.replace("http://", "https://");
-    return (
-      <div style={{ display:"flex", flexDirection:"column", height:"calc(100vh - 64px)" }}>
+  /* ── Filter helpers ── */
+  const q = (localSearch || searchQuery || "").toLowerCase().trim();
 
-        {/* Reader header — single action bar */}
-        <div style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 16px",
-          background:"white", borderBottom:"1px solid #e2e8f0", flexShrink:0, flexWrap:"wrap" }}>
-          <button onClick={() => setOpenBook(null)}
-            style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 14px",
-              borderRadius:8, border:"1px solid #e2e8f0", background:"#f8fafc",
-              color:"#0f172a", cursor:"pointer", fontWeight:600, fontSize:".82rem" }}>
-            <ArrowLeft size={15}/> Back
-          </button>
-          <div style={{ flex:1, minWidth:0 }}>
-            <div style={{ fontWeight:700, fontSize:".9rem", color:"#0f172a",
-              overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{openBook.title}</div>
-            {openBook.course && <div style={{ fontSize:".72rem", color:"#64748b" }}>{openBook.course}</div>}
-          </div>
-          <a href={secure} target="_blank" rel="noreferrer"
-            style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 14px",
-              borderRadius:8, border:"1px solid #e2e8f0", background:"white",
-              color:"#0f172a", textDecoration:"none", fontWeight:600, fontSize:".82rem" }}>
-            <ExternalLink size={13}/> Open tab
-          </a>
-          <a href={secure} download target="_blank" rel="noreferrer"
-            style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 14px",
-              borderRadius:8, border:"none", background:"#10b981",
-              color:"white", textDecoration:"none", fontWeight:700, fontSize:".82rem" }}>
-            <Download size={13}/> Download
-          </a>
-        </div>
-
-        {/* Viewer */}
-        <div style={{ flex:1, overflow:"hidden" }}>
-          <PdfjsViewer url={rawUrl} />
-        </div>
-      </div>
-    );
-  }
-
-  /* ─── BROWSE VIEW ─── */
-  const query = (localSearch || searchQuery || "").toLowerCase();
-
-  // Course list (from courses endpoint, fallback to distinct book courses)
-  const courseList = courses.length
-    ? courses.map(c => c.name || c)
-    : [...new Set(books.map(b => b.course).filter(Boolean))];
-
-  // Books to show
-  const filtered = books.filter(b => {
-    const matchSearch = !query
-      || b.title?.toLowerCase().includes(query)
-      || b.author?.toLowerCase().includes(query);
-    const matchCourse = !activeCourse || b.course === activeCourse;
-    return matchSearch && matchCourse;
+  const filteredFC = flashcards.filter(c => {
+    const matchCourse = !activeCourse || c.course === activeCourse;
+    const matchSearch = !q || c.question.toLowerCase().includes(q) || c.answer.toLowerCase().includes(q);
+    return matchCourse && matchSearch;
   });
 
-  return (
-    <div className="library-wrapper" style={{ padding:"0 0 40px" }}>
+  const filteredNotes = notes.filter(n => {
+    const matchCourse = !activeCourse || n.course === activeCourse;
+    const matchSearch = !q || n.title.toLowerCase().includes(q) || n.body.toLowerCase().includes(q);
+    return matchCourse && matchSearch;
+  });
 
-      {/* ── Top bar ── */}
-      <div style={{ display:"flex", alignItems:"center", gap:12, padding:"20px 0 18px",
-        flexWrap:"wrap" }}>
-        <div style={{ display:"flex", alignItems:"center", gap:8, flex:1 }}>
-          <GraduationCap size={22} color="#10b981"/>
-          <h1 style={{ margin:0, fontSize:"1.2rem", fontWeight:800, color:"var(--text,#0f172a)" }}>
-            Study Library
-          </h1>
+  const filteredRes = resources.filter(r => {
+    const matchCourse = !activeCourse || r.course === activeCourse;
+    const matchSearch = !q || r.title.toLowerCase().includes(q) || (r.description || "").toLowerCase().includes(q);
+    return matchCourse && matchSearch;
+  });
+
+  /* ── Progress (flashcards only) ── */
+  const studiedCount = filteredFC.filter(c => studiedSet.has(c._id)).length;
+  const totalFC      = filteredFC.length;
+
+  /* ════ RENDER ════ */
+  return (
+    <div className="sh-wrapper">
+
+      {/* ─── Header ─── */}
+      <div className="sh-header">
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}>
+          <GraduationCap size={22} color="#10b981" />
+          <h1 className="sh-title">Study Hub</h1>
         </div>
-        <div style={{ position:"relative" }}>
-          <Search size={14} style={{ position:"absolute", left:10, top:"50%",
-            transform:"translateY(-50%)", color:"#94a3b8" }}/>
-          <input value={localSearch} onChange={e=>setLocalSearch(e.target.value)}
-            placeholder="Search books…"
-            style={{ paddingLeft:32, paddingRight:12, height:36, borderRadius:10,
-              border:"1px solid #e2e8f0", background:"#f8fafc", fontSize:".85rem",
-              outline:"none", width:200 }}/>
+        <div className="sh-search">
+          <Search size={14} />
+          <input
+            value={localSearch}
+            onChange={e => setLocalSearch(e.target.value)}
+            placeholder="Search content…"
+          />
         </div>
       </div>
 
-      {/* ── Course filter ── */}
-      <div style={{ display:"flex", gap:8, flexWrap:"wrap", marginBottom:20 }}>
-        <button onClick={()=>setActiveCourse(null)}
-          style={{ padding:"6px 16px", borderRadius:99, fontSize:".78rem", fontWeight:700,
-            border:"none", cursor:"pointer",
-            background: activeCourse===null ? "#10b981" : "#f1f5f9",
-            color: activeCourse===null ? "white" : "#475569" }}>
-          All
-        </button>
-        {courseList.map(name => (
-          <button key={name} onClick={()=>setActiveCourse(name)}
-            style={{ padding:"6px 16px", borderRadius:99, fontSize:".78rem", fontWeight:700,
-              border:"none", cursor:"pointer",
-              background: activeCourse===name ? "#10b981" : "#f1f5f9",
-              color: activeCourse===name ? "white" : "#475569" }}>
-            {name}
-          </button>
+      {/* ─── Course filter pills ─── */}
+      <div className="sh-pills">
+        <button className={`sh-pill${!activeCourse ? " active" : ""}`} onClick={() => setActiveCourse(null)}>All</button>
+        {courses.map(c => (
+          <button
+            key={c}
+            className={`sh-pill${activeCourse === c ? " active" : ""}`}
+            onClick={() => setActiveCourse(c)}
+          >{c}</button>
         ))}
       </div>
 
-      {/* ── Grid ── */}
-      {loading ? (
-        <div className="library-books-grid">
-          {[...Array(6)].map((_,i) => <Skeleton key={i}/>)}
-        </div>
-      ) : filtered.length === 0 ? (
-        <div style={{ textAlign:"center", padding:"60px 24px", color:"#64748b" }}>
-          <div style={{ fontSize:"2.5rem", marginBottom:12 }}>📚</div>
-          <div style={{ fontWeight:700, marginBottom:6 }}>No books found</div>
-          <div style={{ fontSize:".85rem" }}>Try a different search or course filter</div>
-        </div>
-      ) : (
-        <div className="library-books-grid">
-          {filtered.map(book => (
-            <BookCard key={book._id}
-              book={book}
-              bookmarked={bookmarked.has(String(book._id))}
-              onOpen={setOpenBook}
-              onBookmark={handleBookmark}
-            />
-          ))}
+      {/* ─── Tabs ─── */}
+      <div className="sh-tabs">
+        <button className={`sh-tab${activeTab === "flashcards" ? " active" : ""}`} onClick={() => setActiveTab("flashcards")}>
+          <Layers size={15} /> Flashcards
+          <span className="sh-tab-count">{filteredFC.length}</span>
+        </button>
+        <button className={`sh-tab${activeTab === "notes" ? " active" : ""}`} onClick={() => setActiveTab("notes")}>
+          <BookOpen size={15} /> Quick Notes
+          <span className="sh-tab-count">{filteredNotes.length}</span>
+        </button>
+        <button className={`sh-tab${activeTab === "resources" ? " active" : ""}`} onClick={() => setActiveTab("resources")}>
+          <Link2 size={15} /> Resources
+          <span className="sh-tab-count">{filteredRes.length}</span>
+        </button>
+      </div>
+
+      {/* ─── Flashcard progress bar ─── */}
+      {activeTab === "flashcards" && totalFC > 0 && (
+        <div className="sh-progress-bar">
+          <span className="sh-progress-label">Today's Progress</span>
+          <div className="sh-progress-track">
+            <div className="sh-progress-fill" style={{ width: `${(studiedCount / totalFC) * 100}%` }} />
+          </div>
+          <span className="sh-progress-count">{studiedCount}/{totalFC} studied</span>
         </div>
       )}
+
+      {/* ─── Loading ─── */}
+      {loading && <SkeletonGrid count={6} />}
+
+      {/* ─── FLASHCARDS TAB ─── */}
+      {!loading && activeTab === "flashcards" && (
+        filteredFC.length === 0
+          ? <EmptyState icon="🃏" title="No flashcards yet" sub={q ? "Try a different search term" : "Flashcards for this course will appear here once added by your instructor."} />
+          : (
+            <div className="sh-flashcard-grid">
+              {filteredFC.map(card => (
+                <FlashCard
+                  key={card._id}
+                  card={card}
+                  studied={studiedSet.has(card._id)}
+                  onToggleStudied={toggleStudied}
+                />
+              ))}
+            </div>
+          )
+      )}
+
+      {/* ─── NOTES TAB ─── */}
+      {!loading && activeTab === "notes" && (
+        filteredNotes.length === 0
+          ? <EmptyState icon="📝" title="No notes yet" sub={q ? "Try a different search term" : "Your instructor's study notes will appear here."} />
+          : (
+            <div className="sh-notes-grid">
+              {filteredNotes.map(n => <NoteCard key={n._id} note={n} />)}
+            </div>
+          )
+      )}
+
+      {/* ─── RESOURCES TAB ─── */}
+      {!loading && activeTab === "resources" && (
+        filteredRes.length === 0
+          ? <EmptyState icon="🔗" title="No resources yet" sub={q ? "Try a different search term" : "Curated videos, articles, and tools will be added here by your instructor."} />
+          : (
+            <div className="sh-resources-grid">
+              {filteredRes.map(r => <ResourceCard key={r._id} resource={r} />)}
+            </div>
+          )
+      )}
+
     </div>
   );
 }

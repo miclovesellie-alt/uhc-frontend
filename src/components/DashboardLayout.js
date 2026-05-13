@@ -64,7 +64,7 @@ function DashboardLayout() {
 
   const navItems = [
     { icon: <Home         size={18}/>, label: "Home",       path: "/dashboard" },
-    { icon: <BookOpen     size={18}/>, label: "Library",    path: "/library"   },
+    { icon: <BookOpen     size={18}/>, label: "Study Hub",  path: "/library"   },
     { icon: <ClipboardList size={18}/>, label: "Quiz",      path: "/quiz"      },
     { icon: <PenSquare    size={18}/>, label: "Submit",     path: "/submit"    },
     { icon: <Trophy       size={18}/>, label: "Ranks",      path: "/leaderboard" },

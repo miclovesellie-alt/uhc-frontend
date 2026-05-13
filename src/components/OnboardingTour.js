@@ -15,8 +15,8 @@ const STEPS = [
   },
   {
     icon: '📚',
-    title: 'Study Library',
-    desc: 'Access course materials, textbooks, and resources organised by subject. Bookmark your favourites!',
+    title: 'Study Hub',
+    desc: 'Access flashcards, quick notes, and curated resources organised by course. Flip cards to test yourself!',
     highlight: null,
   },
   {

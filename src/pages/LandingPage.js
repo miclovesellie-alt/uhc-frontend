@@ -2,11 +2,21 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
 import { motion } from "framer-motion";
-import { BookOpen, Zap, TrendingUp, Trophy, ArrowRight, Lock, Star, CheckCircle2, Menu, X } from "lucide-react";
+import { BookOpen, Zap, TrendingUp, Trophy, ArrowRight, Lock, Star, CheckCircle2, Menu, X, RotateCcw, Layers } from "lucide-react";
 import "../styles/landingpage.css";
 import graduation from "../assets/graduation.jpeg";
 
 /* ─── Static data ──────────────────────────────────────────────── */
+/* ── Study Hub Demo Flashcards (visible to all, crawlable by Google) ── */
+const FLASHCARD_DEMO = [
+  { id:1, course:"Pharmacology",   emoji:"💊", q:"Before giving digoxin (Lanoxin), which finding requires withholding the dose?",          a:"Apical pulse below 60 bpm. Hold the dose and notify the provider immediately." },
+  { id:2, course:"Med-Surg",       emoji:"🩺", q:"A patient's potassium is 6.8 mEq/L. What is the nurse's priority action?",                  a:"Notify the provider and prepare for treatment — this is life-threatening hyperkalaemia." },
+  { id:3, course:"Maternal-Newborn",emoji:"👶", q:"Late decelerations appear on the fetal monitor. What is the priority nursing action?",       a:"Reposition to left lateral, increase IV fluids, apply O₂, and notify the provider." },
+  { id:4, course:"Psychiatric",     emoji:"🧠", q:"A patient on lithium reports nausea, tremors and confusion. What does the nurse suspect?",   a:"Lithium toxicity. Hold the dose, check serum lithium level, and notify the physician." },
+  { id:5, course:"Pediatric",       emoji:"🧒", q:"A 4-year-old presents with high-pitched stridor and drooling. Suspected epiglottitis. Priority?", a:"Keep the child calm and upright. Do NOT examine the throat. Call for immediate airway support." },
+  { id:6, course:"Fundamentals",    emoji:"📋", q:"What is the five rights of medication administration?",                                       a:"Right patient, right drug, right dose, right route, right time — plus right documentation." },
+];
+
 const QUIZ_DATA = [
   { course: "Med-Surg", questions: [
     { q: "A diabetic patient has fasting blood glucose of 285 mg/dL. Priority intervention?", options: ["A. Administer scheduled insulin", "B. Encourage fluids only", "C. Notify physician immediately", "D. Recheck in 30 minutes"] },
@@ -37,7 +47,7 @@ const QUIZ_DATA = [
 
 const FEATURES = [
   { icon: <Zap size={22}/>, title: "Adaptive Quizzes",       desc: "Smart question banks that focus on your weak areas across every nursing course." },
-  { icon: <BookOpen size={22}/>, title: "Study Library",      desc: "Clinical guides, lecture notes, and exam prep documents from qualified instructors." },
+  { icon: <BookOpen size={22}/>, title: "Study Hub",         desc: "Flashcards, quick notes, and curated resources organised by course — study smarter, not harder." },
   { icon: <TrendingUp size={22}/>, title: "Progress Analytics", desc: "Score history, course breakdowns, and trend charts to visualise your growth." },
   { icon: <Trophy size={22}/>, title: "Leaderboard & Points", desc: "Earn points for every quiz and compete with peers on the national leaderboard." },
 ];
@@ -50,8 +60,123 @@ const LEADERS_FALLBACK = [
   { rank:5, name:"Ama B.",  score:3980,  badge:"⭐" },
 ];
 
+/* ─── Landing Flashcard Demo ────────────────────────────────────── */
+function LandingFlashcards({ navigate }) {
+  const courses = ["All", ...new Set(FLASHCARD_DEMO.map(c => c.course))];
+  const [activeCourse, setActiveCourse] = useState("All");
+  const [flipped, setFlipped] = useState({});
+
+  const filtered = activeCourse === "All"
+    ? FLASHCARD_DEMO
+    : FLASHCARD_DEMO.filter(c => c.course === activeCourse);
+
+  const toggleFlip = (id) => setFlipped(f => ({ ...f, [id]: !f[id] }));
+
+  return (
+    <div>
+      {/* Course pills */}
+      <div style={{ display:"flex", gap:8, flexWrap:"wrap", justifyContent:"center", marginBottom:32 }}>
+        {courses.map(c => (
+          <button key={c} onClick={() => setActiveCourse(c)}
+            style={{ padding:"6px 18px", borderRadius:99, fontWeight:700, fontSize:".78rem",
+              border:"none", cursor:"pointer",
+              background: activeCourse===c ? "#10b981" : "#e2e8f0",
+              color: activeCourse===c ? "white" : "#475569",
+              transition:"all .18s" }}>
+            {c}
+          </button>
+        ))}
+      </div>
+
+      {/* Card grid — content fully visible to Google (questions in DOM always) */}
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(270px,1fr))", gap:20 }}>
+        {filtered.map(card => (
+          <div key={card.id}
+            onClick={() => toggleFlip(card.id)}
+            title="Click to flip"
+            style={{ perspective:1000, height:200, cursor:"pointer" }}>
+            <div style={{
+              width:"100%", height:"100%", position:"relative",
+              transformStyle:"preserve-3d",
+              transition:"transform .55s cubic-bezier(.4,0,.2,1)",
+              transform: flipped[card.id] ? "rotateY(180deg)" : "none",
+              borderRadius:16,
+            }}>
+              {/* FRONT */}
+              <div style={{
+                position:"absolute", inset:0, backfaceVisibility:"hidden",
+                WebkitBackfaceVisibility:"hidden",
+                background:"white", border:"1px solid #e2e8f0",
+                borderRadius:16, padding:"18px 20px",
+                boxShadow:"0 2px 10px rgba(0,0,0,0.06)",
+                display:"flex", flexDirection:"column", justifyContent:"space-between",
+              }}>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                  <span style={{ fontSize:"1.4rem" }}>{card.emoji}</span>
+                  <span style={{ fontSize:".68rem", fontWeight:700, color:"#10b981",
+                    background:"rgba(16,185,129,.1)", padding:"3px 10px", borderRadius:99 }}>
+                    {card.course}
+                  </span>
+                </div>
+                <p style={{ fontSize:".88rem", fontWeight:700, color:"#0f172a",
+                  lineHeight:1.55, margin:"10px 0 0", flex:1,
+                  display:"flex", alignItems:"center" }}>
+                  {card.q}
+                </p>
+                <div style={{ fontSize:".7rem", color:"#94a3b8", display:"flex",
+                  alignItems:"center", gap:4, marginTop:10 }}>
+                  <RotateCcw size={11}/> Tap to reveal answer
+                </div>
+              </div>
+
+              {/* BACK */}
+              <div style={{
+                position:"absolute", inset:0, backfaceVisibility:"hidden",
+                WebkitBackfaceVisibility:"hidden",
+                transform:"rotateY(180deg)",
+                background:"linear-gradient(135deg,#0f172a,#1e293b)",
+                borderRadius:16, padding:"18px 20px",
+                boxShadow:"0 2px 10px rgba(0,0,0,0.12)",
+                display:"flex", flexDirection:"column", justifyContent:"space-between",
+              }}>
+                <div style={{ fontSize:".68rem", fontWeight:700,
+                  textTransform:"uppercase", letterSpacing:".06em", color:"#10b981" }}>
+                  ✦ Answer
+                </div>
+                <p style={{ fontSize:".88rem", fontWeight:600, color:"#f1f5f9",
+                  lineHeight:1.65, flex:1, display:"flex", alignItems:"center",
+                  margin:"10px 0" }}>
+                  {card.a}
+                </p>
+                <div style={{ fontSize:".7rem", color:"#64748b", textAlign:"right" }}>
+                  Tap to flip back
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* CTA under the cards */}
+      <div style={{ textAlign:"center", marginTop:40 }}>
+        <p style={{ color:"#64748b", fontSize:".9rem", marginBottom:16 }}>
+          🔒 Sign up free to unlock <strong>hundreds more flashcards</strong>, notes &amp; resources across all nursing courses.
+        </p>
+        <button onClick={() => navigate("/auth")}
+          style={{ padding:"12px 32px", background:"#10b981", color:"white",
+            border:"none", borderRadius:12, fontWeight:800, fontSize:".95rem",
+            cursor:"pointer", display:"inline-flex", alignItems:"center", gap:10,
+            boxShadow:"0 4px 16px rgba(16,185,129,.35)" }}>
+          <Layers size={16}/> Access Full Study Hub Free →
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Component ────────────────────────────────────────────────── */
 export default function LandingPage() {
+
   const navigate = useNavigate();
   const [scrolled,        setScrolled]        = useState(false);
   const [mobileOpen,      setMobileOpen]       = useState(false);
@@ -127,7 +252,7 @@ export default function LandingPage() {
         </div>
         <div className={`landing-nav-links ${mobileOpen ? "active" : ""}`}>
           <span className="nav-link" onClick={() => { navigate("/auth"); setMobileOpen(false); }}>Quizzes</span>
-          <span className="nav-link" onClick={() => { navigate("/auth"); setMobileOpen(false); }}>Library</span>
+          <span className="nav-link" onClick={() => { navigate("/auth"); setMobileOpen(false); }}>Study Hub</span>
           <span className="nav-link" onClick={() => { navigate("/auth"); setMobileOpen(false); }}>Leaderboard</span>
         </div>
         <div className="landing-nav-right">
@@ -147,11 +272,11 @@ export default function LandingPage() {
             <h1>Study Smarter.<br /><span className="highlight">Pass Your Exams.</span></h1>
             <p style={{ color:"var(--text-secondary)", fontSize:"1.05rem", lineHeight:1.75, margin:"20px 0 32px", maxWidth:480 }}>
               UHC Academy gives nursing students in Ghana &amp; Africa access to adaptive quizzes,
-              a curated study library, and a live national leaderboard — completely free.
+              a Study Hub with flashcards and notes, and a live national leaderboard — completely free.
             </p>
             <div className="hero-actions">
               <button className="hero-btn" onClick={() => navigate("/auth")}>Create Free Account</button>
-              <button className="hero-btn-secondary" onClick={() => navigate("/auth")}>Browse Library</button>
+              <button className="hero-btn-secondary" onClick={() => navigate("/auth")}>Open Study Hub</button>
             </div>
           </motion.div>
         </div>
@@ -283,7 +408,23 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ════════════════ LEADERBOARD ════════════════ */}
+      {/* ════════════════ STUDY HUB DEMO ════════════════ */}
+      <section style={{ padding:"80px 24px", background:"#f8fafc", borderTop:"1px solid #e2e8f0" }}>
+        <div style={{ maxWidth:900, margin:"0 auto" }}>
+          <div style={{ textAlign:"center", marginBottom:44 }}>
+            <span className="section-label">🎓 Study Hub Preview</span>
+            <h2 className="section-title">Flip a Card. Learn Something.</h2>
+            <p style={{ color:"var(--text-secondary)", fontSize:".95rem", maxWidth:520, margin:"10px auto 0" }}>
+              Our Study Hub has interactive flashcards across every nursing course.
+              Tap a card below to reveal the answer — then sign up to access the full set.
+            </p>
+          </div>
+
+          {/* Course pills */}
+          <LandingFlashcards navigate={navigate} />
+        </div>
+      </section>
+
       <section className="lb-section">
         <div className="lb-grid">
           <div>
@@ -356,7 +497,7 @@ export default function LandingPage() {
             <div style={{ padding:"28px 32px", background:"rgba(255,255,255,.12)",
               borderRadius:20, backdropFilter:"blur(10px)", border:"1px solid rgba(255,255,255,.2)",
               maxWidth:300, width:"100%" }}>
-              {["✅ Adaptive quiz system","📚 Full study library","🏆 Leaderboard & points","📊 Progress analytics","📱 Mobile-friendly"].map((t,i) => (
+              {["✅ Adaptive quiz system","🎓 Study Hub (flashcards & notes)","🏆 Leaderboard & points","📊 Progress analytics","📱 Mobile-friendly"].map((t,i) => (
                 <div key={i} style={{ color:"white", fontWeight:600, fontSize:".9rem", marginBottom:12 }}>{t}</div>
               ))}
             </div>
@@ -395,7 +536,7 @@ export default function LandingPage() {
             <h4>Platform</h4>
             <ul>
               <li><a href="/auth">Quiz Library</a></li>
-              <li><a href="/auth">Study Library</a></li>
+              <li><a href="/auth">Study Hub</a></li>
               <li><a href="/auth">Leaderboard</a></li>
               <li><a href="/auth">My Analytics</a></li>
             </ul>

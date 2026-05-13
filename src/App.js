@@ -17,8 +17,6 @@ import ProfilePage from "./components/ProfilePage";
 
 // ===== LIBRARY IMPORTS =====
 import Library from "./pages/Library";
-import TopicPage from "./pages/TopicPage";
-import BookViewer from "./pages/BookViewer";
 
 // ===== OTHER PAGE IMPORTS =====
 import FYP from "./components/FYP";
@@ -158,10 +156,8 @@ function AppRoutes() {
           element={<ProfilePage user={user} setUser={setUser} />}
         />
 
-        {/* ===== LIBRARY ===== */}
+        {/* ===== LIBRARY / STUDY HUB ===== */}
         <Route path="/library" element={<Library />} />
-        <Route path="/library/view/:id" element={<BookViewer />} />
-        <Route path="/library/:topic" element={<TopicPage />} />
 
         {/* ===== SEARCH ===== */}
         <Route path="/search" element={<SearchPage />} />

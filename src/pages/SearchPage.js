@@ -5,7 +5,7 @@ import api from '../api/api';
 import { SkeletonLine } from '../components/Skeleton';
 import '../styles/dashboard.css';
 
-const TABS = ['All', 'Library', 'Feed', 'Courses'];
+const TABS = ['All', 'Study Hub', 'Feed', 'Courses'];
 
 export default function SearchPage() {
   const [params] = useSearchParams();
@@ -24,16 +24,26 @@ export default function SearchPage() {
   const doSearch = async (q) => {
     setLoading(true);
     try {
-      const [booksRes, postsRes, coursesRes] = await Promise.allSettled([
-        api.get('library/books'),
+      const [hubRes, postsRes, coursesRes] = await Promise.allSettled([
+        api.get('studyhub/all'),
         api.get('admin/feed'),
         api.get('courses'),
       ]);
 
       const q_lower = q.toLowerCase();
 
-      const books = (booksRes.status === 'fulfilled' ? booksRes.value.data : [])
-        .filter(b => b.title?.toLowerCase().includes(q_lower) || b.author?.toLowerCase().includes(q_lower));
+      const { flashcards = [], notes = [], resources = [] } =
+        hubRes.status === 'fulfilled' ? hubRes.value.data : {};
+
+      // Search across all Study Hub content, shape to a common format
+      const books = [
+        ...flashcards.filter(c => c.question?.toLowerCase().includes(q_lower) || c.answer?.toLowerCase().includes(q_lower))
+          .map(c => ({ _id: c._id, title: c.question, author: '🃏 Flashcard', course: c.course })),
+        ...notes.filter(n => n.title?.toLowerCase().includes(q_lower) || n.body?.toLowerCase().includes(q_lower))
+          .map(n => ({ _id: n._id, title: n.title, author: '📝 Note', course: n.course })),
+        ...resources.filter(r => r.title?.toLowerCase().includes(q_lower) || r.description?.toLowerCase().includes(q_lower))
+          .map(r => ({ _id: r._id, title: r.title, author: '🔗 Resource', course: r.course })),
+      ];
 
       const posts = (postsRes.status === 'fulfilled' ? postsRes.value.data : [])
         .filter(p => p.title?.toLowerCase().includes(q_lower) || p.content?.toLowerCase().includes(q_lower));
@@ -51,9 +61,9 @@ export default function SearchPage() {
 
   const allCount = results.books.length + results.posts.length + results.courses.length;
 
-  const filteredBooks   = tab === 'All' || tab === 'Library'  ? results.books   : [];
-  const filteredPosts   = tab === 'All' || tab === 'Feed'     ? results.posts   : [];
-  const filteredCourses = tab === 'All' || tab === 'Courses'  ? results.courses : [];
+  const filteredBooks   = tab === 'All' || tab === 'Study Hub' ? results.books   : [];
+  const filteredPosts   = tab === 'All' || tab === 'Feed'      ? results.posts   : [];
+  const filteredCourses = tab === 'All' || tab === 'Courses'   ? results.courses : [];
 
   const noResults = !loading && allCount === 0 && query;
 
@@ -129,17 +139,16 @@ export default function SearchPage() {
         </div>
       )}
 
-      {/* Books */}
       {!loading && filteredBooks.length > 0 && (
-        <Section icon={<BookOpen size={16} />} title="Library Books" count={filteredBooks.length}>
-          {filteredBooks.map(book => (
+        <Section icon={<BookOpen size={16} />} title="Study Hub" count={filteredBooks.length}>
+          {filteredBooks.map(item => (
             <ResultCard
-              key={book._id}
-              icon="📖"
-              title={book.title}
-              subtitle={book.author || 'Unknown Author'}
-              badge={book.course}
-              onClick={() => navigate(`/library/view/${book._id}`)}
+              key={item._id}
+              icon={item.author?.startsWith('🃏') ? '🃏' : item.author?.startsWith('📝') ? '📝' : '🔗'}
+              title={item.title}
+              subtitle={item.author}
+              badge={item.course}
+              onClick={() => navigate('/library')}
             />
           ))}
         </Section>

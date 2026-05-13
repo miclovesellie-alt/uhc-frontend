@@ -14,7 +14,7 @@ function AdminSidebar() {
         </NavLink>
         <NavLink to="/admin/users">Users</NavLink>
         <NavLink to="/admin/questions">Questions</NavLink>
-        <NavLink to="/admin/userlibrary">User Library</NavLink>
+        <NavLink to="/admin/userlibrary">Study Hub</NavLink>
         <NavLink to="/admin/uploads">Bulk Upload</NavLink>
         <NavLink to="/admin/notifications">Notifications</NavLink>
         <NavLink to="/admin/messages">Messages</NavLink>
