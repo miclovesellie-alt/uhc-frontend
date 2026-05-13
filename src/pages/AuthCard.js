@@ -9,10 +9,13 @@ function AuthCard() {
   const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
 
-  const [activePage, setActivePage] = useState("login"); // login | signup | reset
+  const [activePage, setActivePage] = useState("login"); // login | signup | reset | verify-pending
   const [signupStep, setSignupStep] = useState(1); // 1, 2, 3
   const [loginMode, setLoginMode] = useState("email"); // email | phone
   const [signupMode, setSignupMode] = useState("email"); // email | phone
+  const [pendingEmail, setPendingEmail] = useState(""); // email waiting for verification
+  const [resendMsg,   setResendMsg]   = useState("");
+  const [resendLoading, setResendLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "", email: "", phone: "", phonePrefix: "+233",
@@ -107,12 +110,18 @@ function AuthCard() {
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("userId", user._id);
       setUser(user);
-      // Show health splash for 2s before redirecting
       setShowSplash(true);
       const dest = (user.role === "admin" || user.role === "superadmin") ? "/admin" : "/dashboard";
       setTimeout(() => navigate(dest), 2000);
     } catch (err) {
-      setError(err.response?.data?.message || "Invalid credentials");
+      const data = err.response?.data;
+      // Unverified email — show the verify-pending screen
+      if (data?.requiresVerification) {
+        setPendingEmail(data.email || formData.email);
+        setActivePage("verify-pending");
+        return;
+      }
+      setError(data?.message || "Invalid credentials");
     }
   };
 
@@ -128,7 +137,7 @@ function AuthCard() {
     if (!formData.category) { setError("Please select a category!"); return; }
 
     try {
-      await api.post("auth/signup", {
+      const res = await api.post("auth/signup", {
         name: formData.name,
         email: formData.email,
         phone: formData.phonePrefix + formData.phone,
@@ -136,9 +145,13 @@ function AuthCard() {
         category: formData.category,
         country: formData.country,
       });
-      setSuccess("Account created! Redirecting to login...");
-      setFormData({ name:"", email:"", phone:"", phonePrefix:"+233", password:"", confirmPassword:"", category:"", country:"" });
-      setTimeout(() => { setActivePage("login"); setSignupStep(1); }, 2000);
+      // Backend now returns { requiresVerification: true, email }
+      if (res.data.requiresVerification) {
+        setPendingEmail(res.data.email || formData.email);
+        setFormData({ name:"", email:"", phone:"", phonePrefix:"+233", password:"", confirmPassword:"", category:"", country:"" });
+        setSignupStep(1);
+        setActivePage("verify-pending");
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Signup failed");
     }
@@ -476,7 +489,64 @@ function AuthCard() {
             </>
           )}
 
-          {/* ===== RESET PASSWORD ===== */}
+          {/* ===== VERIFY PENDING ===== */}
+          {activePage === "verify-pending" && (
+            <>
+              <div style={{ textAlign: "center", padding: "8px 0 24px" }}>
+                <div style={{ width: 72, height: 72, borderRadius: "50%",
+                  background: "linear-gradient(135deg,rgba(16,185,129,0.12),rgba(14,165,233,0.12))",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "2rem", margin: "0 auto 20px"
+                }}>📧</div>
+                <h1 className="auth-title">Check Your Email</h1>
+                <p className="auth-subtitle" style={{ marginBottom: 0 }}>
+                  We sent a verification link to<br />
+                  <strong style={{ color: "#0f172a" }}>{pendingEmail}</strong>
+                </p>
+              </div>
+
+              <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 14,
+                padding: "16px 20px", marginBottom: 20, fontSize: "0.84rem", color: "#475569", lineHeight: 1.6
+              }}>
+                <strong>What to do next:</strong>
+                <ol style={{ margin: "8px 0 0", paddingLeft: 18 }}>
+                  <li>Open your inbox for <strong>{pendingEmail}</strong></li>
+                  <li>Click the <strong>"Verify My Email"</strong> button in the email</li>
+                  <li>You'll be redirected back to log in</li>
+                </ol>
+              </div>
+
+              {resendMsg && (
+                <p style={{ color: "#10b981", fontSize: "0.82rem", fontWeight: 700, textAlign: "center", marginBottom: 12 }}>
+                  {resendMsg}
+                </p>
+              )}
+
+              <button
+                className="auth-button"
+                disabled={resendLoading}
+                onClick={async () => {
+                  setResendLoading(true); setResendMsg("");
+                  try {
+                    const r = await api.post("auth/resend-verification", { email: pendingEmail });
+                    setResendMsg(r.data.message || "New link sent!");
+                  } catch { setResendMsg("Failed to resend. Try again."); }
+                  finally { setResendLoading(false); }
+                }}
+              >
+                {resendLoading ? "Sending…" : "Resend Verification Email"}
+              </button>
+
+              <button
+                className="auth-button-secondary"
+                style={{ marginTop: 10 }}
+                onClick={() => { setActivePage("login"); setError(""); setSuccess(""); }}
+              >
+                ← Back to Login
+              </button>
+            </>
+          )}
+
           {activePage === "reset" && (
             <>
               <button className="auth-back-btn" onClick={() => { setActivePage("login"); setResetSubmitted(false); setError(""); setSuccess(""); }}>

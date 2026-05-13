@@ -54,6 +54,7 @@ import AdminLayout from "./admin/components/AdminLayout";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import AdminRecovery from "./pages/AdminRecovery";
+import VerifyEmail  from "./pages/VerifyEmail";
 
 function AppRoutes() {
   const { user, setUser } = useContext(UserContext);
@@ -103,6 +104,17 @@ function AppRoutes() {
       {/* ===== PASSWORD RESET PAGES ===== */}
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
+
+      {/* ===== EMAIL VERIFICATION ===== */}
+      <Route path="/verify-email" element={<VerifyEmail />} />
+
+      {/* /login alias — VerifyEmail redirects here after success */}
+      <Route path="/login" element={
+        <motion.div initial="initial" animate="animate" exit="exit"
+          variants={pageVariants} transition={pageTransition} style={{ minHeight: '100vh' }}>
+          <AuthCard />
+        </motion.div>
+      } />
 
       {/* ===== ADMIN RECOVERY (hidden, unlinked from login page) ===== */}
       <Route path="/admin-recovery" element={<AdminRecovery />} />
