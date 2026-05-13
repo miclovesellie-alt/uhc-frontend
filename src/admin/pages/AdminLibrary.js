@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from "../../api/api";
 import {
   Book, Plus, Trash2, Search, BookOpen, FileUp, Download, EyeOff,
-  Layers, Link2, CreditCard
+  Layers, CreditCard
 } from "lucide-react";
 import "../../admin_styles/AdminLibrary.css";
 
