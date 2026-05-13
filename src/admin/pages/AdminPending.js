@@ -4,7 +4,7 @@ import { CheckCircle, XCircle, BookOpen, FileText, RefreshCw, Eye, CheckSquare }
 import { getFileUrl } from "../../utils/config";
 
 export default function AdminPending() {
-  const [data, setData]       = useState({ books: [], posts: [] });
+  const [data, setData]       = useState({ books: [], posts: [], flashcards: [] });
   const [loading, setLoading] = useState(true);
   const [tab, setTab]         = useState("books");
   const [toast, setToast]     = useState(null);
@@ -54,14 +54,14 @@ export default function AdminPending() {
   };
 
   const bulkApprove = async () => {
-    const type = tab === "books" ? "book" : "feed";
+    const type = tab === "books" ? "book" : tab === "flashcards" ? "flashcard" : "feed";
     await Promise.all([...selected].map(id => api.patch(`submissions/${type}/${id}/approve`).catch(()=>{})));
     showToast(`Approved ${selected.size} item(s)!`);
     load();
   };
 
   const bulkReject = async () => {
-    const type = tab === "books" ? "book" : "feed";
+    const type = tab === "books" ? "book" : tab === "flashcards" ? "flashcard" : "feed";
     await Promise.all([...selected].map(id =>
       api.patch(`submissions/${type}/${id}/reject`, { reason: "Bulk rejected — does not meet guidelines" }).catch(()=>{})
     ));
@@ -72,8 +72,8 @@ export default function AdminPending() {
   const googleDocsPreview = (fileUrl) =>
     `https://docs.google.com/viewer?url=${encodeURIComponent(getFileUrl(fileUrl))}&embedded=false`;
 
-  const totalPending = data.books.length + data.posts.length;
-  const currentItems = tab === "books" ? data.books : data.posts;
+  const totalPending = data.books.length + data.posts.length + (data.flashcards||[]).length;
+  const currentItems = tab === "books" ? data.books : tab === "flashcards" ? (data.flashcards||[]) : data.posts;
 
   return (
     <div className="admin-page">
@@ -90,7 +90,7 @@ export default function AdminPending() {
             ⏳ Pending Review
             {totalPending > 0 && <span style={{ marginLeft:10,fontSize:".8rem",fontWeight:700,background:"#ef4444",color:"white",padding:"2px 10px",borderRadius:20 }}>{totalPending}</span>}
           </h1>
-          <p style={{ color:"var(--admin-muted)",fontSize:".82rem",margin:"4px 0 0" }}>Review and approve user-submitted books and posts</p>
+          <p style={{ color:"var(--admin-muted)",fontSize:".82rem",margin:"4px 0 0" }}>Review and approve user-submitted flashcards and posts</p>
         </div>
         <button className="admin-btn secondary sm" onClick={load} disabled={loading}>
           <RefreshCw size={13}/> Refresh
@@ -99,7 +99,7 @@ export default function AdminPending() {
 
       {/* Tabs */}
       <div style={{ display:"flex",gap:8,marginBottom:16 }}>
-        {[["books","📚 Books",data.books.length],["posts","📰 Posts",data.posts.length]].map(([t,l,c])=>(
+        {[["flashcards","🃏 Flashcards",(data.flashcards||[]).length],["posts","📰 Posts",data.posts.length],["books","📂 Books",data.books.length]].map(([t,l,c])=>(
           <button key={t} onClick={()=>{ setTab(t); setSelected(new Set()); }} className={tab===t?"admin-btn primary sm":"admin-btn secondary sm"}>
             {l} {c>0&&<span style={{ marginLeft:6,background:tab===t?"rgba(255,255,255,.3)":"rgba(66,85,255,.15)",borderRadius:20,padding:"1px 8px",fontSize:".72rem",fontWeight:700 }}>{c}</span>}
           </button>
@@ -140,22 +140,38 @@ export default function AdminPending() {
               {/* Checkbox */}
               <input type="checkbox" checked={selected.has(item._id)} onChange={()=>toggleSelect(item._id)}
                 style={{ marginTop:4,width:16,height:16,cursor:"pointer",accentColor:"#4255ff" }}/>
-              <div style={{ width:44,height:44,borderRadius:12,background:tab==="books"?"rgba(66,85,255,.1)":"rgba(22,163,74,.1)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0 }}>
-                {tab==="books" ? <BookOpen size={20} color="#4255ff"/> : <FileText size={20} color="#16a34a"/>}
+              <div style={{ width:44,height:44,borderRadius:12,
+                background: tab==="flashcards" ? "rgba(16,185,129,.1)" : tab==="books" ? "rgba(66,85,255,.1)" : "rgba(22,163,74,.1)",
+                display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:"1.3rem" }}>
+                {tab==="flashcards" ? "🃏" : tab==="books" ? <BookOpen size={20} color="#4255ff"/> : <FileText size={20} color="#16a34a"/>}
               </div>
               <div style={{ flex:1,minWidth:0 }}>
-                <div style={{ fontWeight:700,fontSize:".95rem" }}>{item.title}</div>
-                <div style={{ fontSize:".78rem",color:"var(--admin-muted)",marginTop:3 }}>
-                  By {item.submittedBy?.name||"Unknown"} {item.submittedBy?.email ? `(${item.submittedBy.email})` : ""} · {item.course || item.category} · {new Date(item.createdAt).toLocaleDateString()}
-                </div>
-                {(item.description || item.content) && (
-                  <div style={{ fontSize:".82rem",color:"var(--admin-text)",marginTop:5,lineHeight:1.5,maxHeight:72,overflow:"hidden" }}>
-                    {item.description || item.content}
-                  </div>
-                )}
-                {/* Post image preview */}
-                {item.image && (
-                  <img src={item.image} alt="preview" style={{ marginTop:8,borderRadius:8,maxHeight:100,maxWidth:"100%",objectFit:"cover" }}/>
+                {tab === "flashcards" ? (
+                  <>
+                    <div style={{ fontWeight:700,fontSize:".95rem",marginBottom:4 }}>{item.question}</div>
+                    <div style={{ fontSize:".8rem",color:"var(--admin-muted)",marginBottom:4 }}>
+                      By {item.submittedBy?.name||"Unknown"} · {item.course} · {new Date(item.createdAt).toLocaleDateString()}
+                    </div>
+                    <div style={{ padding:"10px 12px",borderRadius:10,background:"rgba(16,185,129,.07)",border:"1px solid rgba(16,185,129,.15)",fontSize:".85rem",fontWeight:600,color:"#065f46",lineHeight:1.5 }}>
+                      ✦ {item.answer}
+                    </div>
+                    {item.hint && <div style={{ fontSize:".78rem",color:"var(--admin-muted)",marginTop:5,fontStyle:"italic" }}>💡 {item.hint}</div>}
+                  </>
+                ) : (
+                  <>
+                    <div style={{ fontWeight:700,fontSize:".95rem" }}>{item.title}</div>
+                    <div style={{ fontSize:".78rem",color:"var(--admin-muted)",marginTop:3 }}>
+                      By {item.submittedBy?.name||"Unknown"} {item.submittedBy?.email ? `(${item.submittedBy.email})` : ""} · {item.course || item.category} · {new Date(item.createdAt).toLocaleDateString()}
+                    </div>
+                    {(item.description || item.content) && (
+                      <div style={{ fontSize:".82rem",color:"var(--admin-text)",marginTop:5,lineHeight:1.5,maxHeight:72,overflow:"hidden" }}>
+                        {item.description || item.content}
+                      </div>
+                    )}
+                    {item.image && (
+                      <img src={item.image} alt="preview" style={{ marginTop:8,borderRadius:8,maxHeight:100,maxWidth:"100%",objectFit:"cover" }}/>
+                    )}
+                  </>
                 )}
                 <div style={{ marginTop:10,display:"flex",gap:8,flexWrap:"wrap" }}>
                   {tab === "books" && (
@@ -164,10 +180,10 @@ export default function AdminPending() {
                       <Eye size={12}/> Preview
                     </a>
                   )}
-                  <button className="admin-btn primary sm" onClick={()=>approve(tab==="books"?"book":"feed", item._id)}>
+                  <button className="admin-btn primary sm" onClick={()=>approve(tab==="books"?"book":tab==="flashcards"?"flashcard":"feed", item._id)}>
                     <CheckCircle size={13}/> Approve
                   </button>
-                  <button className="admin-btn danger sm" onClick={()=>{ setRejectModal({type:tab==="books"?"book":"feed",id:item._id}); setRejectReason(""); }}>
+                  <button className="admin-btn danger sm" onClick={()=>{ setRejectModal({type:tab==="books"?"book":tab==="flashcards"?"flashcard":"feed",id:item._id}); setRejectReason(""); }}>
                     <XCircle size={13}/> Reject
                   </button>
                 </div>
