@@ -18,6 +18,7 @@ function AdminSidebar() {
         <NavLink to="/admin/uploads">Bulk Upload</NavLink>
         <NavLink to="/admin/notifications">Notifications</NavLink>
         <NavLink to="/admin/messages">Messages</NavLink>
+        <NavLink to="/admin/institutions">Institutions</NavLink>
         <NavLink to="/admin/settings">Settings</NavLink>
       </nav>
     </div>

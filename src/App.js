@@ -40,6 +40,7 @@ import AdminRecycleBin from "./admin/pages/AdminRecycleBin";
 import DuplicateQuestions from "./admin/pages/DuplicateQuestions";
 import AdminAnnouncements from "./admin/pages/AdminAnnouncements";
 import AdminPending from "./admin/pages/AdminPending";
+import AdminInstitutions from "./admin/pages/AdminInstitutions";
 
 // ===== USER PAGES =====
 import Leaderboard from "./pages/Leaderboard";
@@ -130,6 +131,7 @@ function AppRoutes() {
         <Route path="duplicates"    element={<DuplicateQuestions />} />
         <Route path="announcements" element={<AdminAnnouncements />} />
         <Route path="pending"       element={<AdminPending />} />
+        <Route path="institutions"   element={<AdminInstitutions />} />
       </Route>
 
       {/* ===== DASHBOARD LAYOUT WRAPPER ===== */}

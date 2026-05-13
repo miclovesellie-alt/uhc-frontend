@@ -1,14 +1,17 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef, useCallback } from "react";
 import { UserContext } from "../context/UserContext";
 import { 
   FaPencilAlt, FaMedal, FaStar, FaTrophy, FaCog, FaMoon, FaSun, FaGlobe, 
   FaLock, FaTimes, FaCheckCircle, FaUser, FaEnvelope, FaMapMarkerAlt, 
-  FaUserGraduate 
+  FaUserGraduate, FaHospital, FaSearch, FaPlus
 } from "react-icons/fa";
 import "../styles/profile.css";
 import countries from "../data/countries";
 import api from "../api/api";
 import { getBookmarks } from "../utils/bookmarks";
+
+/* ── Institution categories that show the picker ── */
+const INSTITUTION_CATEGORIES = ["Health Tutor", "Nurse", "Doctor", "Other Health Worker"];
 
 const avatarGradient = (name = "") => {
   const palettes = [
@@ -21,11 +24,73 @@ const avatarGradient = (name = "") => {
 
 function ProfilePage({ user, setUser }) {
   const { theme, setTheme } = useContext(UserContext);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing]   = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [language, setLanguage] = useState(localStorage.getItem("language") || "English");
-  const [resetSent, setResetSent] = useState(false);
+  const [language, setLanguage]     = useState(localStorage.getItem("language") || "English");
+  const [resetSent, setResetSent]   = useState(false);
   const [leaderboard, setLeaderboard] = useState([]);
+
+  /* ── Institution picker state ── */
+  const [instSearch,     setInstSearch]     = useState("");
+  const [instResults,    setInstResults]    = useState([]);
+  const [instLoading,    setInstLoading]    = useState(false);
+  const [instSuggesting, setInstSuggesting] = useState(false); // show "add new" form
+  const [instSaveMsg,    setInstSaveMsg]    = useState("");
+  const [newInstName,    setNewInstName]    = useState("");
+  const [newInstType,    setNewInstType]    = useState("school");
+  const instDebounce = useRef(null);
+
+  const showInstPicker = INSTITUTION_CATEGORIES.includes(user?.category);
+
+  /* Search institutions from API */
+  const searchInstitutions = useCallback((q) => {
+    if (!q || q.length < 2) { setInstResults([]); return; }
+    clearTimeout(instDebounce.current);
+    instDebounce.current = setTimeout(() => {
+      setInstLoading(true);
+      api.get(`/institutions?q=${encodeURIComponent(q)}`)
+        .then(r => setInstResults(r.data))
+        .catch(() => {})
+        .finally(() => setInstLoading(false));
+    }, 350);
+  }, []);
+
+  const handleSelectInstitution = async (inst) => {
+    try {
+      await api.patch(`/institutions/select/${inst._id}`);
+      setUser(prev => ({ ...prev, institution: inst }));
+      setInstSearch(inst.name);
+      setInstResults([]);
+      setInstSaveMsg("Institution saved ✓");
+      setTimeout(() => setInstSaveMsg(""), 3000);
+    } catch (e) { alert(e.response?.data?.error || "Failed to set institution."); }
+  };
+
+  const handleClearInstitution = async () => {
+    if (!window.confirm("Remove your institution from your profile?")) return;
+    try {
+      await api.patch("/institutions/clear");
+      setUser(prev => ({ ...prev, institution: null }));
+      setInstSearch("");
+      setInstSaveMsg("Institution cleared.");
+      setTimeout(() => setInstSaveMsg(""), 3000);
+    } catch (e) { alert("Failed to clear institution."); }
+  };
+
+  const handleSuggestInstitution = async () => {
+    if (!newInstName.trim()) return;
+    try {
+      const r = await api.post("/institutions/suggest", { name: newInstName.trim(), type: newInstType, country: user.country });
+      if (r.data.existing) {
+        await handleSelectInstitution(r.data.institution);
+      } else {
+        setInstSaveMsg("Suggestion submitted! Admins will review it shortly.");
+        setTimeout(() => setInstSaveMsg(""), 5000);
+      }
+      setInstSuggesting(false);
+      setNewInstName("");
+    } catch (e) { alert(e.response?.data?.error || "Failed to submit suggestion."); }
+  };
 
   useEffect(() => {
     api.get("/user/leaderboard").then(res => setLeaderboard(res.data)).catch(err => console.error("Leaderboard error", err));
@@ -195,6 +260,110 @@ function ProfilePage({ user, setUser }) {
               </div>
             </div>
           </section>
+
+          {/* ── Institution Picker (tutors / health workers) ── */}
+          {showInstPicker && (
+            <section className="profile-grid-v2" style={{ marginTop: 0 }}>
+              <div className="info-card-v2" style={{ gridColumn: "1 / -1" }}>
+                <div className="card-icon"><FaHospital /></div>
+                <div className="card-body" style={{ width: "100%" }}>
+                  <label>School / Hospital</label>
+                  {user.institution ? (
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 6, flexWrap: "wrap" }}>
+                      <div style={{ flex: 1, fontWeight: 700, color: "var(--text-heading)", fontSize: "0.9rem" }}>
+                        🏥 {user.institution.name}
+                        <span style={{ marginLeft: 8, fontSize: "0.72rem", color: "var(--accent)", fontWeight: 600 }}>
+                          {user.institution.type} · {user.institution.country}
+                        </span>
+                        {user.institutionVerified && (
+                          <span style={{ marginLeft: 8, fontSize: "0.72rem", background: "rgba(16,185,129,0.12)", color: "#10b981", padding: "2px 8px", borderRadius: 99, fontWeight: 700 }}>✓ Verified</span>
+                        )}
+                      </div>
+                      <button
+                        onClick={handleClearInstitution}
+                        style={{ fontSize: "0.75rem", padding: "5px 12px", borderRadius: 8, border: "1px solid #ef4444", background: "rgba(239,68,68,0.08)", color: "#ef4444", cursor: "pointer", fontWeight: 700 }}
+                      >Remove</button>
+                    </div>
+                  ) : (
+                    <div style={{ width: "100%", marginTop: 6 }}>
+                      {/* Search bar */}
+                      <div style={{ position: "relative", marginBottom: 6 }}>
+                        <FaSearch style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#94a3b8", fontSize: "0.8rem" }} />
+                        <input
+                          style={{ width: "100%", padding: "9px 12px 9px 32px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg-input)", color: "var(--text-heading)", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" }}
+                          placeholder="Search your school or hospital…"
+                          value={instSearch}
+                          onChange={e => { setInstSearch(e.target.value); searchInstitutions(e.target.value); }}
+                        />
+                        {instLoading && <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: "0.72rem", color: "#94a3b8" }}>Searching…</span>}
+                      </div>
+
+                      {/* Dropdown results */}
+                      {instResults.length > 0 && (
+                        <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 12, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", marginBottom: 8, overflow: "hidden" }}>
+                          {instResults.map(inst => (
+                            <button
+                              key={inst._id}
+                              onClick={() => handleSelectInstitution(inst)}
+                              style={{ width: "100%", textAlign: "left", padding: "10px 16px", background: "none", border: "none", cursor: "pointer", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 10 }}
+                            >
+                              <span style={{ fontSize: "1.1rem" }}>{inst.type === "hospital" ? "🏥" : "🎓"}</span>
+                              <div>
+                                <div style={{ fontWeight: 700, fontSize: "0.87rem", color: "var(--text-heading)" }}>{inst.name}</div>
+                                <div style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>{inst.type} · {inst.country}</div>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Add new suggestion button */}
+                      {!instSuggesting ? (
+                        <button
+                          onClick={() => setInstSuggesting(true)}
+                          style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.78rem", fontWeight: 700, color: "var(--accent)", background: "none", border: "none", cursor: "pointer", padding: 0, marginTop: 2 }}
+                        >
+                          <FaPlus style={{ fontSize: "0.7rem" }} /> My institution isn't listed — suggest it
+                        </button>
+                      ) : (
+                        <div style={{ background: "var(--bg-input)", border: "1px solid var(--border)", borderRadius: 12, padding: "14px", marginTop: 4, display: "flex", flexDirection: "column", gap: 8 }}>
+                          <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text-heading)" }}>Suggest a new institution</div>
+                          <input
+                            style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text-heading)", fontSize: "0.85rem", outline: "none" }}
+                            placeholder="Full official name…"
+                            value={newInstName}
+                            onChange={e => setNewInstName(e.target.value)}
+                          />
+                          <select
+                            style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text-heading)", fontSize: "0.85rem" }}
+                            value={newInstType}
+                            onChange={e => setNewInstType(e.target.value)}
+                          >
+                            <option value="school">School / University</option>
+                            <option value="hospital">Hospital</option>
+                            <option value="clinic">Clinic</option>
+                            <option value="other">Other</option>
+                          </select>
+                          <div style={{ display: "flex", gap: 8 }}>
+                            <button onClick={handleSuggestInstitution}
+                              style={{ flex: 1, padding: "9px", borderRadius: 8, background: "var(--accent)", color: "white", border: "none", fontWeight: 700, fontSize: "0.82rem", cursor: "pointer" }}
+                            >Submit for review</button>
+                            <button onClick={() => setInstSuggesting(false)}
+                              style={{ padding: "9px 14px", borderRadius: 8, border: "1px solid var(--border)", background: "none", color: "var(--text-muted)", fontWeight: 700, fontSize: "0.82rem", cursor: "pointer" }}
+                            >Cancel</button>
+                          </div>
+                        </div>
+                      )}
+
+                      {instSaveMsg && (
+                        <div style={{ marginTop: 6, fontSize: "0.78rem", fontWeight: 700, color: "#10b981" }}>{instSaveMsg}</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+          )}
 
           {/* Additional Stats Section */}
           <section className="stats-section-v2">

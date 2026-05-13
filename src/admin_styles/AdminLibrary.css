@@ -279,3 +279,90 @@
   border-color: #fca5a5;
 }
 
+/* ══════════════════════════════════════════
+   al-*  Generic admin page layout classes
+   (AdminInstitutions, etc.)
+══════════════════════════════════════════ */
+.al-wrapper { padding: 0 0 60px; min-height: 70vh; }
+.al-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; margin-bottom: 28px; padding-bottom: 20px;
+  border-bottom: 1px solid var(--admin-border);
+}
+.al-header-left { display: flex; align-items: center; gap: 14px; }
+.al-title { margin: 0 0 4px; font-size: 1.2rem; font-weight: 800; color: var(--admin-text); }
+.al-subtitle { margin: 0; font-size: 0.82rem; color: var(--admin-muted); }
+.al-refresh-btn {
+  padding: 8px 12px; border-radius: 10px; border: 1px solid var(--admin-border);
+  background: var(--admin-card-bg); color: var(--admin-muted); cursor: pointer; transition: all 0.18s;
+}
+.al-refresh-btn:hover { border-color: var(--admin-accent); color: var(--admin-accent); }
+
+.al-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--admin-border); margin-bottom: 22px; }
+.al-tab {
+  display: flex; align-items: center; gap: 6px; padding: 10px 20px;
+  font-size: 0.85rem; font-weight: 700; color: var(--admin-muted);
+  background: none; border: none; border-bottom: 3px solid transparent;
+  margin-bottom: -2px; cursor: pointer; transition: all 0.18s; white-space: nowrap;
+}
+.al-tab.active { color: var(--admin-accent); border-bottom-color: var(--admin-accent); }
+.al-tab:hover:not(.active) { color: var(--admin-text); }
+.al-tab-badge {
+  background: #ef4444; color: white; font-size: 0.65rem; font-weight: 800;
+  padding: 2px 6px; border-radius: 99px;
+}
+
+.al-search-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.al-search-wrap { position: relative; flex: 1; max-width: 400px; }
+.al-search-wrap svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--admin-muted); }
+.al-search-wrap input {
+  width: 100%; padding: 9px 12px 9px 34px; border-radius: 10px;
+  border: 1px solid var(--admin-border); background: var(--admin-card-bg);
+  color: var(--admin-text); font-size: 0.85rem; outline: none;
+  transition: border-color 0.2s; box-sizing: border-box;
+}
+.al-search-wrap input:focus { border-color: var(--admin-accent); }
+
+.al-table-wrap {
+  overflow-x: auto; border-radius: 14px;
+  border: 1px solid var(--admin-border); background: var(--admin-card-bg);
+}
+.al-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.al-table th {
+  padding: 12px 16px; text-align: left; font-size: 0.72rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.06em; color: var(--admin-muted);
+  border-bottom: 1px solid var(--admin-border); background: rgba(0,0,0,0.02); white-space: nowrap;
+}
+.al-table td {
+  padding: 14px 16px; vertical-align: middle;
+  border-bottom: 1px solid var(--admin-border); color: var(--admin-text);
+}
+.al-table tbody tr:last-child td { border-bottom: none; }
+.al-table tbody tr:hover { background: rgba(66,85,255,0.03); }
+
+.al-status-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 0.7rem; font-weight: 800; text-transform: capitalize;
+  padding: 4px 10px; border-radius: 99px;
+}
+.al-status-pending  { background: rgba(245,158,11,0.12); color: #f59e0b; }
+.al-status-approved { background: rgba(16,185,129,0.12); color: #10b981; }
+.al-status-rejected { background: rgba(239,68,68,0.12);  color: #ef4444; }
+.al-type-badge { font-size: 0.78rem; font-weight: 600; color: var(--admin-muted); }
+
+.al-action-btn {
+  display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px;
+  border-radius: 8px; font-size: 0.75rem; font-weight: 700; cursor: pointer;
+  border: 1px solid var(--admin-border); background: var(--admin-card-bg);
+  color: var(--admin-text); transition: all 0.18s; white-space: nowrap;
+}
+.al-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.al-approve { border-color: rgba(16,185,129,0.4); color: #10b981; background: rgba(16,185,129,0.07); }
+.al-approve:hover:not(:disabled) { background: rgba(16,185,129,0.14); border-color: #10b981; }
+.al-delete  { border-color: rgba(239,68,68,0.4); color: #ef4444; background: rgba(239,68,68,0.07); }
+.al-delete:hover:not(:disabled)  { background: rgba(239,68,68,0.14); border-color: #ef4444; }
+
+.al-empty { text-align: center; padding: 60px 24px; color: var(--admin-muted); }
+.al-empty svg { margin-bottom: 14px; opacity: 0.4; }
+.al-empty p { margin: 0; font-size: 0.9rem; }
+.al-loading { text-align: center; padding: 50px; color: var(--admin-muted); font-size: 0.9rem; }

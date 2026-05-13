@@ -4,7 +4,8 @@ import { UserContext } from "../context/UserContext";
 import api from "../api/api";
 import {
   GraduationCap, Search, RotateCcw, ExternalLink, BookOpen,
-  Layers, Link2, ChevronDown, ChevronUp, Play, FileText, Wrench, HelpCircle
+  Layers, Link2, ChevronDown, ChevronUp, Play, FileText, Wrench,
+  HelpCircle, ChevronRight, BookMarked, ArrowLeft
 } from "lucide-react";
 import { useToast } from "../components/Toast";
 import { usePageEnabled, MaintenanceScreen } from "../hooks/usePageEnabled";
@@ -18,12 +19,53 @@ function getStudied()     { try { return new Set(JSON.parse(localStorage.getItem
 function saveStudied(set) { localStorage.setItem(STORAGE_KEY, JSON.stringify([...set])); }
 
 /* ════════════════════════════════════════════════════════
+   COURSE EMOJI MAP
+════════════════════════════════════════════════════════ */
+const COURSE_EMOJIS = {
+  "anatomy": "🫀", "physiology": "🧬", "pharmacology": "💊",
+  "microbiology": "🦠", "pathology": "🔬", "nursing": "🩺",
+  "surgery": "🔪", "pediatrics": "👶", "obstetrics": "🤰",
+  "psychiatry": "🧠", "cardiology": "❤️", "neurology": "🧠",
+  "dermatology": "🩹", "nutrition": "🥗", "health": "💉",
+  "community health": "🏘️", "biochemistry": "⚗️", "immunology": "🛡️",
+};
+function getCourseEmoji(courseName = "") {
+  const lower = courseName.toLowerCase();
+  for (const [key, emoji] of Object.entries(COURSE_EMOJIS)) {
+    if (lower.includes(key)) return emoji;
+  }
+  return "📚";
+}
+
+const COURSE_GRADIENTS = [
+  "linear-gradient(135deg,#10b981,#06b6d4)",
+  "linear-gradient(135deg,#4255ff,#8b5cf6)",
+  "linear-gradient(135deg,#f59e0b,#ef4444)",
+  "linear-gradient(135deg,#ec4899,#f43f5e)",
+  "linear-gradient(135deg,#06b6d4,#3b82f6)",
+  "linear-gradient(135deg,#8b5cf6,#ec4899)",
+  "linear-gradient(135deg,#10b981,#4255ff)",
+  "linear-gradient(135deg,#f59e0b,#10b981)",
+];
+function getCourseGradient(idx) {
+  return COURSE_GRADIENTS[idx % COURSE_GRADIENTS.length];
+}
+
+/* ════════════════════════════════════════════════════════
    SKELETON LOADER
 ════════════════════════════════════════════════════════ */
 function SkeletonGrid({ count = 6 }) {
   return (
     <div className="sh-flashcard-grid">
       {[...Array(count)].map((_, i) => <div key={i} className="sh-skeleton" />)}
+    </div>
+  );
+}
+
+function CourseSkeletonGrid() {
+  return (
+    <div className="sh-course-grid">
+      {[...Array(6)].map((_, i) => <div key={i} className="sh-course-skeleton" />)}
     </div>
   );
 }
@@ -38,6 +80,26 @@ function EmptyState({ icon, title, sub }) {
       <div className="sh-empty-title">{title}</div>
       <div className="sh-empty-sub">{sub}</div>
     </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════
+   COURSE SELECTION CARD
+════════════════════════════════════════════════════════ */
+function CourseCard({ course, count, gradient, emoji, onClick }) {
+  return (
+    <button className="sh-course-card" onClick={onClick}>
+      <div className="sh-course-card-top" style={{ background: gradient }}>
+        <span className="sh-course-card-emoji">{emoji}</span>
+        <span className="sh-course-card-count">{count} cards</span>
+      </div>
+      <div className="sh-course-card-body">
+        <div className="sh-course-card-name">{course}</div>
+        <div className="sh-course-card-cta">
+          Study now <ChevronRight size={14} />
+        </div>
+      </div>
+    </button>
   );
 }
 
@@ -147,6 +209,64 @@ function ResourceCard({ resource }) {
 }
 
 /* ════════════════════════════════════════════════════════
+   COURSE FLASHCARD VIEW  (shown after selecting a course)
+════════════════════════════════════════════════════════ */
+function CourseFlashcardView({ course, cards, studiedSet, onToggleStudied, onBack, searchQuery }) {
+  const q = (searchQuery || "").toLowerCase().trim();
+  const filtered = cards.filter(c =>
+    !q || c.question.toLowerCase().includes(q) || c.answer.toLowerCase().includes(q)
+  );
+  const studiedCount = filtered.filter(c => studiedSet.has(c._id)).length;
+  const total = filtered.length;
+
+  return (
+    <div>
+      {/* Back button + course header */}
+      <div className="sh-course-view-header">
+        <button className="sh-back-btn" onClick={onBack}>
+          <ArrowLeft size={16} /> All Courses
+        </button>
+        <div className="sh-course-view-title">
+          <span className="sh-course-view-emoji">{getCourseEmoji(course)}</span>
+          <div>
+            <div className="sh-course-view-name">{course}</div>
+            <div className="sh-course-view-sub">{total} flashcard{total !== 1 ? "s" : ""}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Progress bar */}
+      {total > 0 && (
+        <div className="sh-progress-bar">
+          <span className="sh-progress-label">Today's Progress</span>
+          <div className="sh-progress-track">
+            <div className="sh-progress-fill" style={{ width: `${total === 0 ? 0 : (studiedCount / total) * 100}%` }} />
+          </div>
+          <span className="sh-progress-count">{studiedCount}/{total} studied</span>
+        </div>
+      )}
+
+      {/* Cards */}
+      {total === 0
+        ? <EmptyState icon="🃏" title="No flashcards found" sub={q ? "Try a different search term" : "No flashcards available for this course yet."} />
+        : (
+          <div className="sh-flashcard-grid">
+            {filtered.map(card => (
+              <FlashCard
+                key={card._id}
+                card={card}
+                studied={studiedSet.has(card._id)}
+                onToggleStudied={onToggleStudied}
+              />
+            ))}
+          </div>
+        )
+      }
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════
    MAIN STUDY HUB PAGE
 ════════════════════════════════════════════════════════ */
 export default function Library() {
@@ -160,14 +280,15 @@ export default function Library() {
   const [flashcards, setFlashcards] = useState([]);
   const [notes,      setNotes]      = useState([]);
   const [resources,  setResources]  = useState([]);
-  const [courses,    setCourses]    = useState([]);
+  const [courses,    setCourses]    = useState([]); // derived unique course names
   const [loading,    setLoading]    = useState(true);
 
   /* ── UI state ── */
-  const [activeTab,    setActiveTab]    = useState("flashcards"); // flashcards | notes | resources
-  const [activeCourse, setActiveCourse] = useState(null);         // null = All
-  const [localSearch,  setLocalSearch]  = useState("");
-  const [studiedSet,   setStudiedSet]   = useState(() => getStudied());
+  const [activeTab,      setActiveTab]      = useState("flashcards"); // flashcards | notes | resources
+  const [selectedCourse, setSelectedCourse] = useState(null);        // null = show course grid
+  const [activeCourse,   setActiveCourse]   = useState(null);        // for notes/resources filter
+  const [localSearch,    setLocalSearch]    = useState("");
+  const [studiedSet,     setStudiedSet]     = useState(() => getStudied());
 
   /* ── Fetch ── */
   const fetchAll = useCallback(() => {
@@ -180,9 +301,11 @@ export default function Library() {
         setNotes(n);
         setResources(res);
 
-        // Derive unique courses from all content
+        // Derive unique courses from flashcards (for the course selection view)
+        const fcCourses = [...new Set(fc.map(x => x.course).filter(Boolean))].sort();
+        // All content courses for notes/resources filter
         const allCourses = new Set([
-          ...fc.map(x => x.course),
+          ...fcCourses,
           ...n.map(x => x.course),
           ...res.map(x => x.course),
         ]);
@@ -212,11 +335,24 @@ export default function Library() {
   /* ── Filter helpers ── */
   const q = (localSearch || searchQuery || "").toLowerCase().trim();
 
-  const filteredFC = flashcards.filter(c => {
-    const matchCourse = !activeCourse || c.course === activeCourse;
-    const matchSearch = !q || c.question.toLowerCase().includes(q) || c.answer.toLowerCase().includes(q);
-    return matchCourse && matchSearch;
+  // Group flashcards by course
+  const flashcardsByCourse = {};
+  flashcards.forEach(card => {
+    if (!card.course) return;
+    if (!flashcardsByCourse[card.course]) flashcardsByCourse[card.course] = [];
+    flashcardsByCourse[card.course].push(card);
   });
+  const fcCourseList = Object.keys(flashcardsByCourse).sort();
+
+  // Filter course list if there's a search query (on course selection screen)
+  const filteredFcCourses = q
+    ? fcCourseList.filter(c => {
+        const hasMatch = flashcardsByCourse[c].some(card =>
+          card.question.toLowerCase().includes(q) || card.answer.toLowerCase().includes(q)
+        );
+        return c.toLowerCase().includes(q) || hasMatch;
+      })
+    : fcCourseList;
 
   const filteredNotes = notes.filter(n => {
     const matchCourse = !activeCourse || n.course === activeCourse;
@@ -230,11 +366,7 @@ export default function Library() {
     return matchCourse && matchSearch;
   });
 
-  /* ── Progress (flashcards only) ── */
-  const studiedCount = filteredFC.filter(c => studiedSet.has(c._id)).length;
-  const totalFC      = filteredFC.length;
-
-  /* ════ RENDER ════ */
+  /* ═══ RENDER ═══ */
   return (
     <div className="sh-wrapper">
 
@@ -254,86 +386,145 @@ export default function Library() {
         </div>
       </div>
 
-      {/* ─── Course filter pills ─── */}
-      <div className="sh-pills">
-        <button className={`sh-pill${!activeCourse ? " active" : ""}`} onClick={() => setActiveCourse(null)}>All</button>
-        {courses.map(c => (
-          <button
-            key={c}
-            className={`sh-pill${activeCourse === c ? " active" : ""}`}
-            onClick={() => setActiveCourse(c)}
-          >{c}</button>
-        ))}
-      </div>
-
       {/* ─── Tabs ─── */}
       <div className="sh-tabs">
-        <button className={`sh-tab${activeTab === "flashcards" ? " active" : ""}`} onClick={() => setActiveTab("flashcards")}>
+        <button
+          className={`sh-tab${activeTab === "flashcards" ? " active" : ""}`}
+          onClick={() => { setActiveTab("flashcards"); setSelectedCourse(null); }}
+        >
           <Layers size={15} /> Flashcards
-          <span className="sh-tab-count">{filteredFC.length}</span>
+          <span className="sh-tab-count">{flashcards.length}</span>
         </button>
-        <button className={`sh-tab${activeTab === "notes" ? " active" : ""}`} onClick={() => setActiveTab("notes")}>
+        <button
+          className={`sh-tab${activeTab === "notes" ? " active" : ""}`}
+          onClick={() => { setActiveTab("notes"); setSelectedCourse(null); }}
+        >
           <BookOpen size={15} /> Quick Notes
           <span className="sh-tab-count">{filteredNotes.length}</span>
         </button>
-        <button className={`sh-tab${activeTab === "resources" ? " active" : ""}`} onClick={() => setActiveTab("resources")}>
+        <button
+          className={`sh-tab${activeTab === "resources" ? " active" : ""}`}
+          onClick={() => { setActiveTab("resources"); setSelectedCourse(null); }}
+        >
           <Link2 size={15} /> Resources
           <span className="sh-tab-count">{filteredRes.length}</span>
         </button>
       </div>
 
-      {/* ─── Flashcard progress bar ─── */}
-      {activeTab === "flashcards" && totalFC > 0 && (
-        <div className="sh-progress-bar">
-          <span className="sh-progress-label">Today's Progress</span>
-          <div className="sh-progress-track">
-            <div className="sh-progress-fill" style={{ width: `${(studiedCount / totalFC) * 100}%` }} />
+      {/* ─── Loading ─── */}
+      {loading && activeTab === "flashcards" && <CourseSkeletonGrid />}
+      {loading && activeTab !== "flashcards" && <SkeletonGrid count={6} />}
+
+      {/* ═══════════════════════════════════════════
+          FLASHCARDS TAB
+      ═══════════════════════════════════════════ */}
+      {!loading && activeTab === "flashcards" && (
+
+        selectedCourse ? (
+          /* ── Individual course view ── */
+          <CourseFlashcardView
+            course={selectedCourse}
+            cards={flashcardsByCourse[selectedCourse] || []}
+            studiedSet={studiedSet}
+            onToggleStudied={toggleStudied}
+            onBack={() => setSelectedCourse(null)}
+            searchQuery={localSearch || searchQuery}
+          />
+        ) : (
+          /* ── Course selection grid ── */
+          <div>
+            {/* Course selection hero */}
+            <div className="sh-course-hero">
+              <div className="sh-course-hero-icon">
+                <BookMarked size={28} color="#10b981" />
+              </div>
+              <div>
+                <div className="sh-course-hero-title">Choose a Course to Study</div>
+                <div className="sh-course-hero-sub">
+                  {fcCourseList.length} course{fcCourseList.length !== 1 ? "s" : ""} available
+                  · {flashcards.length} total flashcards
+                </div>
+              </div>
+            </div>
+
+            {filteredFcCourses.length === 0 ? (
+              <EmptyState
+                icon="🃏"
+                title={q ? "No courses match your search" : "No flashcards yet"}
+                sub={q ? "Try a different keyword" : "Your instructor will add flashcards soon. Check back later!"}
+              />
+            ) : (
+              <div className="sh-course-grid">
+                {filteredFcCourses.map((course, idx) => (
+                  <CourseCard
+                    key={course}
+                    course={course}
+                    count={flashcardsByCourse[course].length}
+                    gradient={getCourseGradient(idx)}
+                    emoji={getCourseEmoji(course)}
+                    onClick={() => setSelectedCourse(course)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-          <span className="sh-progress-count">{studiedCount}/{totalFC} studied</span>
+        )
+      )}
+
+      {/* ═══════════════════════════════════════════
+          NOTES TAB
+      ═══════════════════════════════════════════ */}
+      {!loading && activeTab === "notes" && (
+        <div>
+          {/* Course filter pills for notes */}
+          <div className="sh-pills" style={{ marginBottom: 24 }}>
+            <button className={`sh-pill${!activeCourse ? " active" : ""}`} onClick={() => setActiveCourse(null)}>All</button>
+            {courses.map(c => (
+              <button
+                key={c}
+                className={`sh-pill${activeCourse === c ? " active" : ""}`}
+                onClick={() => setActiveCourse(c)}
+              >{c}</button>
+            ))}
+          </div>
+
+          {filteredNotes.length === 0
+            ? <EmptyState icon="📝" title="No notes yet" sub={q ? "Try a different search term" : "Your instructor's study notes will appear here."} />
+            : (
+              <div className="sh-notes-grid">
+                {filteredNotes.map(n => <NoteCard key={n._id} note={n} />)}
+              </div>
+            )
+          }
         </div>
       )}
 
-      {/* ─── Loading ─── */}
-      {loading && <SkeletonGrid count={6} />}
-
-      {/* ─── FLASHCARDS TAB ─── */}
-      {!loading && activeTab === "flashcards" && (
-        filteredFC.length === 0
-          ? <EmptyState icon="🃏" title="No flashcards yet" sub={q ? "Try a different search term" : "Flashcards for this course will appear here once added by your instructor."} />
-          : (
-            <div className="sh-flashcard-grid">
-              {filteredFC.map(card => (
-                <FlashCard
-                  key={card._id}
-                  card={card}
-                  studied={studiedSet.has(card._id)}
-                  onToggleStudied={toggleStudied}
-                />
-              ))}
-            </div>
-          )
-      )}
-
-      {/* ─── NOTES TAB ─── */}
-      {!loading && activeTab === "notes" && (
-        filteredNotes.length === 0
-          ? <EmptyState icon="📝" title="No notes yet" sub={q ? "Try a different search term" : "Your instructor's study notes will appear here."} />
-          : (
-            <div className="sh-notes-grid">
-              {filteredNotes.map(n => <NoteCard key={n._id} note={n} />)}
-            </div>
-          )
-      )}
-
-      {/* ─── RESOURCES TAB ─── */}
+      {/* ═══════════════════════════════════════════
+          RESOURCES TAB
+      ═══════════════════════════════════════════ */}
       {!loading && activeTab === "resources" && (
-        filteredRes.length === 0
-          ? <EmptyState icon="🔗" title="No resources yet" sub={q ? "Try a different search term" : "Curated videos, articles, and tools will be added here by your instructor."} />
-          : (
-            <div className="sh-resources-grid">
-              {filteredRes.map(r => <ResourceCard key={r._id} resource={r} />)}
-            </div>
-          )
+        <div>
+          {/* Course filter pills for resources */}
+          <div className="sh-pills" style={{ marginBottom: 24 }}>
+            <button className={`sh-pill${!activeCourse ? " active" : ""}`} onClick={() => setActiveCourse(null)}>All</button>
+            {courses.map(c => (
+              <button
+                key={c}
+                className={`sh-pill${activeCourse === c ? " active" : ""}`}
+                onClick={() => setActiveCourse(c)}
+              >{c}</button>
+            ))}
+          </div>
+
+          {filteredRes.length === 0
+            ? <EmptyState icon="🔗" title="No resources yet" sub={q ? "Try a different search term" : "Curated videos, articles, and tools will be added here by your instructor."} />
+            : (
+              <div className="sh-resources-grid">
+                {filteredRes.map(r => <ResourceCard key={r._id} resource={r} />)}
+              </div>
+            )
+          }
+        </div>
       )}
 
     </div>
