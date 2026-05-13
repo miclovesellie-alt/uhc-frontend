@@ -277,7 +277,7 @@ function AuthCard() {
 
                 <div className="input-label-row">
                   <label className="input-label">Password</label>
-                  <span className="auth-forgot" onClick={() => setActivePage("reset")}>Forgot?</span>
+                  <span className="auth-forgot" onClick={() => navigate("/forgot-password")}>Forgot?</span>
                 </div>
                 <div className="password-wrapper">
                   <input
