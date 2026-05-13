@@ -4,27 +4,24 @@ import api from "../api/api";
 import "../styles/auth.css";
 
 const ForgotPassword = () => {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({ name: "", email: "", username: "" });
+  const navigate  = useNavigate();
+  const [email,   setEmail]   = useState("");
   const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [error,   setError]   = useState("");
   const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [sent,    setSent]    = useState(false);
 
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
-
-  const handleManualRequest = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
     setError("");
-
     try {
-      const response = await api.post("auth/manual-reset-request", formData);
-      setMessage(response.data.message || "Your request has been sent to the Admin.");
-      setSubmitted(true);
+      const res = await api.post("auth/forgot-password", { email });
+      setMessage(res.data.message || "Check your inbox for a reset link.");
+      setSent(true);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to send request. Please try again later.");
+      setError(err.response?.data?.message || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -39,58 +36,80 @@ const ForgotPassword = () => {
             <span className="back-label">Back to Login</span>
           </button>
 
-          <h1 className="auth-title">Password Reset Request</h1>
-          <p className="auth-subtitle">
-            {submitted 
-              ? "Your request has been received." 
-              : "Please fill out this form to request a manual password reset from the administrators."}
-          </p>
+          {/* Icon */}
+          <div style={{ textAlign: "center", margin: "8px 0 20px" }}>
+            <div style={{
+              width: 64, height: 64, borderRadius: "50%", margin: "0 auto 12px",
+              background: "linear-gradient(135deg,rgba(66,85,255,0.1),rgba(139,92,246,0.1))",
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.8rem"
+            }}>🔐</div>
+            <h1 className="auth-title" style={{ margin: 0 }}>
+              {sent ? "Check Your Inbox" : "Forgot Password?"}
+            </h1>
+            <p className="auth-subtitle" style={{ margin: "6px 0 0" }}>
+              {sent
+                ? `We sent a reset link to ${email}`
+                : "Enter your email and we'll send you a reset link instantly."}
+            </p>
+          </div>
 
           {message && <p className="success-text">{message}</p>}
-          {error && <p className="error-text">{error}</p>}
+          {error   && <p className="error-text">{error}</p>}
 
-          {!submitted ? (
-            <form onSubmit={handleManualRequest}>
-              <label className="input-label">Full Name</label>
-              <input
-                type="text"
-                name="name"
-                placeholder="John Doe"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
-
+          {!sent ? (
+            <form onSubmit={handleSubmit}>
               <label className="input-label">Email Address</label>
               <input
                 type="email"
-                name="email"
                 placeholder="user@example.com"
-                value={formData.email}
-                onChange={handleChange}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
+                autoFocus
               />
-
-              <label className="input-label">Username / Phone Number</label>
-              <input
-                type="text"
-                name="username"
-                placeholder="Enter your username or phone number"
-                value={formData.username}
-                onChange={handleChange}
-                required
-              />
-
-              <button type="submit" className="auth-button" disabled={loading} style={{ marginTop: "16px" }}>
-                {loading ? "Sending Request..." : "Submit Reset Request \u00a0\u2192"}
+              <button
+                type="submit"
+                className="auth-button"
+                disabled={loading}
+                style={{ marginTop: 20 }}
+              >
+                {loading ? "Sending…" : "Send Reset Link →"}
               </button>
             </form>
           ) : (
-            <button className="auth-button-secondary" onClick={() => navigate("/auth")} style={{ marginTop: "24px" }}>
-              Return to Login
-            </button>
+            <div style={{ marginTop: 8 }}>
+              {/* Resend */}
+              <button
+                className="auth-button"
+                disabled={loading}
+                onClick={async () => {
+                  setLoading(true); setError(""); setMessage("");
+                  try {
+                    const r = await api.post("auth/forgot-password", { email });
+                    setMessage(r.data.message || "New link sent!");
+                  } catch { setError("Failed to resend. Try again."); }
+                  finally { setLoading(false); }
+                }}
+              >
+                {loading ? "Sending…" : "Resend Reset Email"}
+              </button>
+              <button
+                className="auth-button-secondary"
+                style={{ marginTop: 10 }}
+                onClick={() => navigate("/auth")}
+              >
+                ← Back to Login
+              </button>
+            </div>
           )}
 
+          {/* Hint: spam folder */}
+          {sent && (
+            <p style={{ fontSize: "0.78rem", color: "#94a3b8", textAlign: "center", marginTop: 16, lineHeight: 1.5 }}>
+              Didn't receive it? Check your spam folder.<br />
+              The link expires in <strong>1 hour</strong>.
+            </p>
+          )}
         </div>
       </div>
     </div>

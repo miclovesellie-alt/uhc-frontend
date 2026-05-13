@@ -10,6 +10,67 @@ import {
   Search, BarChart2, ChevronRight, X, Bell, PenSquare, Trophy, Settings
 } from "lucide-react";
 
+function EmailVerifyBanner({ email }) {
+  const [dismissed, setDismissed] = useState(false);
+  const [sent,      setSent]      = useState(false);
+  const [loading,   setLoading]   = useState(false);
+
+  if (dismissed) return null;
+
+  const sendLink = async () => {
+    setLoading(true);
+    try {
+      await api.post("auth/resend-verification", { email });
+      setSent(true);
+    } catch { /* silent */ }
+    finally { setLoading(false); }
+  };
+
+  return (
+    <div style={{
+      background: "linear-gradient(135deg,#fef3c7,#fde68a)",
+      border: "1px solid #f59e0b",
+      borderRadius: 14,
+      padding: "14px 18px",
+      margin: "0 0 16px",
+      display: "flex",
+      alignItems: "center",
+      gap: 12,
+      flexWrap: "wrap",
+      boxShadow: "0 2px 8px rgba(245,158,11,0.12)",
+    }}>
+      <span style={{ fontSize: "1.2rem", flexShrink: 0 }}>⚠️</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <strong style={{ color: "#92400e", fontSize: "0.88rem" }}>Verify your email address</strong>
+        <div style={{ color: "#b45309", fontSize: "0.8rem", marginTop: 2 }}>
+          {sent
+            ? `✅ Verification link sent to ${email}. Check your inbox.`
+            : `Your account email (${email}) is unverified. Verify it to keep full access.`
+          }
+        </div>
+      </div>
+      {!sent && (
+        <button
+          onClick={sendLink}
+          disabled={loading}
+          style={{
+            padding: "7px 16px", background: "#f59e0b", color: "white",
+            border: "none", borderRadius: 8, fontWeight: 700, fontSize: "0.8rem",
+            cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap",
+          }}
+        >
+          {loading ? "Sending…" : "Send Verification Email"}
+        </button>
+      )}
+      <button
+        onClick={() => setDismissed(true)}
+        style={{ background: "none", border: "none", cursor: "pointer", color: "#b45309", fontSize: "1rem", flexShrink: 0, padding: "4px" }}
+        title="Dismiss"
+      >✕</button>
+    </div>
+  );
+}
+
 function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -217,6 +278,12 @@ function DashboardLayout() {
               <button className="uhc-announcement__close" onClick={() => setAnnouncementDismissed(true)}>✕</button>
             </div>
           )}
+
+          {/* ── Email Verification Caution Banner ── */}
+          {userObj && !userObj.isEmailVerified && (
+            <EmailVerifyBanner email={userObj.email} />
+          )}
+
           <Outlet context={{ searchQuery }} />
         </main>
       </div>
