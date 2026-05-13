@@ -59,8 +59,8 @@
   max-width: 1100px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 340px 1fr;
-  gap: 32px;
+  grid-template-columns: 320px 1fr;
+  gap: 28px;
   position: relative;
   z-index: 1;
 }
@@ -273,8 +273,8 @@
 /* Info Cards Grid */
 .profile-grid-v2 {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
 }
 
 .info-card-v2 {
@@ -446,30 +446,94 @@
 .dark-theme .card-body input,
 .dark-theme .card-body select { background: #0f172a; border-color: #334155; }
 
-/* Responsive */
-@media (max-width: 900px) {
-  .profile-container { grid-template-columns: 1fr; gap: 20px; }
-  .profile-sidebar { flex-direction: column; }
-  .profile-header-v2 { flex-direction: column; align-items: flex-start; gap: 20px; border-bottom-width: 1px; }
-  .header-text h1 { font-size: 2rem; }
-  .profile-avatar-card { padding: 24px 20px; border-radius: 24px; }
-  .info-card-v2 { padding: 16px; border-radius: 16px; gap: 14px; }
-  .card-icon { width: 40px; height: 40px; font-size: 1rem; }
-  .stats-section-v2 { padding: 20px; border-radius: 24px; }
-  .stat-pill { padding: 12px 16px; min-width: 120px; gap: 10px; }
-  .pill-val { font-size: 1.1rem; }
+/* ── Responsive ── */
+@media (max-width: 960px) {
+  .profile-container {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  /* On tablet, sidebar goes on top but stays horizontal */
+  .profile-sidebar {
+    flex-direction: row;
+    align-items: stretch;
+  }
+  .profile-avatar-card { flex: 1; }
+  .profile-settings-v2-btn { min-width: 160px; }
 }
 
-@media (max-width: 450px) {
-  .profile-page-v2 { padding: 20px 12px; }
-  .header-text h1 { font-size: 1.6rem; }
-  .header-text p { font-size: 0.9rem; }
-  .edit-toggle-v2 { width: 100%; justify-content: center; font-size: 0.85rem; padding: 10px; }
-  .profile-avatar-main { width: 100px; height: 100px; font-size: 3rem; }
-  .avatar-outer-ring { width: 130px; height: 130px; }
-  .points-number { font-size: 1.8rem; }
-  .stat-pill { flex: none; width: 100%; }
+@media (max-width: 700px) {
+  .profile-page-v2 { padding: 16px 12px 40px; }
+
+  .profile-container { gap: 16px; }
+
+  /* Sidebar stacks vertically again */
+  .profile-sidebar { flex-direction: column; gap: 14px; }
+
+  .profile-avatar-card { padding: 24px 20px; border-radius: 24px; }
+
+  .profile-header-v2 {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding-bottom: 18px;
+  }
+  .header-text h1 { font-size: 1.9rem; letter-spacing: -0.5px; }
+  .header-text p  { font-size: 0.95rem; }
+
+  .edit-toggle-v2 { width: 100%; justify-content: center; font-size: 0.88rem; padding: 11px 16px; }
+
+  .profile-grid-v2 { grid-template-columns: 1fr; gap: 12px; }
+  .info-card-v2 { padding: 16px; border-radius: 16px; gap: 14px; }
+  .card-icon { width: 40px; height: 40px; font-size: 1rem; border-radius: 12px; }
+
+  .stats-section-v2 { padding: 20px 16px; border-radius: 20px; }
+  .stats-mini-grid { gap: 10px; }
+  .stat-pill { padding: 12px 14px; min-width: 0; gap: 10px; flex: 1; }
+  .pill-val { font-size: 1.1rem; }
+
+  /* Leaderboard: prevent overflow */
+  .leaderboard-container { overflow-x: auto; }
+  .leaderboard-row { padding: 12px 14px; gap: 8px; min-width: 0; }
+
+  /* Settings modal full-screen on mobile */
+  .settings-overlay { padding: 0; align-items: flex-end; }
+  .settings-modal {
+    max-width: 100%;
+    border-radius: 28px 28px 0 0;
+    max-height: 90vh;
+  }
+  .settings-header { padding: 20px 24px; }
+  .settings-content { padding: 20px 24px; }
+  .settings-footer  { padding: 16px 24px; }
 }
+
+@media (max-width: 420px) {
+  .profile-page-v2 { padding: 12px 10px 40px; }
+  .header-text h1 { font-size: 1.5rem; }
+  .header-text p  { font-size: 0.85rem; }
+  .profile-avatar-main { width: 100px; height: 100px; font-size: 3rem; }
+  .avatar-outer-ring   { width: 126px; height: 126px; }
+  .points-number { font-size: 1.8rem; }
+  .rank-badge-v2 { font-size: 0.8rem; padding: 6px 16px; }
+
+  /* Pills full-width on very small phones */
+  .stat-pill { flex: none; width: 100%; }
+
+  /* Info card: icon hidden on very small screens to save space */
+  .card-icon { display: none; }
+  .info-card-v2 { padding: 14px; gap: 0; }
+  .card-body input, .card-body select { font-size: 0.9rem; }
+
+  .section-title { font-size: 0.9rem; }
+  .settings-header h3 { font-size: 1.1rem; }
+  .setting-card { padding: 16px; border-radius: 16px; }
+  .setting-action-btn { padding: 10px 16px; font-size: 0.82rem; }
+  .settings-done-btn { padding: 12px 28px; font-size: 0.9rem; }
+
+  /* Institution picker */
+  .profile-grid-v2 .info-card-v2[style*='1 / -1'] { grid-column: 1; }
+}
+
 
 /* ===== SETTINGS MODAL - PREMIUM GLASSMORPHIC DESIGN ===== */
 .settings-overlay {
@@ -803,9 +867,17 @@
 .leaderboard-row {
   display: flex;
   align-items: center;
-  padding: 16px 20px;
+  padding: 14px 18px;
   border-bottom: 1px solid var(--border);
   transition: background 0.2s;
+  min-width: 0;
+  gap: 10px;
+}
+.leaderboard-row > div {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .leaderboard-row:last-child {
   border-bottom: none;
@@ -816,3 +888,36 @@
 .dark-theme .leaderboard-container { background: #1e293b; border-color: #334155; }
 .dark-theme .leaderboard-row { border-color: #334155; }
 .dark-theme .leaderboard-row.highlight { background: rgba(66, 85, 255, 0.15); }
+
+/* ── Dark theme: institution picker inputs ── */
+.dark-theme .profile-page-v2 input[style],
+.dark-theme .profile-page-v2 select[style] {
+  background: #0f172a !important;
+  color: #f1f5f9 !important;
+  border-color: #334155 !important;
+}
+.dark-theme .profile-page-v2 button[style] {
+  color: #94a3b8 !important;
+}
+
+/* ── Section title (quiz history / saved items) ── */
+.section-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text-heading);
+  display: flex;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+/* ── Profile section wrapper ── */
+.profile-section {
+  background: var(--bg-card, white);
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid var(--border, #f1f5f9);
+}
+@media (max-width: 700px) {
+  .profile-section { padding: 16px; border-radius: 16px; }
+  .leaderboard-row  { padding: 10px 12px; }
+}
