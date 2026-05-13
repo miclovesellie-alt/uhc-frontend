@@ -109,9 +109,13 @@ function CourseCard({ course, count, gradient, emoji, onClick }) {
 function FlashCard({ card, studied, onToggleStudied }) {
   const [flipped, setFlipped] = useState(false);
 
+  // Parse hint into option list if it's a question-converted card (has •)
+  const isQuestionCard = card.hint && card.hint.includes("  •  ");
+  const options = isQuestionCard ? card.hint.split("  •  ") : [];
+
   return (
     <div
-      className={`sh-fc-scene${flipped ? " flipped" : ""}`}
+      className={`sh-fc-scene${flipped ? " flipped" : ""}${isQuestionCard ? " question-card" : ""}`}
       onClick={() => setFlipped(f => !f)}
       title="Click to flip"
     >
@@ -124,7 +128,15 @@ function FlashCard({ card, studied, onToggleStudied }) {
             <span className="sh-fc-course-badge">{card.course}</span>
           </div>
           <div className="sh-fc-question">{card.question}</div>
-          {card.hint && <div className="sh-fc-hint">💡 {card.hint}</div>}
+          {/* For question cards show the 4 options on the front as well */}
+          {isQuestionCard && (
+            <div className="sh-fc-options">
+              {options.map((opt, i) => (
+                <div key={i} className="sh-fc-option">{opt}</div>
+              ))}
+            </div>
+          )}
+          {!isQuestionCard && card.hint && <div className="sh-fc-hint">💡 {card.hint}</div>}
           <div className="sh-fc-footer">
             <span className="sh-fc-flip-hint"><RotateCcw size={11} /> Tap to reveal</span>
             <button
@@ -138,8 +150,23 @@ function FlashCard({ card, studied, onToggleStudied }) {
 
         {/* ── BACK ── */}
         <div className="sh-fc-back">
-          <div className="sh-fc-back-label">✦ Answer</div>
+          <div className="sh-fc-back-label">✦ Correct Answer</div>
           <div className="sh-fc-answer">{card.answer}</div>
+          {isQuestionCard && (
+            <div className="sh-fc-options-back">
+              {options.map((opt, i) => {
+                const isCorrect = opt.trim().slice(3).trim() === card.answer.trim();
+                return (
+                  <div
+                    key={i}
+                    className={`sh-fc-option-back${isCorrect ? " correct" : ""}`}
+                  >
+                    {opt}
+                  </div>
+                );
+              })}
+            </div>
+          )}
           <div className="sh-fc-back-footer">Tap again to flip back</div>
         </div>
       </div>

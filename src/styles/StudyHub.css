@@ -183,9 +183,11 @@
 /* ── Flashcard (flip effect) ── */
 .sh-fc-scene {
   perspective: 1000px;
-  height: 220px;
+  height: 230px;
   cursor: pointer;
 }
+/* Question cards need more room for the 4 options */
+.sh-fc-scene.question-card { height: 340px; }
 .sh-fc-card {
   width: 100%;
   height: 100%;
@@ -246,6 +248,46 @@
   color: var(--sh-muted);
   font-style: italic;
   margin-bottom: 10px;
+}
+
+/* Options list (front face — question cards) */
+.sh-fc-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 6px 0 8px;
+  flex: 1;
+}
+.sh-fc-option {
+  font-size: 0.73rem;
+  color: var(--sh-muted);
+  background: rgba(0,0,0,0.04);
+  border-radius: 6px;
+  padding: 4px 8px;
+  line-height: 1.4;
+}
+
+/* Options list (back face — highlights correct) */
+.sh-fc-options-back {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 8px 0;
+}
+.sh-fc-option-back {
+  font-size: 0.73rem;
+  color: #94a3b8;
+  background: rgba(255,255,255,0.06);
+  border-radius: 6px;
+  padding: 4px 8px;
+  line-height: 1.4;
+  transition: all 0.2s;
+}
+.sh-fc-option-back.correct {
+  background: rgba(16,185,129,0.18);
+  color: #10b981;
+  font-weight: 700;
+  border: 1px solid rgba(16,185,129,0.35);
 }
 .sh-fc-footer {
   display: flex;
@@ -477,6 +519,7 @@
 body.dark-theme .sh-wrapper    { }
 body.dark-theme .sh-fc-front   { background: #1e293b; border-color: #334155; }
 body.dark-theme .sh-fc-front .sh-fc-question { color: #f1f5f9; }
+body.dark-theme .sh-fc-option  { background: rgba(255,255,255,0.06); color: #94a3b8; }
 body.dark-theme .sh-fc-studied-btn { background: #263347; border-color: #334155; color: #94a3b8; }
 body.dark-theme .sh-fc-studied-btn.studied { background: rgba(16,185,129,0.15); border-color: #10b981; color: #10b981; }
 body.dark-theme .sh-note-card  { background: #1e293b; border-color: #334155; }
