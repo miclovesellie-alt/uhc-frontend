@@ -56,6 +56,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import AdminRecovery from "./pages/AdminRecovery";
 import VerifyEmail  from "./pages/VerifyEmail";
+import GoogleAuthCallback from "./pages/GoogleAuthCallback";
 
 const BASE = "https://uhcacadamy.com";
 
@@ -163,6 +164,9 @@ function AppRoutes() {
 
         {/* ===== EMAIL VERIFICATION ===== */}
         <Route path="/verify-email" element={<VerifyEmail />} />
+
+        {/* ===== GOOGLE OAUTH CALLBACK ===== */}
+        <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
 
         {/* /login alias — VerifyEmail redirects here after success */}
         <Route path="/login" element={
