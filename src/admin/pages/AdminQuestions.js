@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Plus, Search, Edit2, Trash2, BookOpen, ChevronDown, ChevronUp, Copy, AlertTriangle } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, BookOpen, ChevronDown, ChevronUp, Copy, AlertTriangle, Pencil, MoveRight } from "lucide-react";
 import api from "../../api/api";
 import { useToast } from "../../hooks/useToast";
 
@@ -33,6 +33,14 @@ export default function AdminQuestions() {
   const [newCourseName, setNewCourseName] = useState("");
   const [addingCourse, setAddingCourse] = useState(false);
   const [courseSearch, setCourseSearch] = useState("");
+
+  // Rename course
+  const [editingCourseName, setEditingCourseName] = useState(null); // the course name currently being edited
+  const [renameValue, setRenameValue] = useState("");
+
+  // Move questions to course
+  const [showMoveModal, setShowMoveModal] = useState(false);
+  const [moveTargetCourse, setMoveTargetCourse] = useState("");
 
   const [newQ, setNewQ] = useState({ question: "", options: ["","","",""], answer: null, course: "", difficulty: "Medium", explanation: "" });
 
@@ -199,6 +207,43 @@ export default function AdminQuestions() {
     } catch (err) { showToast("Add failed", "error"); }
   };
 
+  /* ── Rename course ── */
+  const handleRenameCourse = async (oldName) => {
+    const trimmed = renameValue.trim();
+    if (!trimmed || trimmed === oldName) { setEditingCourseName(null); return; }
+    try {
+      await api.put(`courses/${encodeURIComponent(oldName)}`, { name: trimmed });
+      // Update coursesFromDB list
+      setCoursesFromDB(prev => prev.map(c => c.name === oldName ? { ...c, name: trimmed, slug: trimmed.toLowerCase().replace(/\s+/g, "-") } : c));
+      // Remap questions in local state
+      setQuestions(prev => prev.map(q => q.course === oldName ? { ...q, course: trimmed } : q));
+      // If the active filter was this course, update it
+      if (selectedCourse === oldName) setSelectedCourse(trimmed);
+      showToast(`Course renamed to "${trimmed}"`);
+      setEditingCourseName(null);
+      fetchCourseCounts();
+    } catch (err) {
+      showToast(err.response?.data?.message || "Rename failed", "error");
+    }
+  };
+
+  /* ── Move questions to another course ── */
+  const handleMoveToCourse = async () => {
+    if (!moveTargetCourse) { showToast("Pick a target course", "error"); return; }
+    const ids = [...selectedIds];
+    try {
+      await api.put("admin/questions/move-to-course", { ids, targetCourse: moveTargetCourse });
+      setQuestions(prev => prev.map(q => selectedIds.has(q._id) ? { ...q, course: moveTargetCourse } : q));
+      showToast(`${ids.length} question${ids.length !== 1 ? "s" : ""} moved to "${moveTargetCourse}"`);
+      setSelectedIds(new Set());
+      setShowMoveModal(false);
+      setMoveTargetCourse("");
+      fetchCourseCounts();
+    } catch (err) {
+      showToast("Move failed", "error");
+    }
+  };
+
   /* ── Add course ── */
   const handleAddCourse = async () => {
     if (!newCourseName.trim()) return;
@@ -329,12 +374,16 @@ export default function AdminQuestions() {
       {selectedIds.size > 0 && (
         <div style={{
           display: "flex", alignItems: "center", gap: 12, padding: "10px 16px",
-          background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.2)",
-          borderRadius: 12, marginBottom: 12,
+          background: "rgba(66,85,255,0.06)", border: "1px solid rgba(66,85,255,0.2)",
+          borderRadius: 12, marginBottom: 12, flexWrap: "wrap",
         }}>
-          <span style={{ fontSize: ".85rem", fontWeight: 700, color: "#dc2626" }}>
+          <span style={{ fontSize: ".85rem", fontWeight: 700, color: "#4255ff" }}>
             {selectedIds.size} selected
           </span>
+          <button className="admin-btn primary sm" onClick={() => { setMoveTargetCourse(""); setShowMoveModal(true); }}
+            title="Move selected questions to another course">
+            <MoveRight size={13} /> Move to Course
+          </button>
           <button className="admin-btn danger sm" onClick={() => setShowBulkConfirm(true)}>
             <Trash2 size={13} /> Delete Selected
           </button>
@@ -672,36 +721,70 @@ export default function AdminQuestions() {
 
       {/* ── COURSE MANAGER MODAL ── */}
       {showCourseModal && (
-        <div className="admin-modal-overlay" onClick={() => setShowCourseModal(false)}>
-          <div className="admin-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 420 }}>
+        <div className="admin-modal-overlay" onClick={() => { setShowCourseModal(false); setEditingCourseName(null); }}>
+          <div className="admin-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 440 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
               <h3 style={{ margin: 0 }}>📚 Course Manager</h3>
-              <button className="admin-btn secondary sm" onClick={() => setShowCourseModal(false)}>✕</button>
+              <button className="admin-btn secondary sm" onClick={() => { setShowCourseModal(false); setEditingCourseName(null); }}>✕</button>
             </div>
             <input className="admin-input" style={{ width: "100%", marginBottom: 12, boxSizing: "border-box" }}
               placeholder="Search courses..." value={courseSearch}
               onChange={e => setCourseSearch(e.target.value)} />
-            <div style={{ maxHeight: 240, overflowY: "auto", display: "flex", flexDirection: "column", gap: 6, marginBottom: 12 }}>
+            <div style={{ maxHeight: 280, overflowY: "auto", display: "flex", flexDirection: "column", gap: 6, marginBottom: 12 }}>
               {coursesFromDB.filter(c => c.name?.toLowerCase().includes(courseSearch.toLowerCase())).map(c => (
                 <div key={c.name} style={{
                   display: "flex", alignItems: "center", justifyContent: "space-between",
                   padding: "10px 14px", borderRadius: 10,
-                  background: "#f8fafc", border: "1px solid var(--admin-border)",
+                  background: editingCourseName === c.name ? "rgba(66,85,255,0.05)" : "#f8fafc",
+                  border: `1px solid ${editingCourseName === c.name ? "rgba(66,85,255,0.35)" : "var(--admin-border)"}`,
+                  gap: 10, flexWrap: "wrap",
                 }}>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span style={{ fontSize: ".875rem", color: "var(--admin-text)", fontWeight: 600 }}>{c.name}</span>
-                    {/* ✅ Bug fix: use real DB count from aggregation, not local array filter */}
-                    <span style={{ fontSize: ".72rem", color: 'var(--admin-muted)' }}>
-                      {courseQuestionCounts[c.name] ?? questions.filter(q => q.course === c.name).length} Questions
-                    </span>
-                  </div>
-                  <button 
-                    className="admin-btn danger sm" 
-                    style={{ padding: '6px', borderRadius: '8px' }}
-                    onClick={() => handleDeleteCourse(c.name)}
-                  >
-                    <Trash2 size={14} />
-                  </button>
+                  {editingCourseName === c.name ? (
+                    /* ── Inline rename input ── */
+                    <div style={{ display: "flex", gap: 6, flex: 1, alignItems: "center" }}>
+                      <input
+                        className="admin-input"
+                        style={{ flex: 1, padding: "6px 10px", fontSize: ".85rem" }}
+                        value={renameValue}
+                        autoFocus
+                        onChange={e => setRenameValue(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === "Enter") handleRenameCourse(c.name);
+                          if (e.key === "Escape") setEditingCourseName(null);
+                        }}
+                      />
+                      <button className="admin-btn primary sm" onClick={() => handleRenameCourse(c.name)}>Save</button>
+                      <button className="admin-btn secondary sm" onClick={() => setEditingCourseName(null)}>✕</button>
+                    </div>
+                  ) : (
+                    /* ── Normal row ── */
+                    <>
+                      <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                        <span style={{ fontSize: ".875rem", color: "var(--admin-text)", fontWeight: 600 }}>{c.name}</span>
+                        <span style={{ fontSize: ".72rem", color: 'var(--admin-muted)' }}>
+                          {courseQuestionCounts[c.name] ?? questions.filter(q => q.course === c.name).length} Questions
+                        </span>
+                      </div>
+                      <div style={{ display: "flex", gap: 6 }}>
+                        <button
+                          className="admin-btn secondary sm"
+                          style={{ padding: '6px', borderRadius: '8px' }}
+                          title="Rename course"
+                          onClick={() => { setEditingCourseName(c.name); setRenameValue(c.name); }}
+                        >
+                          <Pencil size={13} />
+                        </button>
+                        <button
+                          className="admin-btn danger sm"
+                          style={{ padding: '6px', borderRadius: '8px' }}
+                          title="Delete course"
+                          onClick={() => handleDeleteCourse(c.name)}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
@@ -751,6 +834,41 @@ export default function AdminQuestions() {
             <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
               <button className="admin-btn secondary" onClick={() => setShowBulkConfirm(false)}>Cancel</button>
               <button className="admin-btn danger" onClick={handleBulkDelete}>Delete All</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MOVE TO COURSE MODAL ── */}
+      {showMoveModal && (
+        <div className="admin-modal-overlay" onClick={() => setShowMoveModal(false)}>
+          <div className="admin-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 400, textAlign: "center" }}>
+            <div style={{ fontSize: "2rem", marginBottom: 10 }}>🚚</div>
+            <h3 style={{ margin: "0 0 6px" }}>Move {selectedIds.size} Question{selectedIds.size !== 1 ? "s" : ""}</h3>
+            <p style={{ color: "var(--admin-muted)", fontSize: ".875rem", marginBottom: 20 }}>
+              Select the course you want to move {selectedIds.size === 1 ? "this question" : "these questions"} to.
+            </p>
+            <select
+              className="admin-select"
+              style={{ width: "100%", marginBottom: 20 }}
+              value={moveTargetCourse}
+              onChange={e => setMoveTargetCourse(e.target.value)}
+            >
+              <option value="">— Select a course —</option>
+              {coursesFromDB.map(c => (
+                <option key={c.name} value={c.name}>{c.name}</option>
+              ))}
+            </select>
+            <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+              <button className="admin-btn secondary" onClick={() => setShowMoveModal(false)}>Cancel</button>
+              <button
+                className="admin-btn primary"
+                disabled={!moveTargetCourse}
+                style={{ opacity: moveTargetCourse ? 1 : 0.5 }}
+                onClick={handleMoveToCourse}
+              >
+                <MoveRight size={14} /> Move Questions
+              </button>
             </div>
           </div>
         </div>
