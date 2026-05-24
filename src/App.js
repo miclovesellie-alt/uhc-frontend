@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 
 import AuthCard from "./pages/AuthCard";
 import LandingPage from "./pages/LandingPage";
@@ -56,6 +57,59 @@ import ResetPassword from "./pages/ResetPassword";
 import AdminRecovery from "./pages/AdminRecovery";
 import VerifyEmail  from "./pages/VerifyEmail";
 
+const BASE = "https://uhcacadamy.com";
+
+// Per-route SEO config — canonical + title + description + indexing
+const ROUTE_SEO = {
+  "/": {
+    title: "UHC Academy | Free Nursing Exam Prep — Quizzes, Library & Leaderboard",
+    description: "Free nursing education platform for students in Ghana and Africa. Practice adaptive quizzes, access study library documents, and compete on the national leaderboard.",
+    index: true,
+  },
+  "/auth": {
+    title: "Sign In or Register | UHC Academy",
+    description: "Log in or create your free UHC Academy account to access nursing quizzes, flashcards, and the national leaderboard.",
+    index: true,
+  },
+  "/forgot-password": {
+    title: "Forgot Password | UHC Academy",
+    description: "Reset your UHC Academy password to regain access to your nursing study account.",
+    index: false,
+  },
+  "/verify-email": { title: "Verify Email | UHC Academy", description: "", index: false },
+  "/login":         { title: "Sign In | UHC Academy", description: "", index: false },
+};
+
+// Prefixes that should always be noindex
+const NOINDEX_PREFIXES = ["/admin", "/dashboard", "/fyp", "/quiz", "/profile",
+  "/library", "/search", "/leaderboard", "/quiz-history", "/review",
+  "/submit", "/reset-password", "/admin-recovery"];
+
+function PageSEO() {
+  const { pathname } = useLocation();
+  const seo = ROUTE_SEO[pathname] || null;
+
+  const shouldNoIndex =
+    !seo?.index ||
+    NOINDEX_PREFIXES.some(prefix => pathname === prefix || pathname.startsWith(prefix + "/"));
+
+  const canonical = `${BASE}${pathname === "/" ? "/" : pathname}`;
+  const title = seo?.title || "UHC Academy";
+  const description = seo?.description || "";
+
+  return (
+    <Helmet>
+      <link rel="canonical" href={canonical} />
+      {title && <title>{title}</title>}
+      {description && <meta name="description" content={description} />}
+      <meta name="robots" content={shouldNoIndex ? "noindex, nofollow" : "index, follow"} />
+      {/* OG + Twitter canonical sync */}
+      <meta property="og:url" content={canonical} />
+      <meta name="twitter:url" content={canonical} />
+    </Helmet>
+  );
+}
+
 function AppRoutes() {
   const { user, setUser } = useContext(UserContext);
   const location = useLocation();
@@ -74,132 +128,137 @@ function AppRoutes() {
   };
 
   return (
-    <AnimatePresence mode="wait">
-    <Routes location={location} key={location.pathname}>
-      {/* ===== LANDING PAGE ===== */}
-      <Route path="/" element={
-        <motion.div
-          initial="initial" animate="animate" exit="exit"
-          variants={pageVariants} transition={pageTransition}
-          style={{ minHeight: '100vh' }}
-        >
-          <LandingPage />
-        </motion.div>
-      } />
-
-      {/* ===== AUTH PAGE ===== */}
-      <Route
-        path="/auth"
-        element={
+    <>
+      <PageSEO />
+      <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        {/* ===== LANDING PAGE ===== */}
+        <Route path="/" element={
           <motion.div
             initial="initial" animate="animate" exit="exit"
             variants={pageVariants} transition={pageTransition}
             style={{ minHeight: '100vh' }}
           >
-            <AuthCard />
+            <LandingPage />
           </motion.div>
-        }
-      />
+        } />
 
-      {/* ===== PASSWORD RESET PAGES ===== */}
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password/:token" element={<ResetPassword />} />
-
-      {/* ===== EMAIL VERIFICATION ===== */}
-      <Route path="/verify-email" element={<VerifyEmail />} />
-
-      {/* /login alias — VerifyEmail redirects here after success */}
-      <Route path="/login" element={
-        <motion.div initial="initial" animate="animate" exit="exit"
-          variants={pageVariants} transition={pageTransition} style={{ minHeight: '100vh' }}>
-          <AuthCard />
-        </motion.div>
-      } />
-
-      {/* ===== ADMIN RECOVERY (hidden, unlinked from login page) ===== */}
-      <Route path="/admin-recovery" element={<AdminRecovery />} />
-
-      {/* ===== ADMIN ROUTES (NESTED UNDER ADMINLAYOUT) ===== */}
-      <Route
-        path="/admin"
-        element={
-          <PrivateRoute adminOnly={true}>
-            <AdminLayout />
-          </PrivateRoute>
-        }
-      >
-        <Route index element={<AdminDashboard />} />
-        <Route path="users"         element={<AdminUsers />} />
-        <Route path="admins"        element={<AdminAdmins />} />
-        <Route path="questions"     element={<AdminQuestions />} />
-        <Route path="settings"      element={<AdminSettings />} />
-        <Route path="logs"          element={<AdminLogs />} />
-        <Route path="notifications" element={<AdminNotifications />} />
-        <Route path="messages"      element={<AdminMessages />} />
-        <Route path="userlibrary"   element={<AdminLibrary />} />
-        <Route path="feed"          element={<AdminFeed />} />
-        <Route path="recycle-bin"   element={<AdminRecycleBin />} />
-        <Route path="uploads"       element={<BulkUpload />} />
-        <Route path="duplicates"    element={<DuplicateQuestions />} />
-        <Route path="announcements" element={<AdminAnnouncements />} />
-        <Route path="pending"       element={<AdminPending />} />
-        <Route path="institutions"   element={<AdminInstitutions />} />
-      </Route>
-
-      {/* ===== DASHBOARD LAYOUT WRAPPER ===== */}
-      <Route
-        element={
-          <PrivateRoute>
-            <DashboardLayout />
-          </PrivateRoute>
-        }
-      >
-        {/* ===== FYP ===== */}
-        <Route path="/dashboard" element={<FYP />} />
-        <Route path="/fyp" element={<FYP />} />
-
-        {/* ===== QUIZ ===== */}
-        <Route path="/quiz" element={<QuizPage />} />
-
-        {/* ===== REVIEW PAGE ===== */}
-        <Route path="/review" element={<ReviewPage />} />
-
-        {/* ===== PROFILE ===== */}
+        {/* ===== AUTH PAGE ===== */}
         <Route
-          path="/profile"
-          element={<ProfilePage user={user} setUser={setUser} />}
+          path="/auth"
+          element={
+            <motion.div
+              initial="initial" animate="animate" exit="exit"
+              variants={pageVariants} transition={pageTransition}
+              style={{ minHeight: '100vh' }}
+            >
+              <AuthCard />
+            </motion.div>
+          }
         />
 
-        {/* ===== LIBRARY / STUDY HUB ===== */}
-        <Route path="/library" element={<Library />} />
+        {/* ===== PASSWORD RESET PAGES ===== */}
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-        {/* ===== SEARCH ===== */}
-        <Route path="/search" element={<SearchPage />} />
+        {/* ===== EMAIL VERIFICATION ===== */}
+        <Route path="/verify-email" element={<VerifyEmail />} />
 
-        {/* ===== LEADERBOARD ===== */}
-        <Route path="/leaderboard" element={<Leaderboard />} />
+        {/* /login alias — VerifyEmail redirects here after success */}
+        <Route path="/login" element={
+          <motion.div initial="initial" animate="animate" exit="exit"
+            variants={pageVariants} transition={pageTransition} style={{ minHeight: '100vh' }}>
+            <AuthCard />
+          </motion.div>
+        } />
 
-        {/* ===== QUIZ HISTORY ===== */}
-        <Route path="/quiz-history" element={<QuizHistory />} />
+        {/* ===== ADMIN RECOVERY (hidden, unlinked from login page) ===== */}
+        <Route path="/admin-recovery" element={<AdminRecovery />} />
 
-        {/* ===== SUBMIT ===== */}
-        <Route path="/submit" element={<Submit />} />
-      </Route>
+        {/* ===== ADMIN ROUTES (NESTED UNDER ADMINLAYOUT) ===== */}
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute adminOnly={true}>
+              <AdminLayout />
+            </PrivateRoute>
+          }
+        >
+          <Route index element={<AdminDashboard />} />
+          <Route path="users"         element={<AdminUsers />} />
+          <Route path="admins"        element={<AdminAdmins />} />
+          <Route path="questions"     element={<AdminQuestions />} />
+          <Route path="settings"      element={<AdminSettings />} />
+          <Route path="logs"          element={<AdminLogs />} />
+          <Route path="notifications" element={<AdminNotifications />} />
+          <Route path="messages"      element={<AdminMessages />} />
+          <Route path="userlibrary"   element={<AdminLibrary />} />
+          <Route path="feed"          element={<AdminFeed />} />
+          <Route path="recycle-bin"   element={<AdminRecycleBin />} />
+          <Route path="uploads"       element={<BulkUpload />} />
+          <Route path="duplicates"    element={<DuplicateQuestions />} />
+          <Route path="announcements" element={<AdminAnnouncements />} />
+          <Route path="pending"       element={<AdminPending />} />
+          <Route path="institutions"   element={<AdminInstitutions />} />
+        </Route>
 
-      {/* ===== 404 ===== */}
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
-    </AnimatePresence>
+        {/* ===== DASHBOARD LAYOUT WRAPPER ===== */}
+        <Route
+          element={
+            <PrivateRoute>
+              <DashboardLayout />
+            </PrivateRoute>
+          }
+        >
+          {/* ===== FYP ===== */}
+          <Route path="/dashboard" element={<FYP />} />
+          <Route path="/fyp" element={<FYP />} />
+
+          {/* ===== QUIZ ===== */}
+          <Route path="/quiz" element={<QuizPage />} />
+
+          {/* ===== REVIEW PAGE ===== */}
+          <Route path="/review" element={<ReviewPage />} />
+
+          {/* ===== PROFILE ===== */}
+          <Route
+            path="/profile"
+            element={<ProfilePage user={user} setUser={setUser} />}
+          />
+
+          {/* ===== LIBRARY / STUDY HUB ===== */}
+          <Route path="/library" element={<Library />} />
+
+          {/* ===== SEARCH ===== */}
+          <Route path="/search" element={<SearchPage />} />
+
+          {/* ===== LEADERBOARD ===== */}
+          <Route path="/leaderboard" element={<Leaderboard />} />
+
+          {/* ===== QUIZ HISTORY ===== */}
+          <Route path="/quiz-history" element={<QuizHistory />} />
+
+          {/* ===== SUBMIT ===== */}
+          <Route path="/submit" element={<Submit />} />
+        </Route>
+
+        {/* ===== 404 ===== */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+      </AnimatePresence>
+    </>
   );
 }
 
 function App() {
   return (
-    <UserProvider>
-      <ToastProvider>
-        <AppRoutes />
-      </ToastProvider>
-    </UserProvider>
+    <HelmetProvider>
+      <UserProvider>
+        <ToastProvider>
+          <AppRoutes />
+        </ToastProvider>
+      </UserProvider>
+    </HelmetProvider>
   );
 }
 
