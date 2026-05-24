@@ -49,7 +49,7 @@ const FEATURES = [
   { icon: <Zap size={22}/>, title: "Adaptive Quizzes",       desc: "Smart question banks that focus on your weak areas across every nursing course." },
   { icon: <BookOpen size={22}/>, title: "Study Hub",         desc: "Flashcards, quick notes, and curated resources organised by course — study smarter, not harder." },
   { icon: <TrendingUp size={22}/>, title: "Progress Analytics", desc: "Score history, course breakdowns, and trend charts to visualise your growth." },
-  { icon: <Trophy size={22}/>, title: "Leaderboard & Points", desc: "Earn points for every quiz and compete with peers on the national leaderboard." },
+  { icon: <Trophy size={22}/>, title: "Leaderboard & Points", desc: "Earn points for every quiz and compete with peers on the global leaderboard." },
 ];
 
 const LEADERS_FALLBACK = [
@@ -268,11 +268,11 @@ export default function LandingPage() {
       <section className="hero-section">
         <div className="hero-text">
           <motion.div initial={{ opacity:0, x:-24 }} animate={{ opacity:1, x:0 }} transition={{ duration:.6 }}>
-            <span className="section-label">Free Nursing Education Platform</span>
+            <span className="section-label">Free Nursing Education Platform — For Every Student</span>
             <h1>Study Smarter.<br /><span className="highlight">Pass Your Exams.</span></h1>
             <p style={{ color:"var(--text-secondary)", fontSize:"1.05rem", lineHeight:1.75, margin:"20px 0 32px", maxWidth:480 }}>
-              UHC Academy gives nursing students in Ghana &amp; Africa access to adaptive quizzes,
-              a Study Hub with flashcards and notes, and a live national leaderboard — completely free.
+              UHC Academy gives nursing students worldwide access to adaptive quizzes,
+              a Study Hub with flashcards and notes, and a live leaderboard — completely free.
             </p>
             <div className="hero-actions">
               <button className="hero-btn" onClick={() => navigate("/auth")}>Create Free Account</button>
@@ -433,8 +433,8 @@ export default function LandingPage() {
               Compete &amp; Climb<br/>the Rankings
             </h2>
             <p style={{ color:"var(--text-secondary)", lineHeight:1.75, margin:"16px 0 28px", maxWidth:400 }}>
-              Every quiz earns you points. Top scorers appear on the national leaderboard,
-              visible to all students. Join today and start climbing.
+              Every quiz earns you points. Top scorers appear on the global leaderboard,
+              visible to all students worldwide. Join today and start climbing.
             </p>
             {["Earn points for every quiz","Compete across all courses","Your rank on your public profile","Rankings update in real time"].map((t,i) => (
               <div key={i} style={{ display:"flex", alignItems:"center", gap:9,
