@@ -1,5 +1,11 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Disallow: /auth
+Disallow: /login
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /verify-email
+Disallow: /admin/
+Disallow: /admin
 
 Sitemap: https://uhcacadamy.com/sitemap.xml

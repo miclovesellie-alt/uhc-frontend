@@ -70,7 +70,7 @@ const ROUTE_SEO = {
   "/auth": {
     title: "Sign In or Register | UHC Academy",
     description: "Log in or create your free UHC Academy account to access nursing quizzes, flashcards, and the global leaderboard.",
-    index: true,
+    index: false,
   },
   "/forgot-password": {
     title: "Forgot Password | UHC Academy",
