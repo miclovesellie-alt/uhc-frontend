@@ -373,7 +373,6 @@
 .rte-wrapper {
   border: 1.5px solid var(--admin-border, #e2e8f0);
   border-radius: 12px;
-  overflow: hidden;
   margin-top: 6px;
   transition: border-color 0.2s;
   background: var(--admin-input-bg, #f8fafc);
@@ -385,6 +384,11 @@
 
 /* Toolbar */
 .rte-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-top-left-radius: 11px;
+  border-top-right-radius: 11px;
   display: flex;
   align-items: center;
   gap: 2px;
@@ -393,6 +397,15 @@
   border-bottom: 1.5px solid var(--admin-border, #e2e8f0);
   flex-wrap: wrap;
 }
+
+/* Contextual Sticky Offsets */
+.admin-page .rte-toolbar {
+  top: 60px; /* Sticks below the sticky admin-topbar (60px) */
+}
+.admin-modal .rte-toolbar {
+  top: -28px; /* Sticks to the top of the scrollable .admin-modal, offsetting its 28px padding */
+}
+
 .rte-btn {
   display: flex;
   align-items: center;
@@ -467,6 +480,8 @@
   color: #94a3b8;
   border-top: 1px solid var(--admin-border, #e2e8f0);
   background: var(--admin-card-bg, #ffffff);
+  border-bottom-left-radius: 11px;
+  border-bottom-right-radius: 11px;
 }
 
 /* Dark mode */
