@@ -21,6 +21,11 @@ function saveStudied(set)  { localStorage.setItem(STORAGE_KEY, JSON.stringify([.
 function getLiked()        { try { return new Set(JSON.parse(localStorage.getItem(LIKED_KEY)   || "[]")); } catch { return new Set(); } }
 function saveLiked(set)    { localStorage.setItem(LIKED_KEY,   JSON.stringify([...set])); }
 
+/* Strip HTML tags — used for plain-text preview in NoteCard */
+function stripHtml(html = "") {
+  return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+}
+
 /* ════════════════════════════════════════════════════════
    COURSE EMOJI MAP
 ════════════════════════════════════════════════════════ */
@@ -177,7 +182,7 @@ function NoteModal({ note, onClose }) {
         <div className="sh-note-modal-divider" style={{ background: note.color || "#10b981" }} />
 
         {/* Body */}
-        <div className="sh-note-modal-body">{note.body}</div>
+        <div className="sh-note-modal-body sh-note-html-content" dangerouslySetInnerHTML={{ __html: note.body }} />
       </div>
     </div>
   );
@@ -289,9 +294,10 @@ function FlashCard({ card, studied, liked, onToggleStudied, onToggleLiked }) {
 ════════════════════════════════════════════════════════ */
 function NoteCard({ note, onOpen }) {
   const PREVIEW_LEN = 160;
-  const preview = (note.body || "").length > PREVIEW_LEN
-    ? note.body.slice(0, PREVIEW_LEN) + "…"
-    : note.body;
+  const plainText = stripHtml(note.body || "");
+  const preview = plainText.length > PREVIEW_LEN
+    ? plainText.slice(0, PREVIEW_LEN) + "…"
+    : plainText;
 
   return (
     <button className="sh-note-card" style={{ "--note-color": note.color || "#10b981" }} onClick={() => onOpen(note)}>

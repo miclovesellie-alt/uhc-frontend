@@ -1002,3 +1002,67 @@ body.dark-theme .sh-back-btn { background: #1e293b; border-color: #334155; color
 body.dark-theme .sh-back-btn:hover { border-color: #10b981; color: #10b981; }
 body.dark-theme .sh-course-view-name { color: #f1f5f9; }
 body.dark-theme .sh-course-hero-title { color: #f1f5f9; }
+
+/* ══════════════════════════════════════════════════
+   HTML NOTE CONTENT  (rendered from rich text editor)
+══════════════════════════════════════════════════ */
+.sh-note-html-content {
+  white-space: normal !important;   /* override pre-wrap */
+  word-break: break-word;
+}
+
+/* Typography inside rendered note body */
+.sh-note-html-content b,
+.sh-note-html-content strong { font-weight: 800; color: var(--sh-text); }
+
+.sh-note-html-content i,
+.sh-note-html-content em { font-style: italic; }
+
+.sh-note-html-content u { text-decoration: underline; }
+
+.sh-note-html-content s,
+.sh-note-html-content strike { text-decoration: line-through; opacity: 0.75; }
+
+/* Lists */
+.sh-note-html-content ul {
+  list-style: disc;
+  padding-left: 22px;
+  margin: 8px 0;
+}
+.sh-note-html-content ol {
+  list-style: decimal;
+  padding-left: 22px;
+  margin: 8px 0;
+}
+.sh-note-html-content li { margin: 4px 0; line-height: 1.7; }
+
+/* Highlights */
+.sh-note-html-content [style*="background-color: rgb(254, 240, 138)"],
+.sh-note-html-content [style*="background-color:#fef08a"] {
+  background: #fef08a;
+  border-radius: 3px;
+  padding: 0 2px;
+}
+.sh-note-html-content [style*="background-color: rgb(187, 247, 208)"],
+.sh-note-html-content [style*="background-color:#bbf7d0"] {
+  background: #bbf7d0;
+  border-radius: 3px;
+  padding: 0 2px;
+}
+
+/* Paragraphs / divs created by browser execCommand */
+.sh-note-html-content p,
+.sh-note-html-content div { margin: 4px 0; line-height: 1.85; }
+
+/* Font sizes set by execCommand fontSize */
+.sh-note-html-content font[size="1"] { font-size: 0.75rem; }
+.sh-note-html-content font[size="3"] { font-size: 0.92rem; }
+.sh-note-html-content font[size="5"] { font-size: 1.1rem; }
+.sh-note-html-content font[size="6"] { font-size: 1.35rem; font-weight: 800; color: var(--sh-text); }
+
+/* Dark theme adjustments for HTML content */
+body.dark-theme .sh-note-html-content b,
+body.dark-theme .sh-note-html-content strong { color: #f1f5f9; }
+body.dark-theme .sh-note-html-content font[size="6"] { color: #f1f5f9; }
+body.dark-theme .sh-note-html-content [style*="background-color: rgb(254, 240, 138)"] { background: rgba(254,240,138,0.25); }
+body.dark-theme .sh-note-html-content [style*="background-color: rgb(187, 247, 208)"] { background: rgba(187,247,208,0.2); }

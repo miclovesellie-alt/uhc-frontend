@@ -1,10 +1,137 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import api from "../../api/api";
 import {
   Book, Plus, Trash2, Search, BookOpen, FileUp, Download, EyeOff,
-  Layers, CreditCard, Edit2
+  Layers, CreditCard, Edit2,
+  Bold, Italic, Underline, Strikethrough, Highlighter,
+  AlignLeft, AlignCenter, AlignRight, AlignJustify,
+  List, ListOrdered, Type, X as ClearIcon
 } from "lucide-react";
 import "../../admin_styles/AdminLibrary.css";
+
+/* ══════════════════════════════════════
+   RICH NOTE EDITOR
+   Zero-dependency rich text editor using
+   contentEditable + execCommand.
+   Saves formatted HTML into note.body.
+══════════════════════════════════════ */
+function RichNoteEditor({ value, onChange, placeholder = "Write your note here…" }) {
+  const editorRef = useRef(null);
+  const isInit    = useRef(false);
+
+  // Set initial HTML only once on mount
+  useEffect(() => {
+    if (!isInit.current && editorRef.current) {
+      editorRef.current.innerHTML = value || "";
+      isInit.current = true;
+    }
+  }, []); // eslint-disable-line
+
+  // Sync when value is externally reset (e.g. form cleared)
+  useEffect(() => {
+    if (editorRef.current && value === "") {
+      editorRef.current.innerHTML = "";
+    }
+  }, [value]);
+
+  const exec = useCallback((cmd, val = null) => {
+    editorRef.current.focus();
+    document.execCommand(cmd, false, val);
+    onChange(editorRef.current.innerHTML);
+  }, [onChange]);
+
+  const HIGHLIGHT_COLOR = "#fef08a";   // yellow
+  const HIGHLIGHT_COLOR2 = "#bbf7d0";  // green
+
+  const toolbarGroups = [
+    // Text style
+    [
+      { icon: <Bold size={13} />,         title: "Bold (Ctrl+B)",        action: () => exec("bold") },
+      { icon: <Italic size={13} />,       title: "Italic (Ctrl+I)",      action: () => exec("italic") },
+      { icon: <Underline size={13} />,    title: "Underline (Ctrl+U)",   action: () => exec("underline") },
+      { icon: <Strikethrough size={13} />,title: "Strikethrough",        action: () => exec("strikeThrough") },
+    ],
+    // Highlight
+    [
+      { icon: <><Highlighter size={12} /><span style={{width:8,height:8,borderRadius:2,background:HIGHLIGHT_COLOR,display:"inline-block",marginLeft:2}}/></>, title: "Highlight Yellow", action: () => exec("backColor", HIGHLIGHT_COLOR) },
+      { icon: <><Highlighter size={12} /><span style={{width:8,height:8,borderRadius:2,background:HIGHLIGHT_COLOR2,display:"inline-block",marginLeft:2}}/></>, title: "Highlight Green",  action: () => exec("backColor", HIGHLIGHT_COLOR2) },
+    ],
+    // Alignment
+    [
+      { icon: <AlignLeft size={13} />,    title: "Align Left",           action: () => exec("justifyLeft") },
+      { icon: <AlignCenter size={13} />,  title: "Align Center",         action: () => exec("justifyCenter") },
+      { icon: <AlignRight size={13} />,   title: "Align Right",          action: () => exec("justifyRight") },
+      { icon: <AlignJustify size={13} />, title: "Justify",              action: () => exec("justifyFull") },
+    ],
+    // Lists
+    [
+      { icon: <List size={13} />,         title: "Bullet List",          action: () => exec("insertUnorderedList") },
+      { icon: <ListOrdered size={13} />,  title: "Numbered List",        action: () => exec("insertOrderedList") },
+    ],
+    // Clear
+    [
+      { icon: <ClearIcon size={13} />,    title: "Clear Formatting",     action: () => exec("removeFormat") },
+    ],
+  ];
+
+  const SIZES = [
+    { label: "Normal",  val: "3" },
+    { label: "Small",   val: "1" },
+    { label: "Large",   val: "5" },
+    { label: "Heading", val: "6" },
+  ];
+
+  return (
+    <div className="rte-wrapper">
+      {/* Toolbar */}
+      <div className="rte-toolbar">
+        {/* Font size dropdown */}
+        <select
+          className="rte-size-select"
+          title="Text Size"
+          defaultValue="3"
+          onChange={e => exec("fontSize", e.target.value)}
+          onClick={e => e.stopPropagation()}
+        >
+          {SIZES.map(s => <option key={s.val} value={s.val}>{s.label}</option>)}
+        </select>
+
+        {toolbarGroups.map((group, gi) => (
+          <React.Fragment key={gi}>
+            {gi > 0 && <span className="rte-divider" />}
+            {group.map((btn, bi) => (
+              <button
+                key={bi}
+                type="button"
+                className="rte-btn"
+                title={btn.title}
+                onMouseDown={e => { e.preventDefault(); btn.action(); }}
+              >
+                {btn.icon}
+              </button>
+            ))}
+          </React.Fragment>
+        ))}
+      </div>
+
+      {/* Editable area */}
+      <div
+        ref={editorRef}
+        contentEditable
+        suppressContentEditableWarning
+        className="rte-body"
+        data-placeholder={placeholder}
+        onInput={() => onChange(editorRef.current.innerHTML)}
+        style={{ minHeight: 140 }}
+      />
+
+      {/* Hint */}
+      <div className="rte-hint">
+        <Type size={10} /> Formatting is saved and displayed to students in the note modal.
+      </div>
+    </div>
+  );
+}
 
 /* ══════════════════════════════════════
    SHARED: INLINE COURSE ADDER
@@ -394,8 +521,12 @@ function StudyHubTab({ courses, onCourseAdded }) {
               <label style={labelStyle}>Title *</label>
               <input value={note.title} onChange={e => setNote({ ...note, title: e.target.value })} placeholder="e.g. Key Cardiac Drugs" style={inputStyle} />
               <label style={labelStyle}>Body *</label>
-              <textarea rows={5} value={note.body} onChange={e => setNote({ ...note, body: e.target.value })} placeholder="Write your note here. Use line breaks for formatting." style={{ ...inputStyle, resize: "vertical" }} />
-              <div style={{ display: "flex", gap: 12 }}>
+              <RichNoteEditor
+                value={note.body}
+                onChange={html => setNote(prev => ({ ...prev, body: html }))}
+                placeholder="Write your note here. Use the toolbar above for formatting."
+              />
+              <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
                 <div style={{ flex: 1 }}>
                   <label style={labelStyle}>Emoji</label>
                   <input value={note.emoji} onChange={e => setNote({ ...note, emoji: e.target.value })} style={{ ...inputStyle, width: 80 }} />
@@ -480,7 +611,14 @@ function StudyHubTab({ courses, onCourseAdded }) {
               {editType === "notes" && (
                 <>
                   <div><label style={labelStyle}>Title *</label><input value={editItem.title || ""} onChange={e => setEditItem(p => ({ ...p, title: e.target.value }))} style={inputStyle} /></div>
-                  <div><label style={labelStyle}>Body *</label><textarea rows={5} value={editItem.body || ""} onChange={e => setEditItem(p => ({ ...p, body: e.target.value }))} style={{ ...inputStyle, resize: "vertical" }} /></div>
+                  <div>
+                    <label style={labelStyle}>Body *</label>
+                    <RichNoteEditor
+                      value={editItem.body || ""}
+                      onChange={html => setEditItem(p => ({ ...p, body: html }))}
+                      placeholder="Edit note body…"
+                    />
+                  </div>
                   <div style={{ display: "flex", gap: 12 }}>
                     <div style={{ flex: 1 }}><label style={labelStyle}>Emoji</label><input value={editItem.emoji || ""} onChange={e => setEditItem(p => ({ ...p, emoji: e.target.value }))} style={{ ...inputStyle, width: 80 }} /></div>
                     <div style={{ flex: 1 }}><label style={labelStyle}>Accent Color</label><input type="color" value={editItem.color || "#10b981"} onChange={e => setEditItem(p => ({ ...p, color: e.target.value }))} style={{ height: 38, marginTop: 4, cursor: "pointer", border: "none", background: "none" }} /></div>
