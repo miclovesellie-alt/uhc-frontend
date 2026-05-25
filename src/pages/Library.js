@@ -439,16 +439,6 @@ export default function Library() {
         setFlashcards(fc);
         setNotes(n);
         setResources(res);
-
-        // Derive unique courses from flashcards (for the course selection view)
-        const fcCourses = [...new Set(fc.map(x => x.course).filter(Boolean))].sort();
-        // All content courses for notes/resources filter
-        const allCourses = new Set([
-          ...fcCourses,
-          ...n.map(x => x.course),
-          ...res.map(x => x.course),
-        ]);
-        setCourses([...allCourses].filter(Boolean).sort());
       })
       .catch(() => toast("Failed to load Study Hub", "error"))
       .finally(() => setLoading(false));
