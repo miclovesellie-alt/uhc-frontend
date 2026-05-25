@@ -183,6 +183,13 @@ function NoteModal({ note, onClose }) {
 
         {/* Body */}
         <div className="sh-note-modal-body sh-note-html-content" dangerouslySetInnerHTML={{ __html: note.body }} />
+
+        {/* Footer with a gentle close button */}
+        <div className="sh-note-modal-footer">
+          <button className="sh-note-modal-close-btn" onClick={onClose}>
+            <ArrowLeft size={14} /> Go Back
+          </button>
+        </div>
       </div>
     </div>
   );
