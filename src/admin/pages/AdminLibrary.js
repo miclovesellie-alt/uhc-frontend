@@ -220,7 +220,8 @@ function BooksTab({ courses, onCourseAdded }) {
 ══════════════════════════════════════ */
 function StudyHubTab({ courses, onCourseAdded }) {
   const [subTab, setSubTab] = useState("flashcards");
-  const [flashcards, setFlashcards] = useState([]);
+  const [flashcards, setFlashcards] = useState([]);   // manually-created only (editable)
+  const [flashcardsTotal, setFlashcardsTotal] = useState(0); // all flashcards incl. question-derived
   const [notes, setNotes]      = useState([]);
   const [resources, setResources]  = useState([]);
   const [loading, setLoading] = useState(true);
@@ -244,8 +245,11 @@ function StudyHubTab({ courses, onCourseAdded }) {
     setLoading(true);
     try {
       const r = await api.get("studyhub/all");
-      // Only show manually-created flashcards (not question-derived ones which have q_ prefix IDs)
-      setFlashcards((r.data.flashcards || []).filter(c => !String(c._id).startsWith("q_")));
+      const allFc = r.data.flashcards || [];
+      // Total count = everything students see (manual + question-derived)
+      setFlashcardsTotal(allFc.length);
+      // Editable list = only manually-created cards (not question-derived)
+      setFlashcards(allFc.filter(c => !String(c._id).startsWith("q_")));
       setNotes(r.data.notes || []);
       setResources(r.data.resources || []);
     } catch { } finally { setLoading(false); }
@@ -323,7 +327,7 @@ function StudyHubTab({ courses, onCourseAdded }) {
       {/* Sub-tabs */}
       <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
         {[
-          { key: "flashcards", label: "🃏 Flashcards", count: flashcards.length },
+        { key: "flashcards", label: "🃏 Flashcards", count: flashcardsTotal },
           { key: "notes",      label: "📝 Notes",       count: notes.length },
           { key: "resources",  label: "🔗 Resources",   count: resources.length },
         ].map(t => (
