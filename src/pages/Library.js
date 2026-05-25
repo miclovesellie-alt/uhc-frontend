@@ -4,8 +4,8 @@ import { UserContext } from "../context/UserContext";
 import api from "../api/api";
 import {
   GraduationCap, Search, RotateCcw, ExternalLink, BookOpen,
-  Layers, Link2, ChevronDown, ChevronUp, Play, FileText, Wrench,
-  HelpCircle, ChevronRight, BookMarked, ArrowLeft
+  Layers, Link2, ChevronDown, Play, FileText, Wrench,
+  HelpCircle, ChevronRight, BookMarked, ArrowLeft, Heart, X, BookText
 } from "lucide-react";
 import { useToast } from "../components/Toast";
 import { usePageEnabled, MaintenanceScreen } from "../hooks/usePageEnabled";
@@ -15,8 +15,11 @@ import "../styles/StudyHub.css";
    STORAGE HELPER — track studied cards per session
 ════════════════════════════════════════════════════════ */
 const STORAGE_KEY = "uhc_studied_cards";
-function getStudied()     { try { return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]")); } catch { return new Set(); } }
-function saveStudied(set) { localStorage.setItem(STORAGE_KEY, JSON.stringify([...set])); }
+const LIKED_KEY   = "uhc_liked_cards";
+function getStudied()      { try { return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]")); } catch { return new Set(); } }
+function saveStudied(set)  { localStorage.setItem(STORAGE_KEY, JSON.stringify([...set])); }
+function getLiked()        { try { return new Set(JSON.parse(localStorage.getItem(LIKED_KEY)   || "[]")); } catch { return new Set(); } }
+function saveLiked(set)    { localStorage.setItem(LIKED_KEY,   JSON.stringify([...set])); }
 
 /* ════════════════════════════════════════════════════════
    COURSE EMOJI MAP
@@ -84,6 +87,103 @@ function EmptyState({ icon, title, sub }) {
 }
 
 /* ════════════════════════════════════════════════════════
+   COURSE SELECTOR  (dropdown style for notes / resources)
+════════════════════════════════════════════════════════ */
+function CourseSelector({ courses, activeCourse, onChange }) {
+  const [open, setOpen] = useState(false);
+  const selected = activeCourse || "All Courses";
+
+  return (
+    <div className="sh-course-selector">
+      <button
+        className="sh-course-selector-btn"
+        onClick={() => setOpen(o => !o)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <span className="sh-course-selector-emoji">
+          {activeCourse ? getCourseEmoji(activeCourse) : "📚"}
+        </span>
+        <span className="sh-course-selector-label">{selected}</span>
+        <ChevronDown size={14} className={`sh-course-selector-chevron${open ? " open" : ""}`} />
+      </button>
+
+      {open && (
+        <>
+          <div className="sh-course-selector-backdrop" onClick={() => setOpen(false)} />
+          <div className="sh-course-selector-dropdown" role="listbox">
+            <button
+              className={`sh-course-selector-option${!activeCourse ? " active" : ""}`}
+              onClick={() => { onChange(null); setOpen(false); }}
+            >
+              <span>📚</span> All Courses
+            </button>
+            {courses.map(c => (
+              <button
+                key={c}
+                className={`sh-course-selector-option${activeCourse === c ? " active" : ""}`}
+                onClick={() => { onChange(c); setOpen(false); }}
+                role="option"
+                aria-selected={activeCourse === c}
+              >
+                <span>{getCourseEmoji(c)}</span> {c}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════
+   NOTE MODAL  (shown when a note card is clicked)
+════════════════════════════════════════════════════════ */
+function NoteModal({ note, onClose }) {
+  // Close on Escape key
+  useEffect(() => {
+    const handler = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  return (
+    <div className="sh-note-modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
+      <div
+        className="sh-note-modal"
+        style={{ "--note-color": note.color || "#10b981" }}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="sh-note-modal-header">
+          <div className="sh-note-modal-title-row">
+            <span className="sh-note-modal-emoji">{note.emoji || "📝"}</span>
+            <div>
+              <div className="sh-note-modal-title">{note.title}</div>
+              <span
+                className="sh-note-modal-course"
+                style={{ background: `${note.color || "#10b981"}20`, color: note.color || "#10b981" }}
+              >
+                {note.course}
+              </span>
+            </div>
+          </div>
+          <button className="sh-note-modal-close" onClick={onClose} aria-label="Close note">
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Divider */}
+        <div className="sh-note-modal-divider" style={{ background: note.color || "#10b981" }} />
+
+        {/* Body */}
+        <div className="sh-note-modal-body">{note.body}</div>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════
    COURSE SELECTION CARD
 ════════════════════════════════════════════════════════ */
 function CourseCard({ course, count, gradient, emoji, onClick }) {
@@ -104,9 +204,9 @@ function CourseCard({ course, count, gradient, emoji, onClick }) {
 }
 
 /* ════════════════════════════════════════════════════════
-   FLASHCARD  (flip effect)
+   FLASHCARD  (flip effect + like button)
 ════════════════════════════════════════════════════════ */
-function FlashCard({ card, studied, onToggleStudied }) {
+function FlashCard({ card, studied, liked, onToggleStudied, onToggleLiked }) {
   const [flipped, setFlipped] = useState(false);
 
   // Parse hint into option list if it's a question-converted card (has •)
@@ -125,7 +225,17 @@ function FlashCard({ card, studied, onToggleStudied }) {
         <div className="sh-fc-front">
           <div className="sh-fc-front-top">
             <span className="sh-fc-emoji">{card.emoji || "🃏"}</span>
-            <span className="sh-fc-course-badge">{card.course}</span>
+            <div className="sh-fc-front-actions">
+              <button
+                className={`sh-fc-like-btn${liked ? " liked" : ""}`}
+                onClick={e => { e.stopPropagation(); onToggleLiked(card._id); }}
+                title={liked ? "Unlike" : "Like this card"}
+                aria-label={liked ? "Unlike" : "Like"}
+              >
+                <Heart size={13} fill={liked ? "currentColor" : "none"} />
+              </button>
+              <span className="sh-fc-course-badge">{card.course}</span>
+            </div>
           </div>
           <div className="sh-fc-question">{card.question}</div>
           {/* For question cards show the 4 options on the front as well */}
@@ -175,31 +285,30 @@ function FlashCard({ card, studied, onToggleStudied }) {
 }
 
 /* ════════════════════════════════════════════════════════
-   NOTE CARD  (expandable body)
+   NOTE CARD  (click to open modal)
 ════════════════════════════════════════════════════════ */
-function NoteCard({ note }) {
-  const [expanded, setExpanded] = useState(false);
-  const PREVIEW_LEN = 200;
-  const isLong = (note.body || "").length > PREVIEW_LEN;
+function NoteCard({ note, onOpen }) {
+  const PREVIEW_LEN = 160;
+  const preview = (note.body || "").length > PREVIEW_LEN
+    ? note.body.slice(0, PREVIEW_LEN) + "…"
+    : note.body;
 
   return (
-    <div className="sh-note-card" style={{ "--note-color": note.color || "#10b981" }}>
+    <button className="sh-note-card" style={{ "--note-color": note.color || "#10b981" }} onClick={() => onOpen(note)}>
       <div className="sh-note-header">
         <span className="sh-note-emoji">{note.emoji || "📝"}</span>
-        <span className="sh-note-title">{note.title}</span>
-        <span className="sh-note-course-badge" style={{ background: `${note.color || "#10b981"}18`, color: note.color || "#10b981" }}>
-          {note.course}
-        </span>
+        <div className="sh-note-header-text">
+          <span className="sh-note-title">{note.title}</span>
+          <span className="sh-note-course-badge" style={{ background: `${note.color || "#10b981"}18`, color: note.color || "#10b981" }}>
+            {note.course}
+          </span>
+        </div>
       </div>
-      <div className="sh-note-body">
-        {expanded || !isLong ? note.body : note.body.slice(0, PREVIEW_LEN) + "…"}
+      <div className="sh-note-body">{preview}</div>
+      <div className="sh-note-open-hint">
+        <BookText size={11} /> Tap to read full note
       </div>
-      {isLong && (
-        <button className="sh-note-expand-btn" onClick={() => setExpanded(e => !e)}>
-          {expanded ? <><ChevronUp size={13} style={{ verticalAlign: "middle" }} /> Show less</> : <><ChevronDown size={13} style={{ verticalAlign: "middle" }} /> Read more</>}
-        </button>
-      )}
-    </div>
+    </button>
   );
 }
 
@@ -238,7 +347,7 @@ function ResourceCard({ resource }) {
 /* ════════════════════════════════════════════════════════
    COURSE FLASHCARD VIEW  (shown after selecting a course)
 ════════════════════════════════════════════════════════ */
-function CourseFlashcardView({ course, cards, studiedSet, onToggleStudied, onBack, searchQuery }) {
+function CourseFlashcardView({ course, cards, studiedSet, likedSet, onToggleStudied, onToggleLiked, onBack, searchQuery }) {
   const q = (searchQuery || "").toLowerCase().trim();
   const filtered = cards.filter(c =>
     !q || c.question.toLowerCase().includes(q) || c.answer.toLowerCase().includes(q)
@@ -283,7 +392,9 @@ function CourseFlashcardView({ course, cards, studiedSet, onToggleStudied, onBac
                 key={card._id}
                 card={card}
                 studied={studiedSet.has(card._id)}
+                liked={likedSet.has(card._id)}
                 onToggleStudied={onToggleStudied}
+                onToggleLiked={onToggleLiked}
               />
             ))}
           </div>
@@ -307,15 +418,16 @@ export default function Library() {
   const [flashcards, setFlashcards] = useState([]);
   const [notes,      setNotes]      = useState([]);
   const [resources,  setResources]  = useState([]);
-  const [courses,    setCourses]    = useState([]); // derived unique course names
   const [loading,    setLoading]    = useState(true);
 
   /* ── UI state ── */
   const [activeTab,      setActiveTab]      = useState("flashcards"); // flashcards | notes | resources
-  const [selectedCourse, setSelectedCourse] = useState(null);        // null = show course grid
+  const [selectedCourse, setSelectedCourse] = useState(null);        // null = show course grid (flashcards)
   const [activeCourse,   setActiveCourse]   = useState(null);        // for notes/resources filter
   const [localSearch,    setLocalSearch]    = useState("");
   const [studiedSet,     setStudiedSet]     = useState(() => getStudied());
+  const [likedSet,       setLikedSet]       = useState(() => getLiked());
+  const [openNote,       setOpenNote]       = useState(null);         // note modal
 
   /* ── Fetch ── */
   const fetchAll = useCallback(() => {
@@ -355,6 +467,17 @@ export default function Library() {
     });
   }, [toast]);
 
+  /* ── Like toggle ── */
+  const toggleLiked = useCallback((id) => {
+    setLikedSet(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) { next.delete(id); toast("Removed from liked", "info"); }
+      else              { next.add(id);    toast("Added to liked ❤️", "success"); }
+      saveLiked(next);
+      return next;
+    });
+  }, [toast]);
+
   /* ── Early returns ── */
   if (checkingFlag) return null;
   if (disabled)     return <MaintenanceScreen pageName="Study Hub" />;
@@ -387,15 +510,24 @@ export default function Library() {
     return matchCourse && matchSearch;
   });
 
+  // Derive note courses
+  const noteCourses = [...new Set(notes.map(n => n.course).filter(Boolean))].sort();
+
   const filteredRes = resources.filter(r => {
     const matchCourse = !activeCourse || r.course === activeCourse;
     const matchSearch = !q || r.title.toLowerCase().includes(q) || (r.description || "").toLowerCase().includes(q);
     return matchCourse && matchSearch;
   });
 
+  // Derive resource courses
+  const resCourses = [...new Set(resources.map(r => r.course).filter(Boolean))].sort();
+
   /* ═══ RENDER ═══ */
   return (
     <div className="sh-wrapper">
+
+      {/* ─── Note Modal ─── */}
+      {openNote && <NoteModal note={openNote} onClose={() => setOpenNote(null)} />}
 
       {/* ─── Header ─── */}
       <div className="sh-header">
@@ -417,21 +549,21 @@ export default function Library() {
       <div className="sh-tabs">
         <button
           className={`sh-tab${activeTab === "flashcards" ? " active" : ""}`}
-          onClick={() => { setActiveTab("flashcards"); setSelectedCourse(null); }}
+          onClick={() => { setActiveTab("flashcards"); setSelectedCourse(null); setActiveCourse(null); }}
         >
           <Layers size={15} /> Flashcards
           <span className="sh-tab-count">{flashcards.length}</span>
         </button>
         <button
           className={`sh-tab${activeTab === "notes" ? " active" : ""}`}
-          onClick={() => { setActiveTab("notes"); setSelectedCourse(null); }}
+          onClick={() => { setActiveTab("notes"); setSelectedCourse(null); setActiveCourse(null); }}
         >
           <BookOpen size={15} /> Quick Notes
           <span className="sh-tab-count">{filteredNotes.length}</span>
         </button>
         <button
           className={`sh-tab${activeTab === "resources" ? " active" : ""}`}
-          onClick={() => { setActiveTab("resources"); setSelectedCourse(null); }}
+          onClick={() => { setActiveTab("resources"); setSelectedCourse(null); setActiveCourse(null); }}
         >
           <Link2 size={15} /> Resources
           <span className="sh-tab-count">{filteredRes.length}</span>
@@ -453,7 +585,9 @@ export default function Library() {
             course={selectedCourse}
             cards={flashcardsByCourse[selectedCourse] || []}
             studiedSet={studiedSet}
+            likedSet={likedSet}
             onToggleStudied={toggleStudied}
+            onToggleLiked={toggleLiked}
             onBack={() => setSelectedCourse(null)}
             searchQuery={localSearch || searchQuery}
           />
@@ -468,7 +602,7 @@ export default function Library() {
               <div>
                 <div className="sh-course-hero-title">Choose a Course to Study</div>
                 <div className="sh-course-hero-sub">
-                  {fcCourseList.length} course{fcCourseList.length !== 1 ? "s" : ""} available
+                  {fcCourseList.length} course{fcCourseList.length !== 1 ? "s" : ""}
                   · {flashcards.length} total flashcards
                 </div>
               </div>
@@ -503,23 +637,39 @@ export default function Library() {
       ═══════════════════════════════════════════ */}
       {!loading && activeTab === "notes" && (
         <div>
-          {/* Course filter pills for notes */}
-          <div className="sh-pills" style={{ marginBottom: 24 }}>
-            <button className={`sh-pill${!activeCourse ? " active" : ""}`} onClick={() => setActiveCourse(null)}>All</button>
-            {courses.map(c => (
-              <button
-                key={c}
-                className={`sh-pill${activeCourse === c ? " active" : ""}`}
-                onClick={() => setActiveCourse(c)}
-              >{c}</button>
-            ))}
+          {/* Course selector for notes */}
+          <div className="sh-tab-toolbar">
+            <div className="sh-tab-toolbar-left">
+              <CourseSelector
+                courses={noteCourses}
+                activeCourse={activeCourse}
+                onChange={setActiveCourse}
+              />
+              {activeCourse && (
+                <span className="sh-active-course-chip">
+                  {getCourseEmoji(activeCourse)} {activeCourse}
+                  <button
+                    className="sh-active-course-chip-x"
+                    onClick={() => setActiveCourse(null)}
+                    aria-label="Clear course filter"
+                  >
+                    <X size={11} />
+                  </button>
+                </span>
+              )}
+            </div>
+            <span className="sh-result-count">
+              {filteredNotes.length} note{filteredNotes.length !== 1 ? "s" : ""}
+            </span>
           </div>
 
           {filteredNotes.length === 0
             ? <EmptyState icon="📝" title="No notes yet" sub={q ? "Try a different search term" : "Your instructor's study notes will appear here."} />
             : (
               <div className="sh-notes-grid">
-                {filteredNotes.map(n => <NoteCard key={n._id} note={n} />)}
+                {filteredNotes.map(n => (
+                  <NoteCard key={n._id} note={n} onOpen={setOpenNote} />
+                ))}
               </div>
             )
           }
@@ -531,16 +681,30 @@ export default function Library() {
       ═══════════════════════════════════════════ */}
       {!loading && activeTab === "resources" && (
         <div>
-          {/* Course filter pills for resources */}
-          <div className="sh-pills" style={{ marginBottom: 24 }}>
-            <button className={`sh-pill${!activeCourse ? " active" : ""}`} onClick={() => setActiveCourse(null)}>All</button>
-            {courses.map(c => (
-              <button
-                key={c}
-                className={`sh-pill${activeCourse === c ? " active" : ""}`}
-                onClick={() => setActiveCourse(c)}
-              >{c}</button>
-            ))}
+          {/* Course selector for resources */}
+          <div className="sh-tab-toolbar">
+            <div className="sh-tab-toolbar-left">
+              <CourseSelector
+                courses={resCourses}
+                activeCourse={activeCourse}
+                onChange={setActiveCourse}
+              />
+              {activeCourse && (
+                <span className="sh-active-course-chip">
+                  {getCourseEmoji(activeCourse)} {activeCourse}
+                  <button
+                    className="sh-active-course-chip-x"
+                    onClick={() => setActiveCourse(null)}
+                    aria-label="Clear course filter"
+                  >
+                    <X size={11} />
+                  </button>
+                </span>
+              )}
+            </div>
+            <span className="sh-result-count">
+              {filteredRes.length} resource{filteredRes.length !== 1 ? "s" : ""}
+            </span>
           </div>
 
           {filteredRes.length === 0
