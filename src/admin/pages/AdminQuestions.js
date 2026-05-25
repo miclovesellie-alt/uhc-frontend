@@ -33,6 +33,9 @@ export default function AdminQuestions() {
   const [newCourseName, setNewCourseName] = useState("");
   const [addingCourse, setAddingCourse] = useState(false);
   const [courseSearch, setCourseSearch] = useState("");
+  // Inline course creation (inside Add Question panel)
+  const [inlineNewCourse, setInlineNewCourse] = useState("");
+  const [creatingInlineCourse, setCreatingInlineCourse] = useState(false);
 
   // Rename course
   const [editingCourseName, setEditingCourseName] = useState(null); // the course name currently being edited
@@ -244,7 +247,7 @@ export default function AdminQuestions() {
     }
   };
 
-  /* ── Add course ── */
+  /* ── Add course (Course Manager modal) ── */
   const handleAddCourse = async () => {
     if (!newCourseName.trim()) return;
     try {
@@ -253,6 +256,22 @@ export default function AdminQuestions() {
       showToast("Course added");
       setNewCourseName(""); setAddingCourse(false);
     } catch (err) { showToast("Course add failed", "error"); }
+  };
+
+  /* ── Inline create course (inside Add Question panel) ── */
+  const handleInlineCreateCourse = async () => {
+    const name = inlineNewCourse.trim();
+    if (!name) return;
+    setCreatingInlineCourse(true);
+    try {
+      const res = await api.post("courses", { name });
+      setCoursesFromDB(prev => [...prev, res.data]);
+      setNewQ(p => ({ ...p, course: res.data.name }));
+      setInlineNewCourse("");
+      showToast(`Course "${res.data.name}" created!`);
+    } catch (err) {
+      showToast(err.response?.data?.message || "Failed to create course", "error");
+    } finally { setCreatingInlineCourse(false); }
   };
 
   /* ── Delete course ── */
@@ -541,6 +560,33 @@ export default function AdminQuestions() {
                   <option value="">— Select a course —</option>
                   {coursesFromDB.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
                 </select>
+                {/* Inline: create a new course without leaving this panel */}
+                <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
+                  <input
+                    className="admin-input"
+                    style={{ flex: 1, fontSize: ".82rem" }}
+                    placeholder="Or type new course name…"
+                    value={inlineNewCourse}
+                    onChange={e => setInlineNewCourse(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); handleInlineCreateCourse(); } }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleInlineCreateCourse}
+                    disabled={!inlineNewCourse.trim() || creatingInlineCourse}
+                    style={{
+                      padding: "8px 13px", borderRadius: 8, border: "none", cursor: inlineNewCourse.trim() ? "pointer" : "default",
+                      background: inlineNewCourse.trim() ? "#10b981" : "#e2e8f0",
+                      color: inlineNewCourse.trim() ? "white" : "#94a3b8",
+                      fontWeight: 700, fontSize: ".78rem", whiteSpace: "nowrap", transition: "all .15s",
+                    }}
+                  >
+                    {creatingInlineCourse ? "…" : "+ Create"}
+                  </button>
+                </div>
+                {newQ.course && (
+                  <div style={{ marginTop: 6, fontSize: ".75rem", color: "#10b981", fontWeight: 600 }}>✓ {newQ.course}</div>
+                )}
               </div>
 
               {/* Difficulty */}

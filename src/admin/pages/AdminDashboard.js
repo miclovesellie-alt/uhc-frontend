@@ -6,7 +6,7 @@ import {
 } from "recharts";
 import api from "../../api/api";
 import { UserContext } from "../../context/UserContext";
-import { RefreshCw, TrendingUp, Users, BookOpen, Zap, Activity, Library } from "lucide-react";
+import { RefreshCw, TrendingUp, Users, BookOpen, Zap, Activity, Library, Layers } from "lucide-react";
 
 const COLORS = ["#4255ff","#16a34a","#d97706","#dc2626","#8b5cf6"];
 
@@ -38,7 +38,7 @@ export default function AdminDashboard() {
   const isDark = adminTheme === "dark";
   const tooltipStyle = { background: isDark ? "#1e293b" : "#fff", border: "1px solid #e2e8f0", borderRadius: 10, color: isDark ? "#f1f5f9" : "#0f172a" };
 
-  const [stats, setStats] = useState({ totalUsers:0,totalQuestions:0,totalCourses:0,activeUsers:0,liveUsers:0,totalBooks:0 });
+  const [stats, setStats] = useState({ totalUsers:0,totalQuestions:0,totalCourses:0,activeUsers:0,liveUsers:0,totalBooks:0,totalStudyHub:0 });
   const [signupTrend, setSignupTrend] = useState([]);
   const [recentUsers, setRecentUsers] = useState([]);
   const [adminLogs, setAdminLogs] = useState([]);
@@ -57,7 +57,7 @@ export default function AdminDashboard() {
 
       if (statsRes.status === "fulfilled" && statsRes.value.data) {
         const d = statsRes.value.data;
-        setStats({ totalUsers:d.totalUsers||0, totalQuestions:d.totalQuestions||0, totalCourses:d.totalCourses||0, activeUsers:d.activeUsers||0, liveUsers:d.liveUsers||0, totalBooks:d.totalBooks||0 });
+        setStats({ totalUsers:d.totalUsers||0, totalQuestions:d.totalQuestions||0, totalCourses:d.totalCourses||0, activeUsers:d.activeUsers||0, liveUsers:d.liveUsers||0, totalBooks:d.totalBooks||0, totalStudyHub:d.totalStudyHub||0 });
         if (Array.isArray(d.signupTrend)) setSignupTrend(d.signupTrend);
       }
       if (usersRes.status === "fulfilled") {
@@ -78,11 +78,12 @@ export default function AdminDashboard() {
   }, []);
 
   const kpi = [
-    { label:"Online Now",      value:presence?.onlineIds?.length||0,  icon:<Zap size={18}/>,      color:"green",  trend:"Live",         path:"/admin/users" },
-    { label:"Total Users",     value:stats.totalUsers,                 icon:<Users size={18}/>,    color:"blue",   trend:"All time",     path:"/admin/users" },
-    { label:"Total Questions", value:stats.totalQuestions,             icon:<BookOpen size={18}/>, color:"purple", trend:"In question bank", path:"/admin/questions" },
-    { label:"Recently Active", value:presence?.recentIds?.length||0,  icon:<Activity size={18}/>, color:"orange", trend:"Last 3 mins",  path:"/admin/users" },
-    { label:"Library Books",   value:stats.totalBooks,                 icon:<Library size={18}/>,  color:"blue",   trend:"Total books",  path:"/admin/userlibrary" },
+    { label:"Online Now",      value:presence?.onlineIds?.length||0,  icon:<Zap size={18}/>,      color:"green",  trend:"Live",                path:"/admin/users" },
+    { label:"Total Users",     value:stats.totalUsers,                 icon:<Users size={18}/>,    color:"blue",   trend:"All time",           path:"/admin/users" },
+    { label:"Total Questions", value:stats.totalQuestions,             icon:<BookOpen size={18}/>, color:"purple", trend:"In question bank",    path:"/admin/questions" },
+    { label:"Recently Active", value:presence?.recentIds?.length||0,  icon:<Activity size={18}/>, color:"orange", trend:"Last 3 mins",         path:"/admin/users" },
+    { label:"Library Books",   value:stats.totalBooks,                 icon:<Library size={18}/>,  color:"blue",   trend:"Total books",         path:"/admin/userlibrary" },
+    { label:"Study Hub Items", value:stats.totalStudyHub,              icon:<Layers size={18}/>,   color:"green",  trend:"Cards + Notes + Links", path:"/admin/userlibrary" },
   ];
 
   const chartData = [
