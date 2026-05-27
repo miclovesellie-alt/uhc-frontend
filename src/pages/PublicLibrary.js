@@ -58,7 +58,7 @@ export default function PublicLibrary() {
         </div>
         <div className={`landing-nav-links ${mobileOpen ? "active" : ""}`}>
           <span className="nav-link" onClick={() => { navigate("/"); setMobileOpen(false); }}>Quizzes</span>
-          <span className="nav-link" onClick={() => { navigate("/library"); setMobileOpen(false); }}>Study Hub</span>
+          <span className="nav-link" onClick={() => { navigate("/study-hub"); setMobileOpen(false); }}>Study Hub</span>
           <span className="nav-link" onClick={() => { navigate("/"); setMobileOpen(false); }}>Leaderboard</span>
         </div>
         <div className="landing-nav-right">
@@ -116,7 +116,7 @@ export default function PublicLibrary() {
             <h4>Platform</h4>
             <ul>
               <li><a href="/auth">Quiz Library</a></li>
-              <li><a href="/library">Study Hub</a></li>
+              <li><a href="/study-hub">Study Hub</a></li>
               <li><a href="/auth">Leaderboard</a></li>
               <li><a href="/auth">My Analytics</a></li>
             </ul>

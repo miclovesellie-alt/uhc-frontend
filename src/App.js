@@ -207,8 +207,8 @@ function AppRoutes() {
           <Route path="institutions"   element={<AdminInstitutions />} />
         </Route>
 
-        {/* ===== PUBLIC LIBRARY (GUEST ACCESS) ===== */}
-        {!user && <Route path="/library" element={<PublicLibrary />} />}
+        {/* ===== PUBLIC STUDY HUB (GUEST ACCESS — static, no conditionals) ===== */}
+        <Route path="/study-hub" element={<PublicLibrary />} />
 
         {/* ===== DASHBOARD LAYOUT WRAPPER ===== */}
         <Route
@@ -235,7 +235,7 @@ function AppRoutes() {
           />
 
           {/* ===== LIBRARY / STUDY HUB ===== */}
-          {user && <Route path="/library" element={<Library />} />}
+          <Route path="/library" element={<Library />} />
 
           {/* ===== SEARCH ===== */}
           <Route path="/search" element={<SearchPage />} />
