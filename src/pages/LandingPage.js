@@ -48,6 +48,13 @@ const QUIZ_DATA = [
   ]},
 ];
 
+const QUICK_NOTES_DEMO = [
+  { emoji: "💊", course: "Pharmacology", title: "Digoxin Safety", note: "Hold if apical pulse < 60 bpm. Toxicity signs: nausea, yellow-green vision, bradycardia. Hypokalaemia increases toxicity risk — always check K⁺ before giving." },
+  { emoji: "🩺", course: "Med-Surg", title: "ABG Normal Values", note: "pH 7.35–7.45 · PaCO₂ 35–45 mmHg · HCO₃ 22–26 mEq/L · PaO₂ 80–100 mmHg. pH < 7.35 = Acidosis. pH > 7.45 = Alkalosis." },
+  { emoji: "👶", course: "Maternal-Newborn", title: "Magnesium Toxicity", note: "First sign: loss of patellar reflexes. Then: respiratory depression. Antidote: Calcium Gluconate 1g IV slow push. Keep at bedside whenever MgSO₄ is infusing." },
+  { emoji: "🧠", course: "Psychiatric", title: "Serotonin Syndrome", note: "SSRI + MAOI = Serotonin syndrome: agitation, hyperthermia, clonus, diaphoresis. Wait 14 days after stopping MAOI before starting SSRI." },
+];
+
 const FEATURES = [
   { icon: <Zap size={22}/>, title: "Adaptive Quizzes",       desc: "Smart question banks that focus on your weak areas across every nursing course." },
   { icon: <BookOpen size={22}/>, title: "Study Hub",         desc: "Flashcards, quick notes, and curated resources organised by course — study smarter, not harder." },
@@ -465,15 +472,54 @@ export default function LandingPage() {
         <div style={{ maxWidth:900, margin:"0 auto" }}>
           <div style={{ textAlign:"center", marginBottom:44 }}>
             <span className="section-label">🎓 Study Hub Preview</span>
-            <h2 className="section-title">Flip a Card. Learn Something.</h2>
-            <p style={{ color:"var(--text-secondary)", fontSize:".95rem", maxWidth:520, margin:"10px auto 0" }}>
-              Our Study Hub has interactive flashcards across every nursing course.
-              Tap a card below to reveal the answer — then sign up to access the full set.
+            <h2 className="section-title">Flashcards &amp; Quick Notes — Built for Nurses.</h2>
+            <p style={{ color:"var(--text-secondary)", fontSize:".95rem", maxWidth:560, margin:"10px auto 0" }}>
+              Our free Study Hub gives nursing students interactive flashcards and concise quick notes across
+              every course — pharmacology, med-surg, pediatrics, psychiatry, and more. No login needed to explore.
             </p>
           </div>
 
           {/* Course pills */}
           <LandingFlashcards navigate={navigate} />
+
+          {/* ── Quick Notes Preview (static in DOM for SEO indexing) ── */}
+          <div style={{ marginTop: 56 }}>
+            <div style={{ textAlign: "center", marginBottom: 28 }}>
+              <span className="section-label">📝 Quick Notes</span>
+              <h3 style={{ fontSize: "1.3rem", fontWeight: 800, color: "#0f172a", margin: "8px 0 6px" }}>
+                Key Nursing Concepts at a Glance
+              </h3>
+              <p style={{ color: "#64748b", fontSize: ".9rem", maxWidth: 480, margin: "0 auto" }}>
+                Bite-sized clinical summaries — the exact facts nurses need to remember, nothing more.
+              </p>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))", gap: 16 }}>
+              {QUICK_NOTES_DEMO.map((n, i) => (
+                <article key={i} style={{ background: "white", border: "1px solid #e2e8f0",
+                  borderRadius: 14, padding: "16px 18px",
+                  boxShadow: "0 2px 8px rgba(0,0,0,.04)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                    <span style={{ fontSize: "1.2rem" }}>{n.emoji}</span>
+                    <span style={{ fontSize: ".7rem", fontWeight: 700, color: "#10b981",
+                      background: "rgba(16,185,129,.1)", padding: "2px 9px", borderRadius: 99 }}>{n.course}</span>
+                  </div>
+                  <h4 style={{ fontSize: ".85rem", fontWeight: 700, color: "#0f172a", margin: "0 0 6px" }}>{n.title}</h4>
+                  <p style={{ fontSize: ".83rem", color: "#334155", lineHeight: 1.65, margin: 0 }}>{n.note}</p>
+                </article>
+              ))}
+            </div>
+            <div style={{ textAlign: "center", marginTop: 32 }}>
+              <p style={{ color: "#64748b", fontSize: ".88rem", marginBottom: 14 }}>
+                📚 Hundreds more quick notes across pharmacology, med-surg, pediatrics, psychiatry &amp; more.
+              </p>
+              <button onClick={() => navigate("/study-hub")}
+                style={{ padding: "12px 28px", background: "#0f172a", color: "white",
+                  border: "none", borderRadius: 12, fontWeight: 700, fontSize: ".92rem",
+                  cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 10 }}>
+                📝 Browse All Quick Notes →
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 

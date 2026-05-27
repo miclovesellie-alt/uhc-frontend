@@ -8,12 +8,62 @@
     <meta name="theme-color" content="#10b981" />
 
     <!-- Primary SEO -->
-    <title>UHC Academy | Free Nursing &amp; Medical Exam Prep — Quizzes, Library &amp; Leaderboard</title>
-    <meta name="description" content="Universal Health Community (UHC Academy) — Free nursing education platform for nurses and medical students worldwide. Practice adaptive quizzes, access study library documents, and compete on the global leaderboard. No credit card required." />
-    <meta name="keywords" content="nursing quiz, nursing exam prep, medical student quiz, UHC Academy, Universal Health Community, nursing student platform, NCLEX practice, medical quiz, nursing leaderboard, nursing study library, pharmacology quiz, medical-surgical nursing, pediatric nursing, global nursing education, free medical education" />
+    <title>UHC Academy | Free Nursing Flashcards, Quick Notes & Exam Prep — Study Hub</title>
+    <meta name="description" content="UHC Academy — Free nursing Study Hub with interactive flashcards, quick notes, and adaptive quizzes for nurses and medical students worldwide. Study pharmacology, med-surg, pediatrics and more. No sign-up required to browse." />
+    <meta name="keywords" content="nursing flashcards, nursing quick notes, free nursing study hub, NCLEX flashcards, nursing exam prep, medical student quiz, UHC Academy, Universal Health Community, pharmacology notes, med-surg nursing notes, pediatric nursing flashcards, nursing study notes, free medical education, adaptive nursing quiz, nursing leaderboard, study hub nursing" />
     <meta name="author" content="Universal Health Community" />
     <meta name="robots" content="index, follow" />
     <!-- Per-page canonical is set dynamically by react-helmet-async in each page component -->
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      "name": "UHC Academy",
+      "alternateName": "Universal Health Community",
+      "url": "https://uhcacadamy.com",
+      "logo": "https://uhcacadamy.com/logo512.png",
+      "description": "Free nursing education platform offering interactive flashcards, quick notes, adaptive quizzes, and a global leaderboard for nursing and medical students worldwide.",
+      "sameAs": [],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Nursing Study Hub",
+        "url": "https://uhcacadamy.com/study-hub",
+        "itemListElement": [
+          {
+            "@type": "Course",
+            "name": "Nursing Flashcards",
+            "description": "Interactive nursing flashcards covering pharmacology, med-surg, maternal-newborn, pediatrics, psychiatric, and fundamentals nursing courses.",
+            "provider": { "@type": "Organization", "name": "UHC Academy" },
+            "educationalLevel": "Undergraduate",
+            "teaches": "Nursing",
+            "isAccessibleForFree": true,
+            "url": "https://uhcacadamy.com/study-hub"
+          },
+          {
+            "@type": "Course",
+            "name": "Nursing Quick Notes",
+            "description": "Concise nursing quick notes and clinical summaries covering key drug dosages, ABG values, priority nursing actions, and disease management.",
+            "provider": { "@type": "Organization", "name": "UHC Academy" },
+            "educationalLevel": "Undergraduate",
+            "teaches": "Nursing",
+            "isAccessibleForFree": true,
+            "url": "https://uhcacadamy.com/study-hub"
+          },
+          {
+            "@type": "Course",
+            "name": "Adaptive Nursing Quizzes",
+            "description": "NCLEX-style adaptive nursing quizzes across all major nursing courses with real-time feedback and progress analytics.",
+            "provider": { "@type": "Organization", "name": "UHC Academy" },
+            "educationalLevel": "Undergraduate",
+            "teaches": "Nursing",
+            "isAccessibleForFree": true
+          }
+        ]
+      }
+    }
+    </script>
 
     <!-- Open Graph (Facebook / WhatsApp) -->
     <meta property="og:type" content="website" />
