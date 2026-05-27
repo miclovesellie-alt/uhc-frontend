@@ -705,7 +705,7 @@ html,body,#root{height:auto!important;min-height:100%;overflow-x:hidden!importan
   }
   .hero-text h1 { font-size: 3.5rem; }
   .hero-actions { justify-content: center; }
-  .hero-image-wrapper { max-width: 500px; margin: 0 auto; }
+  .hero-image-wrapper { max-width: 500px; width: 100%; margin: 0 auto; }
   .hero-floating-card { left: 50%; transform: translateX(-50%); bottom: -20px; }
   
   .ai-assistant-container {
@@ -751,6 +751,8 @@ html,body,#root{height:auto!important;min-height:100%;overflow-x:hidden!importan
   .hero-text h1 { font-size: 2.8rem; }
   .hero-text p { font-size: 1.1rem; }
   .hero-section { min-height: unset; padding-bottom: 80px; }
+  .hero-image-wrapper { max-width: 100%; width: 100%; margin: 0 auto; }
+  .hero-image-container { min-height: 300px; aspect-ratio: 3/4; }
   
   .section-title { font-size: 2.2rem; }
   .section-subtitle { font-size: 1rem; margin-bottom: 40px; }
@@ -785,6 +787,8 @@ html,body,#root{height:auto!important;min-height:100%;overflow-x:hidden!importan
   .hero-text h1 { font-size: 2.2rem; }
   .hero-actions { flex-direction: column; width: 100%; }
   .hero-btn, .hero-btn-secondary { width: 100%; }
+  .hero-image-wrapper { max-width: 100%; width: 100%; }
+  .hero-image-container { min-height: 280px; aspect-ratio: 4/3; }
   
   .ai-model-card { width: 100%; max-width: 300px; height: 580px; }
   .ai-q-btn { padding: 16px 20px; font-size: 0.95rem; }
