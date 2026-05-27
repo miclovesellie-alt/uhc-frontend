@@ -269,7 +269,7 @@ export default function LandingPage() {
         <div className="hero-text">
           <motion.div initial={{ opacity:0, x:-24 }} animate={{ opacity:1, x:0 }} transition={{ duration:.6 }}>
             <span className="section-label">Free Nursing Education Platform — For Every Student</span>
-            <h1>Study Smarter.<br /><span className="highlight">Pass Your Exams.</span></h1>
+            <h1>Focus on Learning.<br /><span className="highlight">We Handle the Rest.</span></h1>
             <p style={{ color:"var(--text-secondary)", fontSize:"1.05rem", lineHeight:1.75, margin:"20px 0 32px", maxWidth:480 }}>
               UHC Academy gives nursing students worldwide access to adaptive quizzes,
               a Study Hub with flashcards and notes, and a live leaderboard — completely free.
