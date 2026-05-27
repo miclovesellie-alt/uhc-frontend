@@ -63,7 +63,7 @@ const LEADERS_FALLBACK = [
   { rank:5, name:"Ama B.",  score:3980,  badge:"⭐" },
 ];
 
-const HERO_SLIDES = [favIconImg, practicalImg, booksImg];
+const HERO_SLIDES = [graduation, favIconImg, practicalImg, booksImg];
 
 /* ─── Landing Flashcard Demo ────────────────────────────────────── */
 function LandingFlashcards({ navigate }) {
@@ -304,10 +304,9 @@ export default function LandingPage() {
                   width: "100%",
                   height: "100%",
                   objectFit: "cover",
+                  objectPosition: "center top",
                   opacity: i === heroIdx ? 1 : 0,
-                  transition: "opacity 1.2s cubic-bezier(.4,0,.2,1), transform 5s ease",
-                  transform: i === heroIdx ? "scale(1.04)" : "scale(1)",
-                  willChange: "opacity, transform",
+                  transition: "opacity 1.2s cubic-bezier(.4,0,.2,1)",
                 }}
               />
             ))}
