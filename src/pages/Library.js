@@ -424,7 +424,8 @@ export default function Library() {
   const { user }  = useContext(UserContext);
   const isAdmin   = user?.role === "admin" || user?.role === "superadmin";
   const { disabled, loading: checkingFlag } = usePageEnabled("disableLibrary", isAdmin);
-  const { searchQuery } = useOutletContext();
+  const context = useOutletContext();
+  const searchQuery = context?.searchQuery || "";
   const toast = useToast();
 
   /* ── Data ── */

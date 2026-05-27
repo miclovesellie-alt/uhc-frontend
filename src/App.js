@@ -18,6 +18,7 @@ import ProfilePage from "./components/ProfilePage";
 
 // ===== LIBRARY IMPORTS =====
 import Library from "./pages/Library";
+import PublicLibrary from "./pages/PublicLibrary";
 
 // ===== OTHER PAGE IMPORTS =====
 import FYP from "./components/FYP";
@@ -206,6 +207,9 @@ function AppRoutes() {
           <Route path="institutions"   element={<AdminInstitutions />} />
         </Route>
 
+        {/* ===== PUBLIC LIBRARY (GUEST ACCESS) ===== */}
+        {!user && <Route path="/library" element={<PublicLibrary />} />}
+
         {/* ===== DASHBOARD LAYOUT WRAPPER ===== */}
         <Route
           element={
@@ -231,7 +235,7 @@ function AppRoutes() {
           />
 
           {/* ===== LIBRARY / STUDY HUB ===== */}
-          <Route path="/library" element={<Library />} />
+          {user && <Route path="/library" element={<Library />} />}
 
           {/* ===== SEARCH ===== */}
           <Route path="/search" element={<SearchPage />} />

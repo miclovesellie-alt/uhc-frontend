@@ -162,7 +162,7 @@ function LandingFlashcards({ navigate }) {
         <p style={{ color:"#64748b", fontSize:".9rem", marginBottom:16 }}>
           🔒 Sign up free to unlock <strong>hundreds more flashcards</strong>, notes &amp; resources across all nursing courses.
         </p>
-        <button onClick={() => navigate("/auth")}
+        <button onClick={() => navigate("/library")}
           style={{ padding:"12px 32px", background:"#10b981", color:"white",
             border:"none", borderRadius:12, fontWeight:800, fontSize:".95rem",
             cursor:"pointer", display:"inline-flex", alignItems:"center", gap:10,
@@ -252,7 +252,7 @@ export default function LandingPage() {
         </div>
         <div className={`landing-nav-links ${mobileOpen ? "active" : ""}`}>
           <span className="nav-link" onClick={() => { navigate("/auth"); setMobileOpen(false); }}>Quizzes</span>
-          <span className="nav-link" onClick={() => { navigate("/auth"); setMobileOpen(false); }}>Study Hub</span>
+          <span className="nav-link" onClick={() => { navigate("/library"); setMobileOpen(false); }}>Study Hub</span>
           <span className="nav-link" onClick={() => { navigate("/auth"); setMobileOpen(false); }}>Leaderboard</span>
         </div>
         <div className="landing-nav-right">
@@ -276,7 +276,7 @@ export default function LandingPage() {
             </p>
             <div className="hero-actions">
               <button className="hero-btn" onClick={() => navigate("/auth")}>Create Free Account</button>
-              <button className="hero-btn-secondary" onClick={() => navigate("/auth")}>Open Study Hub</button>
+              <button className="hero-btn-secondary" onClick={() => navigate("/library")}>Open Study Hub</button>
             </div>
           </motion.div>
         </div>
@@ -536,7 +536,7 @@ export default function LandingPage() {
             <h4>Platform</h4>
             <ul>
               <li><a href="/auth">Quiz Library</a></li>
-              <li><a href="/auth">Study Hub</a></li>
+              <li><a href="/library">Study Hub</a></li>
               <li><a href="/auth">Leaderboard</a></li>
               <li><a href="/auth">My Analytics</a></li>
             </ul>
