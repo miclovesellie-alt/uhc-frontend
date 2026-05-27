@@ -208,6 +208,8 @@ html,body,#root{height:auto!important;min-height:100%;overflow-x:hidden!importan
   background: #e2e8f0;
 }
 .hero-image-container img {
+  position: absolute;
+  inset: 0;
   width: 100%; height: 100%; object-fit: cover;
 }
 .hero-floating-card {

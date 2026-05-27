@@ -5,6 +5,9 @@ import { motion } from "framer-motion";
 import { BookOpen, Zap, TrendingUp, Trophy, ArrowRight, Lock, Star, CheckCircle2, Menu, X, RotateCcw, Layers } from "lucide-react";
 import "../styles/landingpage.css";
 import graduation from "../assets/graduation.jpeg";
+import favIconImg from "../assets/fav icon.jpeg";
+import practicalImg from "../assets/practical.jpeg";
+import booksImg from "../assets/books with lenses.jpeg";
 
 /* ─── Static data ──────────────────────────────────────────────── */
 /* ── Study Hub Demo Flashcards (visible to all, crawlable by Google) ── */
@@ -59,6 +62,8 @@ const LEADERS_FALLBACK = [
   { rank:4, name:"Nana K.", score:4150,  badge:"⭐" },
   { rank:5, name:"Ama B.",  score:3980,  badge:"⭐" },
 ];
+
+const HERO_SLIDES = [favIconImg, practicalImg, booksImg];
 
 /* ─── Landing Flashcard Demo ────────────────────────────────────── */
 function LandingFlashcards({ navigate }) {
@@ -180,7 +185,7 @@ export default function LandingPage() {
   const navigate = useNavigate();
   const [scrolled,        setScrolled]        = useState(false);
   const [mobileOpen,      setMobileOpen]       = useState(false);
-  const [heroImage,       setHeroImage]        = useState(graduation);
+  const [heroIdx,         setHeroIdx]          = useState(0);
   const [leaders,         setLeaders]          = useState(LEADERS_FALLBACK);
   const [contactForm,     setContactForm]      = useState({ name:"", email:"", message:"" });
   const [contactStatus,   setContactStatus]    = useState(null);
@@ -206,13 +211,18 @@ export default function LandingPage() {
         badge:["🥇","🥈","🥉","⭐","⭐"][i],
       })));
     }).catch(()=>{});
-    api.get("settings/heroImageUrl").then(r => {
-      if (r.data?.value) setHeroImage(r.data.value);
-    }).catch(()=>{});
     api.get("settings/contactInfo").then(r => {
       if (r.data?.value && typeof r.data.value === "object")
         setSiteContact(prev => ({ ...prev, ...r.data.value }));
     }).catch(()=>{});
+  }, []);
+
+  // Auto-advance hero slideshow
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setHeroIdx(i => (i + 1) % HERO_SLIDES.length);
+    }, 4500);
+    return () => clearInterval(timer);
   }, []);
 
   const selectCourse = (i) => { setCourse(i); setQIdx(0); setPhase("quiz"); setBusy(false); };
@@ -282,13 +292,56 @@ export default function LandingPage() {
         </div>
         <div className="hero-image-wrapper">
           <div className="hero-image-container">
-            <img src={heroImage} alt="Nursing student" onError={e => { e.target.onerror=null; e.target.src=graduation; }} />
-            <div className="hero-floating-card">
-              <div style={{ background:"#10b981", padding:8, borderRadius:10, color:"white" }}><Trophy size={18}/></div>
-              <div>
-                <div style={{ fontWeight:800, fontSize:".88rem" }}>Free forever</div>
-                <div style={{ fontSize:".73rem", color:"#64748b" }}>No credit card needed</div>
-              </div>
+            {HERO_SLIDES.map((src, i) => (
+              <img
+                key={i}
+                src={src}
+                alt="UHC Academy"
+                onError={e => { e.target.onerror=null; e.target.src=graduation; }}
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  opacity: i === heroIdx ? 1 : 0,
+                  transition: "opacity 1.2s cubic-bezier(.4,0,.2,1), transform 5s ease",
+                  transform: i === heroIdx ? "scale(1.04)" : "scale(1)",
+                  willChange: "opacity, transform",
+                }}
+              />
+            ))}
+
+            {/* Futuristic gradient vignette */}
+            <div style={{
+              position: "absolute", inset: 0, pointerEvents: "none",
+              background: "linear-gradient(180deg, rgba(15,23,42,0.08) 0%, transparent 40%, rgba(15,23,42,0.4) 100%)",
+              zIndex: 1,
+            }} />
+
+            {/* Slide indicator pills */}
+            <div style={{
+              position: "absolute", bottom: 18, left: "50%", transform: "translateX(-50%)",
+              display: "flex", gap: 7, zIndex: 2,
+            }}>
+              {HERO_SLIDES.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setHeroIdx(i)}
+                  aria-label={`Slide ${i + 1}`}
+                  style={{
+                    width: i === heroIdx ? 26 : 8,
+                    height: 8,
+                    borderRadius: 99,
+                    border: "none",
+                    background: i === heroIdx ? "#10b981" : "rgba(255,255,255,0.5)",
+                    transition: "width .45s cubic-bezier(.4,0,.2,1), background .45s, box-shadow .45s",
+                    cursor: "pointer",
+                    padding: 0,
+                    boxShadow: i === heroIdx ? "0 0 10px rgba(16,185,129,.7)" : "none",
+                  }}
+                />
+              ))}
             </div>
           </div>
         </div>
