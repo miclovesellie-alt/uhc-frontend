@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Plus, Search, Edit2, Trash2, BookOpen, ChevronDown, ChevronUp, Copy, AlertTriangle, Pencil, MoveRight } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, BookOpen, ChevronDown, ChevronUp, Copy, AlertTriangle, Pencil, MoveRight, FileDown } from "lucide-react";
 import api from "../../api/api";
 import { useToast } from "../../hooks/useToast";
 
@@ -44,6 +44,10 @@ export default function AdminQuestions() {
   // Move questions to course
   const [showMoveModal, setShowMoveModal] = useState(false);
   const [moveTargetCourse, setMoveTargetCourse] = useState("");
+
+  // Export
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportCourse, setExportCourse] = useState("__ALL__");
 
   const [newQ, setNewQ] = useState({ question: "", options: ["","","",""], answer: null, course: "", difficulty: "Medium", explanation: "" });
 
@@ -247,6 +251,77 @@ export default function AdminQuestions() {
     }
   };
 
+  /* ── Export questions ── */
+  const handleExport = () => {
+    const courseList = exportCourse === "__ALL__"
+      ? courses.filter(c => c !== "All")
+      : [exportCourse];
+
+    const toExport = questions.filter(q =>
+      exportCourse === "__ALL__" ? true : q.course === exportCourse
+    );
+
+    if (toExport.length === 0) {
+      showToast("No questions found for this selection", "error");
+      return;
+    }
+
+    // Group by course for nicer output
+    const grouped = {};
+    toExport.forEach(q => {
+      const c = q.course || "(No Course)";
+      if (!grouped[c]) grouped[c] = [];
+      grouped[c].push(q);
+    });
+
+    const lines = [];
+    const totalLabel = exportCourse === "__ALL__" ? "All Courses" : exportCourse;
+    lines.push(`═══════════════════════════════════════════`);
+    lines.push(`  QUESTION EXPORT — ${totalLabel}`);
+    lines.push(`  Exported: ${new Date().toLocaleString()}`);
+    lines.push(`  Total Questions: ${toExport.length}`);
+    lines.push(`═══════════════════════════════════════════`);
+    lines.push("");
+
+    Object.keys(grouped).sort().forEach(courseName => {
+      const qs = grouped[courseName];
+      lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+      lines.push(`  📚 ${courseName.toUpperCase()}  (${qs.length} question${qs.length !== 1 ? "s" : ""})`);
+      lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+      lines.push("");
+
+      qs.forEach((q, idx) => {
+        const diff = q.difficulty || "Medium";
+        lines.push(`Q${idx + 1}. [${diff}] ${q.question}`);
+        (q.options || []).forEach((opt, i) => {
+          const letter = String.fromCharCode(65 + i);
+          const correct = q.answer === i;
+          lines.push(`   ${letter}. ${opt}${correct ? "  ✓" : ""}`);
+        });
+        if (q.explanation) {
+          lines.push(`   💡 Explanation: ${q.explanation}`);
+        }
+        lines.push("");
+      });
+    });
+
+    const content = lines.join("\n");
+    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const filename = exportCourse === "__ALL__"
+      ? `questions_all_courses_${new Date().toISOString().slice(0, 10)}.txt`
+      : `questions_${exportCourse.toLowerCase().replace(/\s+/g, "_")}_${new Date().toISOString().slice(0, 10)}.txt`;
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(`✓ Exported ${toExport.length} questions`);
+    setShowExportModal(false);
+  };
+
   /* ── Add course (Course Manager modal) ── */
   const handleAddCourse = async () => {
     if (!newCourseName.trim()) return;
@@ -325,12 +400,20 @@ export default function AdminQuestions() {
             {totalCount.toLocaleString()} total questions · {courses.length - 1} courses
           </p>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button className="admin-btn secondary sm" onClick={() => window.location.href = "/admin/duplicates"}>
             <Copy size={14} /> Find Duplicates
           </button>
           <button className="admin-btn secondary sm" onClick={() => setShowCourseModal(true)}>
             <BookOpen size={14} /> Courses
+          </button>
+          <button
+            className="admin-btn secondary sm"
+            onClick={() => { setExportCourse("__ALL__"); setShowExportModal(true); }}
+            title="Export questions as plain text"
+            style={{ display: "flex", alignItems: "center", gap: 6 }}
+          >
+            <FileDown size={14} /> Export
           </button>
           <button className="admin-btn primary" onClick={() => setShowAddModal(true)}>
             <Plus size={15} /> Add Question
@@ -921,6 +1004,123 @@ export default function AdminQuestions() {
       )}
 
       <style>{`@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}`}</style>
+
+      {/* ── EXPORT MODAL ── */}
+      {showExportModal && (
+        <div className="admin-modal-overlay" onClick={() => setShowExportModal(false)}>
+          <div className="admin-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 440 }}>
+            {/* Header */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 800, color: "var(--admin-text)" }}>
+                  <FileDown size={18} style={{ verticalAlign: "middle", marginRight: 8 }} />
+                  Export Questions
+                </h3>
+                <p style={{ margin: "4px 0 0", fontSize: ".78rem", color: "var(--admin-muted)" }}>
+                  Downloads a plain-text (.txt) file formatted exactly as students see the questions.
+                </p>
+              </div>
+              <button className="admin-btn secondary sm" onClick={() => setShowExportModal(false)}>✕</button>
+            </div>
+
+            {/* Course picker */}
+            <div style={{ marginBottom: 20 }}>
+              <label style={{
+                fontSize: ".75rem", fontWeight: 700, color: "var(--admin-muted)",
+                textTransform: "uppercase", letterSpacing: ".06em", display: "block", marginBottom: 8,
+              }}>
+                Select Course to Export
+              </label>
+
+              {/* Export All pill */}
+              <div
+                onClick={() => setExportCourse("__ALL__")}
+                style={{
+                  display: "flex", alignItems: "center", gap: 10, padding: "12px 16px",
+                  borderRadius: 10, cursor: "pointer", marginBottom: 8,
+                  border: `2px solid ${exportCourse === "__ALL__" ? "#4255ff" : "var(--admin-border)"}`,
+                  background: exportCourse === "__ALL__" ? "rgba(66,85,255,0.06)" : "var(--admin-surface, #f8fafc)",
+                  transition: "all .15s",
+                }}
+              >
+                <div style={{
+                  width: 20, height: 20, borderRadius: "50%", border: "2px solid",
+                  borderColor: exportCourse === "__ALL__" ? "#4255ff" : "var(--admin-border)",
+                  background: exportCourse === "__ALL__" ? "#4255ff" : "transparent",
+                  flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  {exportCourse === "__ALL__" && <div style={{ width: 8, height: 8, borderRadius: "50%", background: "white" }} />}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, fontSize: ".88rem", color: exportCourse === "__ALL__" ? "#4255ff" : "var(--admin-text)" }}>
+                    📦 Export All Courses
+                  </div>
+                  <div style={{ fontSize: ".73rem", color: "var(--admin-muted)", marginTop: 1 }}>
+                    {questions.length.toLocaleString()} total questions across all courses
+                  </div>
+                </div>
+              </div>
+
+              {/* Individual course pills */}
+              <div style={{ maxHeight: 240, overflowY: "auto", display: "flex", flexDirection: "column", gap: 6, paddingRight: 4 }}>
+                {courses.filter(c => c !== "All").map(c => {
+                  const count = questions.filter(q => q.course === c).length;
+                  const isActive = exportCourse === c;
+                  return (
+                    <div
+                      key={c}
+                      onClick={() => setExportCourse(c)}
+                      style={{
+                        display: "flex", alignItems: "center", gap: 10, padding: "10px 16px",
+                        borderRadius: 10, cursor: "pointer",
+                        border: `2px solid ${isActive ? "#10b981" : "var(--admin-border)"}`,
+                        background: isActive ? "rgba(16,185,129,0.06)" : "var(--admin-surface, #f8fafc)",
+                        transition: "all .15s",
+                      }}
+                    >
+                      <div style={{
+                        width: 20, height: 20, borderRadius: "50%", border: "2px solid",
+                        borderColor: isActive ? "#10b981" : "var(--admin-border)",
+                        background: isActive ? "#10b981" : "transparent",
+                        flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
+                      }}>
+                        {isActive && <div style={{ width: 8, height: 8, borderRadius: "50%", background: "white" }} />}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 600, fontSize: ".85rem", color: isActive ? "#10b981" : "var(--admin-text)" }}>{c}</div>
+                        <div style={{ fontSize: ".72rem", color: "var(--admin-muted)", marginTop: 1 }}>{count} question{count !== 1 ? "s" : ""}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Preview info */}
+            <div style={{
+              padding: "10px 14px", borderRadius: 10,
+              background: "rgba(66,85,255,0.04)", border: "1px solid rgba(66,85,255,0.15)",
+              fontSize: ".78rem", color: "#4255ff", marginBottom: 20, lineHeight: 1.6,
+            }}>
+              📄 <strong>Plain Text Format:</strong> Questions numbered, options A–D with correct answer marked ✓, explanations included. Ready to paste or print.
+            </div>
+
+            {/* Actions */}
+            <div style={{ display: "flex", gap: 10 }}>
+              <button className="admin-btn secondary" style={{ flex: 1 }} onClick={() => setShowExportModal(false)}>Cancel</button>
+              <button
+                className="admin-btn primary"
+                style={{ flex: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+                onClick={handleExport}
+              >
+                <FileDown size={16} />
+                Download .txt
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
