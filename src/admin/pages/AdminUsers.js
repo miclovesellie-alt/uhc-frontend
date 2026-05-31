@@ -294,8 +294,11 @@ export default function AdminUsers() {
 
       {/* User Modal */}
       {selectedUser && !confirmAction && (
-        <div className="admin-modal-overlay" onClick={()=>{setSelectedUser(null);setUserTab("info");setEditMode(false);}}>
-          <div className="admin-modal" onClick={e=>e.stopPropagation()} style={{maxWidth:440, maxHeight:"90vh", overflowY:"auto"}}>
+        <div className="admin-modal-overlay" 
+          onClick={()=>{setSelectedUser(null);setUserTab("info");setEditMode(false);}}
+          style={{ display: "flex", justifyContent: "center", alignItems: "flex-start", overflowY: "auto", padding: "40px 16px" }}
+        >
+          <div className="admin-modal" onClick={e=>e.stopPropagation()} style={{maxWidth:440, width:"100%"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}>
               <div style={{display:"flex",alignItems:"center",gap:12}}>
                 <div style={{width:48,height:48,borderRadius:"50%",background:"var(--admin-accent-pale)",color:"var(--admin-accent)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:"1.1rem"}}>{selectedUser.name?.[0]}</div>
