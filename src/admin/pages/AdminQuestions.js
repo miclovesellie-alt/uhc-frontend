@@ -253,10 +253,6 @@ export default function AdminQuestions() {
 
   /* ── Export questions ── */
   const handleExport = () => {
-    const courseList = exportCourse === "__ALL__"
-      ? courses.filter(c => c !== "All")
-      : [exportCourse];
-
     const toExport = questions.filter(q =>
       exportCourse === "__ALL__" ? true : q.course === exportCourse
     );
