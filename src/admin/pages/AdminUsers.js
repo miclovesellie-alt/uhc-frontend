@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useOutletContext } from "react-router-dom";
 import api from "../../api/api";
-import { Search, Shield, Ban, Key, Trash2, RefreshCw, Eye, EyeOff, Download, Clock, CheckSquare, Square } from "lucide-react";
+import { Search, Shield, Ban, Key, Trash2, RefreshCw, Eye, EyeOff, Download, Clock, CheckSquare, Square, Edit } from "lucide-react";
 import { UserContext } from "../../context/UserContext";
 import { useToast } from "../../hooks/useToast";
 
@@ -65,6 +65,9 @@ export default function AdminUsers() {
   const [suspendDays, setSuspendDays] = useState("3");
   const [suspendReason, setSuspendReason] = useState("");
   const [selected, setSelected] = useState(new Set()); // bulk selection
+  const [sortBy, setSortBy] = useState("joined_desc");
+  const [editMode, setEditMode] = useState(false);
+  const [editForm, setEditForm] = useState({ name: "", phone: "", country: "", category: "", points: 0 });
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fetchUsers(); }, []);
@@ -81,9 +84,9 @@ export default function AdminUsers() {
 
   const updateUser = async (data, label) => {
     try {
-      await api.patch(`users/${selectedUser._id}`, data);
+      const res = await api.patch(`users/${selectedUser._id}`, data);
       showToast(`${label} successful`);
-      setSelectedUser(null); setConfirmAction(null);
+      setSelectedUser(res.data); setConfirmAction(null);
       fetchUsers();
     } catch (err) { showToast(err.response?.data?.message||"Action failed","error"); }
   };
@@ -116,10 +119,33 @@ export default function AdminUsers() {
 
   const doUnsuspend = async () => {
     try {
-      await api.patch(`social/unsuspend/${selectedUser._id}`);
+      const res = await api.patch(`social/unsuspend/${selectedUser._id}`);
       showToast(`${selectedUser.name} unsuspended`);
-      setSelectedUser(null); fetchUsers();
+      setSelectedUser(res.data); fetchUsers();
     } catch { showToast("Unsuspend failed","error"); }
+  };
+
+  const startEditing = () => {
+    setEditForm({
+      name: selectedUser.name || "",
+      phone: selectedUser.phone || "",
+      country: selectedUser.country || "",
+      category: selectedUser.category || "",
+      points: selectedUser.points || 0
+    });
+    setEditMode(true);
+  };
+
+  const saveUserDetails = async () => {
+    try {
+      const res = await api.patch(`users/${selectedUser._id}`, editForm);
+      showToast("User details updated successfully");
+      setSelectedUser(res.data);
+      setEditMode(false);
+      fetchUsers();
+    } catch (err) {
+      showToast(err.response?.data?.message || "Failed to update details", "error");
+    }
   };
 
   // Bulk ban selected users
@@ -145,7 +171,16 @@ export default function AdminUsers() {
       if (filter==="active")    return u.status!=="banned"&&u.status!=="suspended";
       return true;
     })
-    .filter(u => `${u.name} ${u.email}`.toLowerCase().includes(search.toLowerCase()));
+    .filter(u => `${u.name} ${u.email}`.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => {
+      if (sortBy === "joined_desc") return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+      if (sortBy === "joined_asc") return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
+      if (sortBy === "name_asc") return (a.name || "").localeCompare(b.name || "");
+      if (sortBy === "name_desc") return (b.name || "").localeCompare(a.name || "");
+      if (sortBy === "points_desc") return (b.points || 0) - (a.points || 0);
+      if (sortBy === "points_asc") return (a.points || 0) - (b.points || 0);
+      return 0;
+    });
 
   const totalPages = Math.ceil(filteredUsers.length / PAGE_SIZE);
   const paginated = filteredUsers.slice((page-1)*PAGE_SIZE, page*PAGE_SIZE);
@@ -189,6 +224,14 @@ export default function AdminUsers() {
           <option value="admins">Admins</option>
           <option value="banned">Banned</option>
           <option value="suspended">Suspended</option>
+        </select>
+        <select className="admin-select" value={sortBy} onChange={e=>{setSortBy(e.target.value);setPage(1);}}>
+          <option value="joined_desc">Joined (Newest First)</option>
+          <option value="joined_asc">Joined (Oldest First)</option>
+          <option value="name_asc">Name (A-Z)</option>
+          <option value="name_desc">Name (Z-A)</option>
+          <option value="points_desc">Points (Highest First)</option>
+          <option value="points_asc">Points (Lowest First)</option>
         </select>
       </div>
 
@@ -251,7 +294,7 @@ export default function AdminUsers() {
 
       {/* User Modal */}
       {selectedUser && !confirmAction && (
-        <div className="admin-modal-overlay" onClick={()=>{setSelectedUser(null);setUserTab("info");}}>
+        <div className="admin-modal-overlay" onClick={()=>{setSelectedUser(null);setUserTab("info");setEditMode(false);}}>
           <div className="admin-modal" onClick={e=>e.stopPropagation()} style={{maxWidth:440}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}>
               <div style={{display:"flex",alignItems:"center",gap:12}}>
@@ -262,7 +305,7 @@ export default function AdminUsers() {
                   <div style={{fontSize:".72rem",color:"var(--admin-muted)",marginTop:2}}>Joined: {selectedUser.createdAt?new Date(selectedUser.createdAt).toLocaleDateString():"—"}</div>
                 </div>
               </div>
-              <button className="admin-btn secondary sm" onClick={()=>{setSelectedUser(null);setUserTab("info");}}>✕</button>
+              <button className="admin-btn secondary sm" onClick={()=>{setSelectedUser(null);setUserTab("info");setEditMode(false);}}>✕</button>
             </div>
             <div style={{display:"flex",gap:6,marginBottom:16,borderBottom:"1px solid var(--admin-border)",paddingBottom:12}}>
               {[["info","👤 Info"],["activity","📋 Activity"]].map(([t,l])=>(
@@ -271,29 +314,76 @@ export default function AdminUsers() {
             </div>
             {userTab==="info" && (
               <>
-                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:20}}>
-                  {[["Role",selectedUser.role||"user"],["Status",selectedUser.status||"active"],["Country",selectedUser.country||"—"],["Category",selectedUser.category||"—"],["Points",selectedUser.points||0],["Phone",selectedUser.phone||"—"]].map(([label,val])=>(
-                    <div key={label} style={{padding:"10px 12px",background:"rgba(255,255,255,0.04)",borderRadius:10,border:"1px solid var(--admin-border)"}}>
-                      <div style={{fontSize:".7rem",color:"var(--admin-muted)",fontWeight:600,textTransform:"uppercase",letterSpacing:".08em",marginBottom:4}}>{label}</div>
-                      <div style={{fontSize:".875rem",color:"var(--admin-text)",fontWeight:600}}>{String(val)}</div>
+                {editMode ? (
+                  <div style={{display:"flex",flexDirection:"column",gap:12,marginBottom:20}}>
+                    <div>
+                      <label style={{fontSize:".75rem",color:"var(--admin-muted)",fontWeight:600,display:"block",marginBottom:4}}>NAME</label>
+                      <input className="admin-input" style={{width:"100%",boxSizing:"border-box"}} value={editForm.name} onChange={e=>setEditForm({...editForm, name:e.target.value})}/>
                     </div>
-                  ))}
-                </div>
-                <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                  <button className="admin-btn secondary" style={{justifyContent:"flex-start",gap:10}} onClick={()=>setConfirmAction({type:"role",label:selectedUser.role==="admin"?"Demote to User":"Promote to Admin"})}>
-                    <Shield size={15}/> {selectedUser.role==="admin"?"Demote to User":"Promote to Admin"}
-                  </button>
-                  <button className="admin-btn secondary" style={{justifyContent:"flex-start",gap:10}} onClick={()=>setConfirmAction({type:"ban",label:selectedUser.status==="banned"?"Unban User":"Ban User"})}>
-                    <Ban size={15}/> {selectedUser.status==="banned"?"Unban User":"Ban User"}
-                  </button>
-                  {selectedUser.status==="suspended" ? (
-                    <button className="admin-btn secondary" style={{justifyContent:"flex-start",gap:10}} onClick={doUnsuspend}><Clock size={15}/> Unsuspend User</button>
-                  ) : (
-                    <button className="admin-btn secondary" style={{justifyContent:"flex-start",gap:10,color:"#d97706"}} onClick={()=>setSuspendModal(true)}><Clock size={15}/> Suspend Temporarily</button>
-                  )}
-                  <button className="admin-btn secondary" style={{justifyContent:"flex-start",gap:10}} onClick={()=>setResetModal(true)}><Key size={15}/> Reset Password</button>
-                  <button className="admin-btn danger" style={{justifyContent:"flex-start",gap:10}} onClick={()=>setConfirmAction({type:"delete",label:`Delete ${selectedUser.name}`})}><Trash2 size={15}/> Delete User</button>
-                </div>
+                    <div>
+                      <label style={{fontSize:".75rem",color:"var(--admin-muted)",fontWeight:600,display:"block",marginBottom:4}}>PHONE</label>
+                      <input className="admin-input" style={{width:"100%",boxSizing:"border-box"}} value={editForm.phone} onChange={e=>setEditForm({...editForm, phone:e.target.value})}/>
+                    </div>
+                    <div>
+                      <label style={{fontSize:".75rem",color:"var(--admin-muted)",fontWeight:600,display:"block",marginBottom:4}}>COUNTRY</label>
+                      <input className="admin-input" style={{width:"100%",boxSizing:"border-box"}} value={editForm.country} onChange={e=>setEditForm({...editForm, country:e.target.value})}/>
+                    </div>
+                    <div>
+                      <label style={{fontSize:".75rem",color:"var(--admin-muted)",fontWeight:600,display:"block",marginBottom:4}}>CATEGORY</label>
+                      <input className="admin-input" style={{width:"100%",boxSizing:"border-box"}} value={editForm.category} onChange={e=>setEditForm({...editForm, category:e.target.value})}/>
+                    </div>
+                    <div>
+                      <label style={{fontSize:".75rem",color:"var(--admin-muted)",fontWeight:600,display:"block",marginBottom:4}}>POINTS</label>
+                      <input className="admin-input" type="number" style={{width:"100%",boxSizing:"border-box"}} value={editForm.points} onChange={e=>setEditForm({...editForm, points: parseInt(e.target.value)||0})}/>
+                    </div>
+                    <div style={{display:"flex",gap:10,marginTop:8}}>
+                      <button className="admin-btn secondary" style={{flex:1}} onClick={()=>setEditMode(false)}>Cancel</button>
+                      <button className="admin-btn primary" style={{flex:1}} onClick={saveUserDetails}>Save Changes</button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
+                      {[["Role",selectedUser.role||"user"],["Status",selectedUser.status||"active"],["Country",selectedUser.country||"—"],["Category",selectedUser.category||"—"],["Points",selectedUser.points||0],["Phone",selectedUser.phone||"—"]].map(([label,val])=>(
+                        <div key={label} style={{padding:"10px 12px",background:"rgba(255,255,255,0.04)",borderRadius:10,border:"1px solid var(--admin-border)"}}>
+                          <div style={{fontSize:".7rem",color:"var(--admin-muted)",fontWeight:600,textTransform:"uppercase",letterSpacing:".08em",marginBottom:4}}>{label}</div>
+                          <div style={{fontSize:".875rem",color:"var(--admin-text)",fontWeight:600}}>{String(val)}</div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Registration & Login Timestamps */}
+                    <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:20,padding:"12px 14px",background:"rgba(255,255,255,0.02)",borderRadius:10,border:"1px solid var(--admin-border)"}}>
+                      <div style={{display:"flex",justifyContent:"space-between",fontSize:".8rem"}}>
+                        <span style={{color:"var(--admin-muted)"}}>Account Created</span>
+                        <span style={{fontWeight:600,color:"var(--admin-text)"}}>{selectedUser.createdAt ? new Date(selectedUser.createdAt).toLocaleString() : "—"}</span>
+                      </div>
+                      <div style={{display:"flex",justifyContent:"space-between",fontSize:".8rem"}}>
+                        <span style={{color:"var(--admin-muted)"}}>Last Login</span>
+                        <span style={{fontWeight:600,color:"var(--admin-text)"}}>{selectedUser.lastLogin ? new Date(selectedUser.lastLogin).toLocaleString() : "Never"}</span>
+                      </div>
+                    </div>
+
+                    <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                      <button className="admin-btn secondary" style={{justifyContent:"flex-start",gap:10}} onClick={startEditing}>
+                        <Edit size={15}/> Edit User Info
+                      </button>
+                      <button className="admin-btn secondary" style={{justifyContent:"flex-start",gap:10}} onClick={()=>setConfirmAction({type:"role",label:selectedUser.role==="admin"?"Demote to User":"Promote to Admin"})}>
+                        <Shield size={15}/> {selectedUser.role==="admin"?"Demote to User":"Promote to Admin"}
+                      </button>
+                      <button className="admin-btn secondary" style={{justifyContent:"flex-start",gap:10}} onClick={()=>setConfirmAction({type:"ban",label:selectedUser.status==="banned"?"Unban User":"Ban User"})}>
+                        <Ban size={15}/> {selectedUser.status==="banned"?"Unban User":"Ban User"}
+                      </button>
+                      {selectedUser.status==="suspended" ? (
+                        <button className="admin-btn secondary" style={{justifyContent:"flex-start",gap:10}} onClick={doUnsuspend}><Clock size={15}/> Unsuspend User</button>
+                      ) : (
+                        <button className="admin-btn secondary" style={{justifyContent:"flex-start",gap:10,color:"#d97706"}} onClick={()=>setSuspendModal(true)}><Clock size={15}/> Suspend Temporarily</button>
+                      )}
+                      <button className="admin-btn secondary" style={{justifyContent:"flex-start",gap:10}} onClick={()=>setResetModal(true)}><Key size={15}/> Reset Password</button>
+                      <button className="admin-btn danger" style={{justifyContent:"flex-start",gap:10}} onClick={()=>setConfirmAction({type:"delete",label:`Delete ${selectedUser.name}`})}><Trash2 size={15}/> Delete User</button>
+                    </div>
+                  </>
+                )}
               </>
             )}
             {userTab==="activity" && <UserActivityFeed userId={selectedUser._id}/>}
