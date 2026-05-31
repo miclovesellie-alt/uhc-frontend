@@ -257,8 +257,10 @@
   background: var(--admin-card);
   border: 1px solid var(--admin-border);
   border-radius: var(--admin-radius);
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   margin-bottom: 28px;
+  -webkit-overflow-scrolling: touch;
 }
 .admin-table {
   width: 100%;
@@ -485,6 +487,11 @@
 }
 @media (min-width: 769px) {
   .mobile-only { display: none !important; }
+}
+
+/* Hide on laptop-width screens only (769–1280px) to prevent table overflow */
+@media (min-width: 769px) and (max-width: 1280px) {
+  .laptop-hide { display: none !important; }
 }
 
 /* ===== ADMIN DARK MODE (Scoped to .admin-dark) ===== */

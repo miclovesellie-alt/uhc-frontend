@@ -207,7 +207,7 @@ export default function AdminUsers() {
                     {selected.size===paginated.length&&paginated.length>0?<CheckSquare size={16} color="var(--admin-accent)"/>:<Square size={16}/>}
                   </button>
                 </th>
-                <th>#</th><th>User</th><th>Email</th><th>Role</th><th>Status</th><th>Country</th><th>Points</th><th>Joined</th><th>Actions</th>
+                <th>#</th><th>User</th><th>Status</th><th>Role</th><th style={{whiteSpace:"nowrap"}}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -223,15 +223,11 @@ export default function AdminUsers() {
                     <div style={{width:32,height:32,borderRadius:"50%",background:"var(--admin-accent-pale)",color:"var(--admin-accent)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,fontSize:".85rem",flexShrink:0}}>{u.name?.[0]||"?"}</div>
                     <span style={{fontWeight:600,fontSize:".875rem"}}>{u.name}</span>
                   </div></td>
-                  <td style={{color:"var(--admin-muted)",fontSize:".82rem"}}>{u.email}</td>
-                  <td><span className={`admin-badge ${roleColor(u.role)}`}>{u.role||"user"}</span></td>
                   <td><span className={`admin-badge ${presence?.onlineIds?.includes(u._id)?"green":u.status==="banned"?"red":u.status==="suspended"?"orange":"gray"}`}>
                     {presence?.onlineIds?.includes(u._id)?"Live":u.status==="banned"?"Banned":u.status==="suspended"?"Suspended":"Offline"}
                   </span></td>
-                  <td style={{color:"var(--admin-muted)",fontSize:".82rem"}}>{u.country||"—"}</td>
-                  <td style={{fontWeight:600}}>{u.points||0}</td>
-                  <td style={{color:"var(--admin-muted)",fontSize:".78rem",whiteSpace:"nowrap"}}>{u.createdAt?new Date(u.createdAt).toLocaleDateString():"—"}</td>
-                  <td onClick={e=>e.stopPropagation()}>
+                  <td><span className={`admin-badge ${roleColor(u.role)}`}>{u.role||"user"}</span></td>
+                  <td onClick={e=>e.stopPropagation()} style={{whiteSpace:"nowrap"}}>
                     <button className="admin-btn secondary sm" onClick={()=>{ setSelectedUser(u); setUserTab("info"); }}>Manage</button>
                   </td>
                 </tr>

@@ -1,11 +1,24 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
+
+# Private / authenticated routes — keep crawlers out
+Disallow: /admin
+Disallow: /admin/
+Disallow: /dashboard
+Disallow: /fyp
+Disallow: /quiz
+Disallow: /profile
+Disallow: /library
+Disallow: /search
+Disallow: /leaderboard
+Disallow: /quiz-history
+Disallow: /review
+Disallow: /submit
+Disallow: /reset-password
+Disallow: /admin-recovery
 Disallow: /auth
 Disallow: /login
 Disallow: /forgot-password
-Disallow: /reset-password
 Disallow: /verify-email
-Disallow: /admin/
-Disallow: /admin
 
 Sitemap: https://uhcacadamy.com/sitemap.xml
