@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { CheckCircle, XCircle, AlertTriangle, Info, X } from 'lucide-react';
 import '../styles/toast.css';
+import { playToastSound } from '../utils/sounds';
 
 const ToastContext = createContext(null);
 
@@ -16,6 +17,8 @@ export function ToastProvider({ children }) {
     const id = `${Date.now()}_${Math.random()}`;
     setToasts(prev => [...prev, { id, message, type, exiting: false }]);
     setTimeout(() => removeToast(id), duration);
+    // Play soft sound matching the toast type
+    playToastSound(type);
     return id;
   }, [removeToast]);
 

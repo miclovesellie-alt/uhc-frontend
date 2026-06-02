@@ -4,10 +4,12 @@ import { UserContext } from "../context/UserContext";
 import api from "../api/api";
 import OnboardingTour from "./OnboardingTour";
 import "../styles/dashboard.css";
+import { isSoundEnabled, setSoundEnabled, playNavigate } from "../utils/sounds";
 
 import {
   Home, BookOpen, ClipboardList, User, LogOut,
-  Search, BarChart2, ChevronRight, X, Bell, PenSquare, Trophy, Settings
+  Search, BarChart2, ChevronRight, X, Bell, PenSquare, Trophy, Settings,
+  Volume2, VolumeX,
 } from "lucide-react";
 
 function EmailVerifyBanner({ email }) {
@@ -82,7 +84,16 @@ function DashboardLayout() {
   const [announcement, setAnnouncement] = useState("");
   const [announcementDismissed, setAnnouncementDismissed] = useState(false);
   const [showTour, setShowTour] = useState(!localStorage.getItem('uhc_tour_done'));
+  const [soundOn, setSoundOn] = useState(isSoundEnabled());
   const logoDropdownRef = useRef();
+
+  const toggleSound = () => {
+    const next = !soundOn;
+    setSoundEnabled(next);
+    setSoundOn(next);
+    // Play a soft confirm sound when turning ON
+    if (next) setTimeout(() => playNavigate(), 50);
+  };
 
   const isActive = (path) => location.pathname === path;
 
@@ -176,6 +187,26 @@ function DashboardLayout() {
 
         {/* Right actions */}
         <div className="topbar-nav-group">
+          {/* Sound toggle */}
+          <button
+            id="uhc-sound-toggle"
+            className="topbar-avatar-btn"
+            onClick={toggleSound}
+            title={soundOn ? "Mute sounds" : "Enable sounds"}
+            aria-label={soundOn ? "Mute sounds" : "Enable sounds"}
+            style={{
+              width: 36, height: 36, borderRadius: "50%",
+              background: "var(--surface)",
+              border: "1.5px solid var(--border)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: soundOn ? "var(--accent)" : "var(--text-muted)",
+              cursor: "pointer", flexShrink: 0,
+              transition: "all .2s",
+            }}
+          >
+            {soundOn ? <Volume2 size={17} /> : <VolumeX size={17} />}
+          </button>
+
           {/* Notifications */}
           <button
             className="topbar-avatar-btn"

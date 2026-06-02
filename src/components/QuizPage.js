@@ -7,6 +7,10 @@ import "../styles/quiz.css";
 import api from "../api/api";
 import coursesTopics from "../data/courses_topics.json";
 import { usePageEnabled, MaintenanceScreen } from "../hooks/usePageEnabled";
+import {
+  playSelect, playCorrect, playWrong, playFinish,
+  playStreak, playTimerWarn, playRefresh,
+} from "../utils/sounds";
 
 /* ── Book Loader ── */
 const BookLoader = ({ text = "Loading…" }) => (
@@ -177,6 +181,8 @@ export default function QuizPage() {
     clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setTimeLeft(t => {
+        // Play a gentle warning tick when clock enters danger zone
+        if ((t === 10 || t === 5) && !locked) playTimerWarn();
         if (t <= 1) { clearInterval(timerRef.current); confirmAnswer(true); return 0; }
         return t - 1;
       });
@@ -198,6 +204,7 @@ export default function QuizPage() {
     setIdx(0); setSelAns(null); setLocked(false);
     setScore(0); setStreak(0); setBestStreak(0);
     setDone(false); setTimeLeft(45); setStage("quiz");
+    playRefresh(); // gentle whoosh when quiz loads
   };
 
   /* ── Confirm answer ── */
@@ -214,8 +221,12 @@ export default function QuizPage() {
       const ns = streak + 1;
       setStreak(ns);
       setBestStreak(b => Math.max(b, ns));
+      // Streak milestone gets sparkle, otherwise just correct chime
+      if (ns > 0 && ns % 3 === 0) playStreak();
+      else playCorrect();
     } else {
       setStreak(0);
+      if (!timedOut) playWrong(); // timed out = silent (no punishment sound)
     }
   }, [selAns, answers, idx, questions, streak]);
 
@@ -237,6 +248,7 @@ export default function QuizPage() {
       // Save to history
       const fs = answers.filter((a, i) => a === questions[i]?.answer).length;
       saveQuizHistory(selCourse, fs, questions.length, bestStreak);
+      playFinish(); // gentle fanfare on quiz completion
       setDone(true);
     }
   };
@@ -476,10 +488,10 @@ export default function QuizPage() {
                   <div
                     key={i}
                     className={cls}
-                    onClick={() => !effectiveLocked && setSelAns(i)}
+                    onClick={() => { if (!effectiveLocked) { setSelAns(i); playSelect(); } }}
                     role="button"
                     tabIndex={0}
-                    onKeyDown={(e) => { if(!effectiveLocked && (e.key === 'Enter' || e.key === ' ')) setSelAns(i); }}
+                    onKeyDown={(e) => { if(!effectiveLocked && (e.key === 'Enter' || e.key === ' ')) { setSelAns(i); playSelect(); } }}
                     style={{ cursor: effectiveLocked ? 'default' : 'pointer' }}
                   >
                     <span className="opt-letter">{String.fromCharCode(65 + i)}</span>
