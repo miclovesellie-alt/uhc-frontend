@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Zap, Plus, Send, Upload, Flag, BookOpen, X, ChevronUp } from "lucide-react";
+import { Zap, Plus, Send, Upload, Flag, BookOpen, X } from "lucide-react";
 
 const DOCK_ACTIONS = [
   { id: "add-q",      label: "Add Question",       icon: <Plus size={16}/>,    color: "#4255ff", bg: "rgba(66,85,255,0.12)",   path: "/admin/questions" },

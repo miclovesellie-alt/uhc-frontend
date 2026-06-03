@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Users, HelpCircle, Upload, Bell, Settings, LogOut,
   Menu, X, FileText, Shield, Library, Mail, Layout, Trash2, Megaphone,
   Clock, ChevronLeft, ChevronRight, Search, Check, ExternalLink,
-  Zap, Sun, Moon, ChevronRight as Crumb, ArrowRight
+  Sun, Moon, ChevronRight as Crumb, ArrowRight
 } from "lucide-react";
 import CommandPalette from "./CommandPalette";
 import AdminQuickDock from "./AdminQuickDock";
@@ -287,6 +287,7 @@ export default function AdminLayout() {
 
     socket.on("PRESENCE_UPDATE", d => setPresence(d));
     return () => socket.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ── Load initial data ──
@@ -311,7 +312,6 @@ export default function AdminLayout() {
 
   useEffect(() => {
     import("../../api/api").then(({ default: api }) => {
-      const userId = localStorage.getItem("userId");
       const token = localStorage.getItem("token");
       if (token) axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       api.get("admin/presence").then(res => { if (res.data) setPresence(res.data); }).catch(() => {});
