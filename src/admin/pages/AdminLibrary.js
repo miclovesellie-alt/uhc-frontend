@@ -347,14 +347,14 @@ function BooksTab({ courses, onCourseAdded }) {
 ══════════════════════════════════════ */
 function StudyHubTab({ courses, onCourseAdded }) {
   const [subTab, setSubTab] = useState("flashcards");
-  const [flashcards, setFlashcards] = useState([]);   // manually-created only (editable)
-  const [flashcardsTotal, setFlashcardsTotal] = useState(0); // all flashcards incl. question-derived
+  const [flashcards, setFlashcards] = useState([]);   // ALL flashcards (manual + question-derived)
   const [notes, setNotes]      = useState([]);
   const [resources, setResources]  = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving]  = useState(false);
   const [courseFilter, setCourseFilter] = useState(""); // "" = All
+  const [showManualOnly, setShowManualOnly] = useState(false); // toggle to filter out q_ cards
 
   // Edit state
   const [editItem, setEditItem]   = useState(null); // item data
@@ -373,10 +373,8 @@ function StudyHubTab({ courses, onCourseAdded }) {
     try {
       const r = await api.get("studyhub/all");
       const allFc = r.data.flashcards || [];
-      // Total count = everything students see (manual + question-derived)
-      setFlashcardsTotal(allFc.length);
-      // Editable list = only manually-created cards (not question-derived)
-      setFlashcards(allFc.filter(c => !String(c._id).startsWith("q_")));
+      // Show ALL flashcards (manual + question-derived) so admin sees what students see
+      setFlashcards(allFc);
       setNotes(r.data.notes || []);
       setResources(r.data.resources || []);
     } catch { } finally { setLoading(false); }
@@ -431,7 +429,9 @@ function StudyHubTab({ courses, onCourseAdded }) {
   };
 
   // Derived lists
-  const currentList = subTab === "flashcards" ? flashcards : subTab === "notes" ? notes : resources;
+  const manualFlashcards = flashcards.filter(c => !String(c._id).startsWith("q_"));
+  const visibleFlashcards = showManualOnly ? manualFlashcards : flashcards;
+  const currentList = subTab === "flashcards" ? visibleFlashcards : subTab === "notes" ? notes : resources;
   const filteredList = courseFilter ? currentList.filter(item => item.course === courseFilter) : currentList;
 
   // All unique courses that exist in the Study Hub items (for filter pills)
@@ -449,12 +449,16 @@ function StudyHubTab({ courses, onCourseAdded }) {
   };
   const labelStyle = { fontSize: "0.82rem", fontWeight: 600, color: "var(--admin-muted, #64748b)", display: "block", marginTop: 12 };
 
+  const totalFlashcards = flashcards.length;
+  const manualCount = manualFlashcards.length;
+  const qDerivedCount = totalFlashcards - manualCount;
+
   return (
     <>
       {/* Sub-tabs */}
-      <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
+      <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
         {[
-        { key: "flashcards", label: "🃏 Flashcards", count: flashcardsTotal },
+          { key: "flashcards", label: "🃏 Flashcards", count: totalFlashcards },
           { key: "notes",      label: "📝 Notes",       count: notes.length },
           { key: "resources",  label: "🔗 Resources",   count: resources.length },
         ].map(t => (
@@ -471,6 +475,35 @@ function StudyHubTab({ courses, onCourseAdded }) {
           <Plus size={16} /> {showForm ? "Cancel" : `Add ${subTab === "flashcards" ? "Flashcard" : subTab === "notes" ? "Note" : "Resource"}`}
         </button>
       </div>
+
+      {/* Flashcard source toggle */}
+      {subTab === "flashcards" && (
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14, padding: "10px 16px", background: "rgba(16,185,129,0.06)", borderRadius: 12, border: "1px solid rgba(16,185,129,0.15)", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: ".8rem", fontWeight: 700, color: "var(--admin-text)" }}>🃏 {manualCount} manual</span>
+            <span style={{ fontSize: ".75rem", color: "var(--admin-muted)" }}>+</span>
+            <span style={{ fontSize: ".8rem", fontWeight: 700, color: "#8b5cf6" }}>❓ {qDerivedCount} from Questions</span>
+            <span style={{ fontSize: ".75rem", color: "var(--admin-muted)" }}>= {totalFlashcards} total (what students see)</span>
+          </div>
+          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: ".78rem", color: "var(--admin-muted)" }}>Manual only</span>
+            <div
+              onClick={() => setShowManualOnly(v => !v)}
+              style={{
+                width: 40, height: 22, borderRadius: 99, cursor: "pointer", transition: "background .2s",
+                background: showManualOnly ? "#10b981" : "var(--admin-border)",
+                position: "relative",
+              }}
+            >
+              <div style={{
+                position: "absolute", top: 3, left: showManualOnly ? "calc(100% - 19px)" : 3,
+                width: 16, height: 16, borderRadius: "50%", background: "white",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.2)", transition: "left .2s",
+              }}/>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Course Filter Pills */}
       {allItemCourses.length > 0 && (
@@ -685,19 +718,35 @@ function StudyHubTab({ courses, onCourseAdded }) {
                 </td></tr>
               )}
 
-              {subTab === "flashcards" && filteredList.map(c => (
-                <tr key={c._id}>
-                  <td><span style={{ fontWeight: 600 }}>{c.emoji} {c.question.slice(0, 60)}{c.question.length > 60 ? "…" : ""}</span></td>
-                  <td><span className="admin-badge blue">{c.course}</span></td>
-                  <td className="desktop-only">{new Date(c.createdAt).toLocaleDateString()}</td>
-                  <td>
-                    <div style={{ display: "flex", gap: 4 }}>
-                      <button className="admin-btn secondary sm" title="Edit" onClick={() => { setEditItem({ ...c }); setEditType("flashcards"); }}><Edit2 size={13} /></button>
-                      <button className="admin-btn danger sm" title="Delete" onClick={() => handleDelete("flashcards", c._id)}><Trash2 size={15} /></button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {subTab === "flashcards" && filteredList.map(c => {
+                const isQDerived = String(c._id).startsWith("q_");
+                return (
+                  <tr key={c._id} style={{ opacity: isQDerived ? 0.85 : 1 }}>
+                    <td>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ fontWeight: 600 }}>{c.emoji} {c.question.slice(0, 60)}{c.question.length > 60 ? "…" : ""}</span>
+                        {isQDerived && (
+                          <span style={{ fontSize: ".65rem", padding: "2px 7px", borderRadius: 99, background: "rgba(139,92,246,0.1)", color: "#8b5cf6", fontWeight: 700, whiteSpace: "nowrap" }}>❓ From Questions</span>
+                        )}
+                      </div>
+                    </td>
+                    <td><span className="admin-badge blue">{c.course}</span></td>
+                    <td className="desktop-only">{c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "—"}</td>
+                    <td>
+                      <div style={{ display: "flex", gap: 4 }}>
+                        {isQDerived ? (
+                          <span title="Edit via Questions page" style={{ fontSize: ".72rem", color: "var(--admin-muted)", padding: "4px 8px" }}>Read-only</span>
+                        ) : (
+                          <button className="admin-btn secondary sm" title="Edit" onClick={() => { setEditItem({ ...c }); setEditType("flashcards"); }}><Edit2 size={13} /></button>
+                        )}
+                        {!isQDerived && (
+                          <button className="admin-btn danger sm" title="Delete" onClick={() => handleDelete("flashcards", c._id)}><Trash2 size={15} /></button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
 
               {subTab === "notes" && filteredList.map(n => (
                 <tr key={n._id}>
