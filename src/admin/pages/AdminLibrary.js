@@ -505,22 +505,105 @@ function StudyHubTab({ courses, onCourseAdded }) {
         </div>
       )}
 
-      {/* Course Filter Pills */}
-      {allItemCourses.length > 0 && (
-        <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap", alignItems: "center" }}>
-          <span style={{ fontSize: "0.73rem", fontWeight: 700, color: "var(--admin-muted)", textTransform: "uppercase", letterSpacing: ".06em", marginRight: 4 }}>Filter:</span>
-          <button onClick={() => setCourseFilter("")}
-            style={{ padding: "4px 12px", borderRadius: 99, border: "none", cursor: "pointer", fontSize: "0.75rem", fontWeight: 700, background: !courseFilter ? "#4255ff" : "var(--admin-surface, #f1f5f9)", color: !courseFilter ? "white" : "var(--admin-muted, #475569)", transition: "all .15s" }}>
-            All
-          </button>
-          {allItemCourses.map(c => (
-            <button key={c} onClick={() => setCourseFilter(courseFilter === c ? "" : c)}
-              style={{ padding: "4px 12px", borderRadius: 99, border: "none", cursor: "pointer", fontSize: "0.75rem", fontWeight: 700, background: courseFilter === c ? "#4255ff" : "var(--admin-surface, #f1f5f9)", color: courseFilter === c ? "white" : "var(--admin-muted, #475569)", transition: "all .15s" }}>
-              {c}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Course Filter — organized panel */}
+      {allItemCourses.length > 0 && (() => {
+        // count per course for current sub-tab
+        const countFor = (course) => {
+          const list = subTab === "flashcards" ? visibleFlashcards : subTab === "notes" ? notes : resources;
+          return list.filter(i => i.course === course).length;
+        };
+        const totalForAll = subTab === "flashcards" ? visibleFlashcards.length : subTab === "notes" ? notes.length : resources.length;
+        return (
+          <div style={{
+            marginBottom: 18, padding: "12px 14px",
+            background: "var(--admin-surface, #f8fafc)",
+            border: "1px solid var(--admin-border, #e2e8f0)",
+            borderRadius: 14,
+          }}>
+            {/* Header row */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+              <span style={{ fontSize: ".72rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: ".08em", color: "var(--admin-muted)" }}>
+                📂 Filter by Course
+              </span>
+              {courseFilter && (
+                <button
+                  onClick={() => setCourseFilter("")}
+                  style={{ marginLeft: "auto", fontSize: ".7rem", color: "#ef4444", background: "rgba(239,68,68,0.08)", border: "none", borderRadius: 6, padding: "2px 8px", cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", gap: 3 }}
+                >
+                  ✕ Clear filter
+                </button>
+              )}
+            </div>
+
+            {/* Pills grid */}
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              {/* All pill */}
+              <button
+                onClick={() => setCourseFilter("")}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 5,
+                  padding: "5px 12px", borderRadius: 99, border: "none", cursor: "pointer",
+                  fontSize: ".76rem", fontWeight: 700, transition: "all .15s",
+                  background: !courseFilter ? "#4255ff" : "var(--admin-card, #fff)",
+                  color: !courseFilter ? "white" : "var(--admin-muted, #475569)",
+                  boxShadow: !courseFilter ? "0 2px 8px rgba(66,85,255,0.25)" : "0 1px 3px rgba(0,0,0,0.06)",
+                  border: `1px solid ${!courseFilter ? "#4255ff" : "var(--admin-border, #e2e8f0)"}`,
+                }}
+              >
+                All
+                <span style={{
+                  background: !courseFilter ? "rgba(255,255,255,0.25)" : "var(--admin-border, #e2e8f0)",
+                  color: !courseFilter ? "white" : "#64748b",
+                  fontSize: ".65rem", fontWeight: 800,
+                  padding: "1px 6px", borderRadius: 99,
+                }}>
+                  {totalForAll}
+                </span>
+              </button>
+
+              {/* One pill per course */}
+              {allItemCourses.map(c => {
+                const cnt = countFor(c);
+                const active = courseFilter === c;
+                return (
+                  <button
+                    key={c}
+                    onClick={() => setCourseFilter(active ? "" : c)}
+                    title={`${cnt} item${cnt !== 1 ? "s" : ""} in ${c}`}
+                    style={{
+                      display: "inline-flex", alignItems: "center", gap: 5,
+                      padding: "5px 12px", borderRadius: 99, cursor: "pointer",
+                      fontSize: ".76rem", fontWeight: 700, transition: "all .15s",
+                      background: active ? "#10b981" : "var(--admin-card, #fff)",
+                      color: active ? "white" : "var(--admin-text, #0f172a)",
+                      boxShadow: active ? "0 2px 8px rgba(16,185,129,0.25)" : "0 1px 3px rgba(0,0,0,0.06)",
+                      border: `1px solid ${active ? "#10b981" : "var(--admin-border, #e2e8f0)"}`,
+                      opacity: cnt === 0 ? 0.45 : 1,
+                    }}
+                  >
+                    {c}
+                    <span style={{
+                      background: active ? "rgba(255,255,255,0.25)" : "rgba(16,185,129,0.12)",
+                      color: active ? "white" : "#10b981",
+                      fontSize: ".65rem", fontWeight: 800,
+                      padding: "1px 6px", borderRadius: 99,
+                    }}>
+                      {cnt}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Active filter confirmation */}
+            {courseFilter && (
+              <div style={{ marginTop: 10, fontSize: ".75rem", color: "#10b981", fontWeight: 700, display: "flex", alignItems: "center", gap: 5 }}>
+                ✓ Showing <strong>"{courseFilter}"</strong> — {countFor(courseFilter)} item{countFor(courseFilter) !== 1 ? "s" : ""}
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Add form */}
       {showForm && (

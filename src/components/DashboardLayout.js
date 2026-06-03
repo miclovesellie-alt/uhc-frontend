@@ -148,14 +148,14 @@ function DashboardLayout() {
 
       {/* ===== TOP NAVBAR ===== */}
       <div className="dashboard-topbar">
-        {/* Logout for mobile (replaces hamburger since bottom nav is used) */}
+        {/* Home for mobile — replaces old logout position */}
         <button
           className="topbar-hamburger"
-          onClick={() => setShowLogoutModal(true)}
-          title="Logout"
-          style={{ color: '#ef4444' }}
+          onClick={() => navigate('/dashboard')}
+          title="Home"
+          style={{ color: 'var(--accent)' }}
         >
-          <LogOut size={20} />
+          <Home size={20} />
         </button>
 
         {/* Logo */}
@@ -383,7 +383,8 @@ function DashboardLayout() {
 
       {/* ===== MOBILE BOTTOM NAV ===== */}
       <nav className="uhc-bottom-nav" aria-label="Main navigation">
-        {navItems.slice(0, 4).map((item) => (
+        {/* Skip Home (now in topbar), show Study Hub → Ranks */}
+        {navItems.slice(1, 5).map((item) => (
           <button
             key={item.path}
             className={`uhc-bottom-nav__item${isActive(item.path) ? " active" : ""}`}
@@ -393,6 +394,15 @@ function DashboardLayout() {
             <span>{item.label}</span>
           </button>
         ))}
+        {/* Logout as last bottom-nav item */}
+        <button
+          className="uhc-bottom-nav__item"
+          onClick={() => setShowLogoutModal(true)}
+          style={{ color: '#ef4444' }}
+        >
+          <LogOut size={20} />
+          <span>Exit</span>
+        </button>
       </nav>
 
       {/* ===== ONBOARDING TOUR ===== */}

@@ -393,7 +393,74 @@ function ProfilePage({ user, setUser }) {
             </div>
           </section>
 
+          {/* ===== UPGRADE TO PREMIUM ===== */}
+          <section style={{
+            background: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)",
+            borderRadius: 28,
+            padding: "28px 32px",
+            position: "relative",
+            overflow: "hidden",
+            border: "1px solid rgba(139,92,246,0.3)",
+            boxShadow: "0 20px 60px rgba(66,85,255,0.15)",
+          }}>
+            {/* Background shimmer blobs */}
+            <div style={{ position:"absolute", top:-40, right:-40, width:160, height:160, borderRadius:"50%", background:"radial-gradient(circle, rgba(139,92,246,0.3) 0%, transparent 70%)", pointerEvents:"none" }} />
+            <div style={{ position:"absolute", bottom:-30, left:20, width:120, height:120, borderRadius:"50%", background:"radial-gradient(circle, rgba(66,85,255,0.25) 0%, transparent 70%)", pointerEvents:"none" }} />
+
+            <div style={{ position:"relative", zIndex:1 }}>
+              {/* Header */}
+              <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16 }}>
+                <div style={{ background:"linear-gradient(135deg,#f59e0b,#fbbf24)", borderRadius:12, width:40, height:40, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.2rem", flexShrink:0, boxShadow:"0 4px 14px rgba(245,158,11,0.4)" }}>
+                  ⚡
+                </div>
+                <div>
+                  <div style={{ fontSize:"1.1rem", fontWeight:900, color:"white", letterSpacing:"-0.3px" }}>Upgrade to Premium</div>
+                  <div style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.55)", fontWeight:600 }}>Unlock the full UHC experience</div>
+                </div>
+                <div style={{ marginLeft:"auto", background:"linear-gradient(135deg,#f59e0b,#f97316)", color:"white", fontSize:"0.65rem", fontWeight:800, padding:"3px 10px", borderRadius:99, textTransform:"uppercase", letterSpacing:".08em", flexShrink:0 }}>
+                  PRO
+                </div>
+              </div>
+
+              {/* Feature grid */}
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(160px,1fr))", gap:"10px 20px", marginBottom:20 }}>
+                {[
+                  { icon:"🚀", label:"Unlimited quizzes & topics" },
+                  { icon:"📊", label:"Advanced progress analytics" },
+                  { icon:"🃏", label:"Full flashcard & note library" },
+                  { icon:"🏆", label:"Priority leaderboard ranking" },
+                  { icon:"🔔", label:"Instant study reminders" },
+                  { icon:"📚", label:"Downloadable resources" },
+                ].map((f,i) => (
+                  <div key={i} style={{ display:"flex", alignItems:"center", gap:8 }}>
+                    <span style={{ fontSize:"1rem" }}>{f.icon}</span>
+                    <span style={{ fontSize:"0.77rem", color:"rgba(255,255,255,0.75)", fontWeight:600 }}>{f.label}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* CTA row */}
+              <div style={{ display:"flex", alignItems:"center", gap:12, flexWrap:"wrap" }}>
+                <button style={{
+                  background:"linear-gradient(135deg,#f59e0b,#fbbf24)",
+                  color:"#0f172a", border:"none", borderRadius:12,
+                  padding:"12px 28px", fontWeight:900, fontSize:"0.9rem",
+                  cursor:"pointer", boxShadow:"0 6px 20px rgba(245,158,11,0.35)",
+                  transition:"transform .2s, box-shadow .2s",
+                  whiteSpace:"nowrap",
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 10px 28px rgba(245,158,11,0.5)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform=""; e.currentTarget.style.boxShadow="0 6px 20px rgba(245,158,11,0.35)"; }}
+                >
+                  ⚡ Upgrade Now — Free Trial
+                </button>
+                <span style={{ fontSize:"0.73rem", color:"rgba(255,255,255,0.45)", fontWeight:600 }}>No credit card required · Cancel anytime</span>
+              </div>
+            </div>
+          </section>
+
           {/* ===== TOP 5 LEADERBOARD ===== */}
+
           <section className="profile-section" style={{ marginTop: '30px' }}>
             <h3 className="section-title"><FaTrophy style={{ color: '#f59e0b', marginRight: '8px' }} /> Top 5 Leaderboard</h3>
             <div className="leaderboard-container">
