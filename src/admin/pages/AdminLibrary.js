@@ -355,6 +355,8 @@ function StudyHubTab({ courses, onCourseAdded }) {
   const [saving, setSaving]  = useState(false);
   const [courseFilter, setCourseFilter] = useState(""); // "" = All
   const [showManualOnly, setShowManualOnly] = useState(false); // toggle to filter out q_ cards
+  const [courseSearch, setCourseSearch] = useState("");
+  const [isCoursesExpanded, setIsCoursesExpanded] = useState(false);
 
   // Edit state
   const [editItem, setEditItem]   = useState(null); // item data
@@ -462,7 +464,7 @@ function StudyHubTab({ courses, onCourseAdded }) {
           { key: "notes",      label: "📝 Notes",       count: notes.length },
           { key: "resources",  label: "🔗 Resources",   count: resources.length },
         ].map(t => (
-          <button key={t.key} onClick={() => { setSubTab(t.key); setShowForm(false); setCourseFilter(""); }}
+          <button key={t.key} onClick={() => { setSubTab(t.key); setShowForm(false); setCourseFilter(""); setCourseSearch(""); setIsCoursesExpanded(false); }}
             style={{
               padding: "7px 18px", borderRadius: 99, border: "none", cursor: "pointer", fontWeight: 700, fontSize: "0.8rem",
               background: subTab === t.key ? "#10b981" : "var(--admin-surface, #f1f5f9)",
@@ -513,56 +515,76 @@ function StudyHubTab({ courses, onCourseAdded }) {
           return list.filter(i => i.course === course).length;
         };
         const totalForAll = subTab === "flashcards" ? visibleFlashcards.length : subTab === "notes" ? notes.length : resources.length;
+
+        // Filter courses by search input
+        const matchedCourses = allItemCourses.filter(c =>
+          c.toLowerCase().includes(courseSearch.toLowerCase())
+        );
+
+        // Limit display if not expanded and no search term is entered
+        const maxCollapsed = 6;
+        const shouldCollapse = matchedCourses.length > maxCollapsed && !courseSearch;
+        
+        // Build list of visible courses
+        let visibleCourses = shouldCollapse && !isCoursesExpanded 
+          ? matchedCourses.slice(0, maxCollapsed) 
+          : matchedCourses;
+          
+        // Ensure the active course filter is always visible even if collapsed
+        if (shouldCollapse && !isCoursesExpanded && courseFilter && !visibleCourses.includes(courseFilter)) {
+          if (matchedCourses.includes(courseFilter)) {
+            // Create a copy and append it so we don't mutate state/original array directly
+            visibleCourses = [...visibleCourses, courseFilter];
+          }
+        }
+
         return (
-          <div style={{
-            marginBottom: 18, padding: "12px 14px",
-            background: "var(--admin-surface, #f8fafc)",
-            border: "1px solid var(--admin-border, #e2e8f0)",
-            borderRadius: 14,
-          }}>
+          <div className="course-filter-panel">
             {/* Header row */}
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-              <span style={{ fontSize: ".72rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: ".08em", color: "var(--admin-muted)" }}>
+            <div className="course-filter-header">
+              <div className="course-filter-title">
                 📂 Filter by Course
-              </span>
-              {courseFilter && (
-                <button
-                  onClick={() => setCourseFilter("")}
-                  style={{ marginLeft: "auto", fontSize: ".7rem", color: "#ef4444", background: "rgba(239,68,68,0.08)", border: "none", borderRadius: 6, padding: "2px 8px", cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", gap: 3 }}
-                >
-                  ✕ Clear filter
-                </button>
+              </div>
+
+              {/* Course Search Bar */}
+              {allItemCourses.length > maxCollapsed && (
+                <div className="course-filter-search-wrap">
+                  <Search size={13} className="course-filter-search-icon" />
+                  <input
+                    type="text"
+                    placeholder="Search courses..."
+                    value={courseSearch}
+                    onChange={e => setCourseSearch(e.target.value)}
+                    className="course-filter-search-input"
+                  />
+                  {courseSearch && (
+                    <button
+                      onClick={() => setCourseSearch("")}
+                      className="course-filter-search-clear"
+                      title="Clear search"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
               )}
             </div>
 
             {/* Pills grid */}
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            <div className="course-filter-pills">
               {/* All pill */}
               <button
                 onClick={() => setCourseFilter("")}
-                style={{
-                  display: "inline-flex", alignItems: "center", gap: 5,
-                  padding: "5px 12px", borderRadius: 99, cursor: "pointer",
-                  fontSize: ".76rem", fontWeight: 700, transition: "all .15s",
-                  background: !courseFilter ? "#4255ff" : "var(--admin-card, #fff)",
-                  color: !courseFilter ? "white" : "var(--admin-muted, #475569)",
-                  boxShadow: !courseFilter ? "0 2px 8px rgba(66,85,255,0.25)" : "0 1px 3px rgba(0,0,0,0.06)",
-                  border: `1px solid ${!courseFilter ? "#4255ff" : "var(--admin-border, #e2e8f0)"}`,
-                }}
+                className={`course-pill-btn ${!courseFilter ? "active-all" : ""}`}
               >
                 All
-                <span style={{
-                  background: !courseFilter ? "rgba(255,255,255,0.25)" : "var(--admin-border, #e2e8f0)",
-                  color: !courseFilter ? "white" : "#64748b",
-                  fontSize: ".65rem", fontWeight: 800,
-                  padding: "1px 6px", borderRadius: 99,
-                }}>
+                <span className="course-pill-count">
                   {totalForAll}
                 </span>
               </button>
 
-              {/* One pill per course */}
-              {allItemCourses.map(c => {
+              {/* Course pills */}
+              {visibleCourses.map(c => {
                 const cnt = countFor(c);
                 const active = courseFilter === c;
                 return (
@@ -570,35 +592,48 @@ function StudyHubTab({ courses, onCourseAdded }) {
                     key={c}
                     onClick={() => setCourseFilter(active ? "" : c)}
                     title={`${cnt} item${cnt !== 1 ? "s" : ""} in ${c}`}
-                    style={{
-                      display: "inline-flex", alignItems: "center", gap: 5,
-                      padding: "5px 12px", borderRadius: 99, cursor: "pointer",
-                      fontSize: ".76rem", fontWeight: 700, transition: "all .15s",
-                      background: active ? "#10b981" : "var(--admin-card, #fff)",
-                      color: active ? "white" : "var(--admin-text, #0f172a)",
-                      boxShadow: active ? "0 2px 8px rgba(16,185,129,0.25)" : "0 1px 3px rgba(0,0,0,0.06)",
-                      border: `1px solid ${active ? "#10b981" : "var(--admin-border, #e2e8f0)"}`,
-                      opacity: cnt === 0 ? 0.45 : 1,
-                    }}
+                    className={`course-pill-btn ${active ? "active-course" : ""}`}
+                    style={{ opacity: cnt === 0 && !active ? 0.5 : 1 }}
                   >
                     {c}
-                    <span style={{
-                      background: active ? "rgba(255,255,255,0.25)" : "rgba(16,185,129,0.12)",
-                      color: active ? "white" : "#10b981",
-                      fontSize: ".65rem", fontWeight: 800,
-                      padding: "1px 6px", borderRadius: 99,
-                    }}>
+                    <span className="course-pill-count">
                       {cnt}
                     </span>
                   </button>
                 );
               })}
+
+              {/* Expand / Collapse Button */}
+              {shouldCollapse && (
+                <button
+                  onClick={() => setIsCoursesExpanded(!isCoursesExpanded)}
+                  className="course-expand-btn"
+                >
+                  {isCoursesExpanded ? "Show Less" : `+ Show ${matchedCourses.length - maxCollapsed} More`}
+                </button>
+              )}
             </div>
 
             {/* Active filter confirmation */}
             {courseFilter && (
-              <div style={{ marginTop: 10, fontSize: ".75rem", color: "#10b981", fontWeight: 700, display: "flex", alignItems: "center", gap: 5 }}>
+              <div className="course-filter-info">
                 ✓ Showing <strong>"{courseFilter}"</strong> — {countFor(courseFilter)} item{countFor(courseFilter) !== 1 ? "s" : ""}
+                <button
+                  onClick={() => setCourseFilter("")}
+                  style={{
+                    marginLeft: 8,
+                    fontSize: ".7rem",
+                    color: "#ef4444",
+                    background: "rgba(239,68,68,0.08)",
+                    border: "none",
+                    borderRadius: 6,
+                    padding: "2px 8px",
+                    cursor: "pointer",
+                    fontWeight: 700
+                  }}
+                >
+                  ✕ Clear
+                </button>
               </div>
             )}
           </div>
