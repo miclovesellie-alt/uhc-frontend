@@ -542,7 +542,7 @@ function StudyHubTab({ courses, onCourseAdded }) {
                 onClick={() => setCourseFilter("")}
                 style={{
                   display: "inline-flex", alignItems: "center", gap: 5,
-                  padding: "5px 12px", borderRadius: 99, border: "none", cursor: "pointer",
+                  padding: "5px 12px", borderRadius: 99, cursor: "pointer",
                   fontSize: ".76rem", fontWeight: 700, transition: "all .15s",
                   background: !courseFilter ? "#4255ff" : "var(--admin-card, #fff)",
                   color: !courseFilter ? "white" : "var(--admin-muted, #475569)",
