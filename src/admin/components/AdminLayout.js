@@ -10,6 +10,8 @@ import {
   Clock, ChevronLeft, ChevronRight, Search, Check, ExternalLink,
   Zap, Sun, Moon, ChevronRight as Crumb, ArrowRight
 } from "lucide-react";
+import CommandPalette from "./CommandPalette";
+import AdminQuickDock from "./AdminQuickDock";
 
 /* ── Resolve a navigation path from notification content ── */
 function resolveNotifPath(n) {
@@ -26,8 +28,6 @@ function resolveNotifPath(n) {
   if (msg.includes("log") || msg.includes("activity")) return "/admin/logs";
   return "/admin/notifications";
 }
-import CommandPalette from "./CommandPalette";
-import AdminQuickDock from "./AdminQuickDock";
 
 const baseNavItems = [
   { icon: <LayoutDashboard size={17}/>, label: "Dashboard",     path: "/admin"               },
