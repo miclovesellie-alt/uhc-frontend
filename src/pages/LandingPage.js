@@ -304,7 +304,7 @@ export default function LandingPage() {
               <button
                 className="hero-btn"
                 onClick={() => navigate("/auth")}
-                style={{ position: "relative", overflow: "hidden", minWidth: 210 }}
+                style={{ position: "relative", overflow: "hidden", width: 230, textAlign: "center", justifyContent: "center" }}
               >
                 <AnimatePresence mode="wait">
                   <motion.span
