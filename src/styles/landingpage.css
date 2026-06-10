@@ -189,7 +189,6 @@ html,body,#root{height:auto!important;min-height:100%;overflow-x:hidden!importan
   padding:16px 32px;background:var(--primary);color:white;
   border:none;border-radius:var(--radius);cursor:pointer;font-weight:800;font-size:1rem;
   transition:all .25s;box-shadow: 0 10px 25px rgba(16, 185, 129, 0.25);
-  white-space: nowrap;
 }
 .hero-btn:hover{transform:translateY(-2px);box-shadow: 0 15px 35px rgba(16, 185, 129, 0.35);background:var(--primary-dark)}
 
