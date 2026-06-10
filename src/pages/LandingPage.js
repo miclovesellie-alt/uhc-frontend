@@ -198,6 +198,15 @@ export default function LandingPage() {
   const [contactStatus,   setContactStatus]    = useState(null);
   const [siteContact,     setSiteContact]      = useState({ email:"boafokyei3@gmail.com", phone:"", whatsapp:"+233598173019", facebook:"", instagram:"", tiktok:"", twitter:"", youtube:"" });
 
+  // Hero button cycling label
+  const BTN_LABELS = ["Create Free Account", "Log In"];
+  const [btnLabelIdx, setBtnLabelIdx] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setBtnLabelIdx(i => (i + 1) % BTN_LABELS.length), 2500);
+    return () => clearInterval(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Quiz
   const [course,   setCourse]   = useState(0);
   const [qIdx,     setQIdx]     = useState(0);
@@ -292,7 +301,24 @@ export default function LandingPage() {
               a Study Hub with flashcards and notes, and a live leaderboard — completely free.
             </p>
             <div className="hero-actions">
-              <button className="hero-btn" onClick={() => navigate("/auth")}>Create Free Account</button>
+              <button
+                className="hero-btn"
+                onClick={() => navigate("/auth")}
+                style={{ position: "relative", overflow: "hidden", minWidth: 210 }}
+              >
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={btnLabelIdx}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -12 }}
+                    transition={{ duration: 0.35, ease: "easeInOut" }}
+                    style={{ display: "inline-block", pointerEvents: "none" }}
+                  >
+                    {BTN_LABELS[btnLabelIdx]}
+                  </motion.span>
+                </AnimatePresence>
+              </button>
               <button className="hero-btn-secondary" onClick={() => navigate("/study-hub")}>Open Study Hub</button>
             </div>
           </motion.div>
