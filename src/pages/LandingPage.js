@@ -315,7 +315,6 @@ export default function LandingPage() {
                 <span style={{
                   opacity: btnVisible ? 1 : 0,
                   transition: "opacity 0.3s ease",
-                  display: "inline-block",
                 }}>
                   {BTN_LABELS[btnLabelIdx]}
                 </span>
