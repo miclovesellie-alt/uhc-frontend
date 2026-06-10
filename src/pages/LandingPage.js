@@ -305,14 +305,26 @@ export default function LandingPage() {
                 className="hero-btn"
                 onClick={() => navigate("/auth")}
               >
+                {/* Invisible spacer — always holds the width/height of the longest label */}
+                <span style={{ visibility: "hidden", pointerEvents: "none" }} aria-hidden="true">
+                  Create Free Account
+                </span>
+                {/* Animated label sits on top, absolutely centered */}
                 <AnimatePresence mode="wait">
                   <motion.span
                     key={btnLabelIdx}
-                    initial={{ opacity: 0, y: 12 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -12 }}
-                    transition={{ duration: 0.35, ease: "easeInOut" }}
-                    style={{ display: "inline-block", pointerEvents: "none" }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      pointerEvents: "none",
+                    }}
                   >
                     {BTN_LABELS[btnLabelIdx]}
                   </motion.span>
