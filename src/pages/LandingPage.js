@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { BookOpen, Zap, TrendingUp, Trophy, ArrowRight, Lock, Star, CheckCircle2, Menu, X, RotateCcw, Layers } from "lucide-react";
 import "../styles/landingpage.css";
 import graduation from "../assets/graduation.jpeg";
