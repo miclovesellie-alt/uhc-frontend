@@ -179,7 +179,9 @@ function LandingFlashcards({ navigate }) {
             border:"none", borderRadius:12, fontWeight:800, fontSize:".95rem",
             cursor:"pointer", display:"inline-flex", alignItems:"center", gap:10,
             boxShadow:"0 4px 16px rgba(16,185,129,.35)" }}>
-          <Layers size={16}/> Access Full Study Hub Free →
+          <span style={{ display: "inline-block", position: "relative" }}>
+            <Layers size={16}/>
+          </span> Access Full Study Hub Free →
         </button>
       </div>
     </div>
@@ -309,19 +311,25 @@ export default function LandingPage() {
             </p>
             <div className="hero-actions">
               <button className="hero-btn" onClick={() => navigate("/auth")}>
-                {/* Invisible anchor — always holds full size of longest label */}
-                <span style={{ visibility: "hidden", userSelect: "none" }} aria-hidden="true">
-                  Create Free Account
-                </span>
-                {/* Animated label — absolutely centered, never affects layout */}
-                <span style={{
-                  position: "absolute", inset: 0,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  opacity: btnVisible ? 1 : 0,
-                  transition: "opacity 0.3s ease",
-                  pointerEvents: "none",
-                }}>
-                  {BTN_LABELS[btnLabelIdx]}
+                <span style={{ position: "relative", display: "inline-block" }}>
+                  {/* Invisible anchor — locks the button to the size of the longest label */}
+                  <span style={{ visibility: "hidden", userSelect: "none" }} aria-hidden="true">
+                    Create Free Account
+                  </span>
+                  {/* Animated label — sits on top, never affects layout */}
+                  <span style={{
+                    position: "absolute",
+                    inset: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    opacity: btnVisible ? 1 : 0,
+                    transition: "opacity 0.3s ease",
+                    pointerEvents: "none",
+                    whiteSpace: "nowrap",
+                  }}>
+                    {BTN_LABELS[btnLabelIdx]}
+                  </span>
                 </span>
               </button>
               <button className="hero-btn-secondary" onClick={() => navigate("/study-hub")}>Open Study Hub</button>
