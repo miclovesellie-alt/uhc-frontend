@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import CommandPalette from "./CommandPalette";
 import AdminQuickDock from "./AdminQuickDock";
+import { playToastSound } from "../../utils/sounds";
 
 /* ── Resolve a navigation path from notification content ── */
 function resolveNotifPath(n) {
@@ -260,6 +261,9 @@ export default function AdminLayout() {
 
     socket.on("ADMIN_NOTIFICATION", d => {
       const id = Date.now();
+      // Play a gentle notification sound based on severity
+      const soundType = d.type === "SUCCESS" ? "success" : d.type === "DANGER" ? "error" : d.type === "WARNING" ? "warning" : "info";
+      playToastSound(soundType);
       // Smart route resolution for toast
       const msg = (d.message || "").toLowerCase();
       let actionPath = "/admin/notifications";
