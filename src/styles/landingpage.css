@@ -296,6 +296,13 @@ html,body,#root{height:auto!important;min-height:100%;overflow-x:hidden!importan
 .section-subtitle{font-size:1.15rem;color:var(--text-secondary);max-width:600px;margin:0 auto 64px;line-height:1.6}
 
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+.tw-cursor {
+  display: inline-block;
+  font-weight: 300;
+  color: var(--primary);
+  animation: blink 0.7s step-start infinite;
+  margin-left: 2px;
+}
 
 /* ===== FACTS SECTION (FLIP CARDS) ===== */
 .facts-section { padding: 120px 8%; text-align: center; background: white; }
@@ -703,6 +710,7 @@ html,body,#root{height:auto!important;min-height:100%;overflow-x:hidden!importan
     gap: 40px;
     text-align: center;
   }
+  .hero-text { text-align: center; }
   .hero-text h1 { font-size: 3.5rem; }
   .hero-actions { justify-content: center; }
   .hero-image-wrapper { max-width: 500px; width: 100%; margin: 0 auto; }

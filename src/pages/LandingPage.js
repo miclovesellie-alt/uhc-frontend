@@ -216,6 +216,31 @@ export default function LandingPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Typewriter for hero h1
+  const TW1 = "Focus On Learning,";
+  const TW2 = "We Will Handle The Stress";
+  const [twLine1, setTwLine1] = useState("");
+  const [twLine2, setTwLine2] = useState("");
+  const [twDone,  setTwDone]  = useState(false);
+  useEffect(() => {
+    let i = 0;
+    const t1 = setInterval(() => {
+      i++;
+      setTwLine1(TW1.slice(0, i));
+      if (i >= TW1.length) {
+        clearInterval(t1);
+        let j = 0;
+        const t2 = setInterval(() => {
+          j++;
+          setTwLine2(TW2.slice(0, j));
+          if (j >= TW2.length) { clearInterval(t2); setTwDone(true); }
+        }, 55);
+      }
+    }, 65);
+    return () => clearInterval(t1);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Quiz
   const [course,   setCourse]   = useState(0);
   const [qIdx,     setQIdx]     = useState(0);
@@ -303,8 +328,14 @@ export default function LandingPage() {
       <section className="hero-section">
         <div className="hero-text">
           <motion.div initial={{ opacity:0, x:-24 }} animate={{ opacity:1, x:0 }} transition={{ duration:.6 }}>
-            <span className="section-label">Free Nursing Education Platform — For Every Student</span>
-            <h1>Focus on Learning.<br /><span className="highlight">We Handle the Rest.</span></h1>
+            <span className="section-label" style={{ display: "block", textAlign: "center" }}>Do You Love To Learn?</span>
+            <h1>
+              {twLine1}{!twDone && twLine2.length === 0 && <span className="tw-cursor">|</span>}
+              <br />
+              <span className="highlight">
+                {twLine2}{!twDone && twLine2.length > 0 && <span className="tw-cursor">|</span>}
+              </span>
+            </h1>
             <p style={{ color:"var(--text-secondary)", fontSize:"1.05rem", lineHeight:1.75, margin:"20px 0 32px", maxWidth:480 }}>
               UHC Academy gives nursing students worldwide access to adaptive quizzes,
               a Study Hub with flashcards and notes, and a live leaderboard — completely free.
