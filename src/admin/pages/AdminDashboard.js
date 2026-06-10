@@ -143,12 +143,12 @@ export default function AdminDashboard() {
     { label:"Study Hub Items", value:stats.totalStudyHub,              icon:<Layers size={18}/>,   color:"green",  trend:"Cards + Notes + Links",path:"/admin/userlibrary" },
   ];
 
-  /* ── Bar chart data — split into two sensible groups ── */
+  /* ── Bar chart data ── */
   const chartData = [
     { name:"Users",      value:stats.totalUsers },
     { name:"Questions",  value:stats.totalQuestions },
     { name:"Courses",    value:stats.totalCourses },
-    { name:"Active 24h", value:stats.activeUsers },
+    { name:"Online Now", value:presence?.onlineIds?.length || 0 },
   ];
 
   const avatarColor = (name="") => {
@@ -271,7 +271,7 @@ export default function AdminDashboard() {
         <div className="admin-chart-card">
           <h3>Platform Statistics</h3>
           <p style={{fontSize:".75rem",color:"var(--admin-muted)",marginBottom:12,marginTop:-8}}>
-            Showing: Users · Questions · Courses · Active (24h)
+            Showing: Users · Questions · Courses · Online Now
           </p>
           <ResponsiveContainer width="100%" height={220}>
             {chartType==="pie" ? (
