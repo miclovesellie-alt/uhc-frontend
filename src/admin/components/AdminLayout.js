@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import CommandPalette from "./CommandPalette";
 import AdminQuickDock from "./AdminQuickDock";
-import { playToastSound } from "../../utils/sounds";
+import { playToastSound, unlockAudio } from "../../utils/sounds";
 
 /* ── Resolve a navigation path from notification content ── */
 function resolveNotifPath(n) {
@@ -240,6 +240,17 @@ export default function AdminLayout() {
   const [bellNotifs, setBellNotifs] = useState([]);
   const bellRef = useRef(null);
   const isDark = adminTheme === "dark";
+
+  // ── Unlock AudioContext on first user gesture (browser autoplay policy) ──
+  useEffect(() => {
+    const unlock = () => unlockAudio();
+    window.addEventListener("click",   unlock, { once: true });
+    window.addEventListener("keydown", unlock, { once: true });
+    return () => {
+      window.removeEventListener("click",   unlock);
+      window.removeEventListener("keydown", unlock);
+    };
+  }, []);
 
   // ── Global Ctrl+K listener ──
   useEffect(() => {

@@ -27,6 +27,25 @@ export function isSoundEnabled() {
   return localStorage.getItem("uhc_sounds_off") !== "true";
 }
 
+/**
+ * Must be called on a user gesture (click, keydown, etc.) to unlock
+ * the browser's autoplay policy so programmatic sounds work later.
+ * Safe to call multiple times — only acts once.
+ */
+let _unlocked = false;
+export function unlockAudio() {
+  if (_unlocked) return;
+  const ctx = getCtx();
+  if (!ctx) return;
+  // Play a one-frame silent buffer to satisfy the gesture requirement
+  const buf = ctx.createBuffer(1, 1, 22050);
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  src.connect(ctx.destination);
+  src.start(0);
+  ctx.resume().then(() => { _unlocked = true; }).catch(() => {});
+}
+
 export function setSoundEnabled(val) {
   if (val) {
     localStorage.removeItem("uhc_sounds_off");
