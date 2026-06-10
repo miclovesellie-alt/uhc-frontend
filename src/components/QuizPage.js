@@ -101,6 +101,7 @@ export default function QuizPage() {
 
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState("Typo");
+  const [showQuitModal, setShowQuitModal] = useState(false);
 
   const awardPoints = async (amount, reason) => {
     try {
@@ -363,6 +364,20 @@ export default function QuizPage() {
             <motion.button className="quiz-back-button" onClick={() => setStage("selectCourse")}>
               <ArrowLeft size={22} />
             </motion.button>
+            <button
+              onClick={() => setShowQuitModal(true)}
+              title="Exit quiz setup"
+              style={{
+                position: "absolute", top: 14, right: 14,
+                background: "none", border: "1px solid #fecaca",
+                borderRadius: 8, padding: "4px 10px",
+                color: "#ef4444", fontSize: "0.75rem",
+                fontWeight: 700, cursor: "pointer",
+                display: "flex", alignItems: "center", gap: 4,
+              }}
+            >
+              ✕ Exit
+            </button>
             <div className="quiz-header-badge"><Clock size={16} /> Select Mode</div>
             <h1 className="quiz-card-title">How Many Questions?</h1>
             <p className="quiz-card-sub">Course: <strong>{selCourse}</strong></p>
@@ -414,6 +429,19 @@ export default function QuizPage() {
                 {streak >= 3 && <span className="quiz-streak-badge">🔥 {streak}</span>}
               </div>
               <div className="quiz-tb-right">
+                <button
+                  onClick={() => setShowQuitModal(true)}
+                  title="Exit quiz"
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '4px',
+                    padding: '4px 8px', borderRadius: '6px',
+                    border: '1px solid #fecaca', background: '#fef2f2',
+                    color: '#ef4444', fontSize: '0.65rem',
+                    fontWeight: 700, cursor: 'pointer'
+                  }}
+                >
+                  ✕ Exit
+                </button>
                 <button 
                   className="quiz-report-btn-header" 
                   onClick={() => setShowReportModal(true)}
@@ -615,6 +643,86 @@ export default function QuizPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ══ QUIT MODAL ══ */}
+      {showQuitModal && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          background: "rgba(0,0,0,0.55)", zIndex: 1100,
+          display: "flex", alignItems: "center", justifyContent: "center"
+        }}>
+          <motion.div
+            initial={{ scale: 0.88, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            style={{
+              background: "var(--card-bg, #fff)", padding: "28px 28px 24px",
+              borderRadius: "18px", width: "90%", maxWidth: "400px",
+              boxShadow: "0 16px 40px rgba(0,0,0,0.25)",
+              textAlign: "center",
+            }}
+          >
+            <div style={{ fontSize: "2.4rem", marginBottom: 8 }}>🚪</div>
+            <h3 style={{ margin: "0 0 8px", color: "var(--text, #0f172a)", fontSize: "1.15rem" }}>Leave Quiz?</h3>
+            <p style={{ fontSize: "0.85rem", color: "#64748b", marginBottom: 24, lineHeight: 1.6 }}>
+              {stage === "quiz"
+                ? "Would you like to save your progress so you can continue later, or discard it?"
+                : "Are you sure you want to go back to course selection?"}
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {stage === "quiz" && (
+                <button
+                  onClick={() => {
+                    // progress is already persisted continuously — just navigate away
+                    setShowQuitModal(false);
+                    clearInterval(timerRef.current);
+                    setStage("selectCourse");
+                    setDone(false); setReviewMode(false);
+                  }}
+                  style={{
+                    padding: "11px 0", borderRadius: 10, border: "none",
+                    background: "linear-gradient(135deg,#4255ff,#7c3aed)",
+                    color: "#fff", fontWeight: 700, fontSize: "0.9rem", cursor: "pointer"
+                  }}
+                >
+                  💾 Save Progress &amp; Exit
+                </button>
+              )}
+              <button
+                onClick={() => {
+                  localStorage.removeItem(storeKey);
+                  setShowQuitModal(false);
+                  clearInterval(timerRef.current);
+                  setStage("selectCourse");
+                  setDone(false); setReviewMode(false);
+                  setQuestions([]); setAnswers([]); setFlagged([]);
+                  setIdx(0); setSelAns(null); setLocked(false);
+                  setScore(0); setStreak(0); setBestStreak(0); setTimeLeft(45);
+                }}
+                style={{
+                  padding: "11px 0", borderRadius: 10,
+                  border: "1.5px solid #fca5a5",
+                  background: "#fef2f2", color: "#ef4444",
+                  fontWeight: 700, fontSize: "0.9rem", cursor: "pointer"
+                }}
+              >
+                🗑️ {stage === "quiz" ? "Discard Progress & Exit" : "Yes, Go Back"}
+              </button>
+              <button
+                onClick={() => setShowQuitModal(false)}
+                style={{
+                  padding: "9px 0", borderRadius: 10,
+                  border: "1px solid #e2e8f0",
+                  background: "var(--bg, #f8fafc)", color: "#64748b",
+                  fontWeight: 600, fontSize: "0.85rem", cursor: "pointer"
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       {/* ══ REPORT MODAL ══ */}
       {showReportModal && (
