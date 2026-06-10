@@ -181,7 +181,7 @@ function NotifCard({ n, idx, onRead, onDelete, navigate }) {
           </button>
         )}
 
-        {/* Action button â€” always visible if there's a route */}
+        {/* Action button — always visible if there's a route */}
         {actionPath && (
           <button
             className="notif-action-btn"
@@ -328,21 +328,30 @@ export default function AdminNotifications() {
 
   const processNotifications = (backendNotifs, ss, mm) => {
     const list = [];
-    if (ss) list.push({ id: "ss", type: "Security", icon: "ðŸ“µ", title: "No-Screenshot Active", desc: "Screenshot protection is enabled for all quizzes", time: "Active now", read: false, color: "blue" });
-    if (mm) list.push({ id: "mm", type: "System", icon: "ðŸ”§", title: "Maintenance Mode", desc: "Platform is in maintenance â€” users cannot log in", time: "Active now", read: false, color: "orange" });
+    if (ss) list.push({ id: "ss", type: "Security", icon: "📵", title: "No-Screenshot Active", desc: "Screenshot protection is enabled for all quizzes", time: "Active now", read: false, color: "blue" });
+    if (mm) list.push({ id: "mm", type: "System", icon: "🔧", title: "Maintenance Mode", desc: "Platform is in maintenance — users cannot log in", time: "Active now", read: false, color: "orange" });
 
     backendNotifs.forEach(n => {
       const isReadByMe = n.readBy?.includes(localStorage.getItem("userId"));
+      const msgLower = (n.message || "").toLowerCase();
+      const isQuiz = msgLower.includes("quiz");
+      let notifType = "System";
+      if (n.type === "DANGER") notifType = "Security";
+      else if (n.type === "WARNING") notifType = isQuiz ? "Quiz" : "System";
+      let icon = "🔔";
+      if (n.type === "DANGER") icon = "🚫";
+      else if (isQuiz) icon = "🧠";
+      else if (n.type === "WARNING") icon = "⚠️";
       list.push({
         id: n._id,
-        type: n.type === "DANGER" ? "Security" : n.type === "WARNING" ? "Quiz" : "System",
-        icon: n.type === "DANGER" ? "ðŸš«" : n.type === "WARNING" ? "âš ï¸" : "ðŸ””",
+        type: notifType,
+        icon,
         title: n.sender?.name || "System Alert",
         desc: n.message,
         message: n.message,
         time: new Date(n.createdAt).toLocaleString(),
         read: isReadByMe,
-        color: n.type === "DANGER" ? "red" : n.type === "WARNING" ? "orange" : "blue",
+        color: n.type === "DANGER" ? "red" : isQuiz ? "green" : "blue",
       });
     });
     return list;
@@ -437,7 +446,7 @@ export default function AdminNotifications() {
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div>
             <h1 style={{ fontSize: "1.4rem", fontWeight: 800, color: "var(--admin-text)", margin: 0, display: "flex", alignItems: "center", gap: 10 }}>
-              ðŸ”” Notifications
+              🔔 Notifications
               {unread > 0 && (
                 <span style={{
                   fontSize: ".75rem", background: "#ef4444", color: "white",
