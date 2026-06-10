@@ -201,8 +201,15 @@ export default function LandingPage() {
   // Hero button cycling label
   const BTN_LABELS = ["Create Free Account", "Log In"];
   const [btnLabelIdx, setBtnLabelIdx] = useState(0);
+  const [btnVisible, setBtnVisible] = useState(true);
   useEffect(() => {
-    const t = setInterval(() => setBtnLabelIdx(i => (i + 1) % BTN_LABELS.length), 2500);
+    const t = setInterval(() => {
+      setBtnVisible(false);
+      setTimeout(() => {
+        setBtnLabelIdx(i => (i + 1) % BTN_LABELS.length);
+        setBtnVisible(true);
+      }, 300);
+    }, 2800);
     return () => clearInterval(t);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -305,30 +312,13 @@ export default function LandingPage() {
                 className="hero-btn"
                 onClick={() => navigate("/auth")}
               >
-                {/* Invisible spacer — always holds the width/height of the longest label */}
-                <span style={{ visibility: "hidden", pointerEvents: "none" }} aria-hidden="true">
-                  Create Free Account
+                <span style={{
+                  opacity: btnVisible ? 1 : 0,
+                  transition: "opacity 0.3s ease",
+                  display: "inline-block",
+                }}>
+                  {BTN_LABELS[btnLabelIdx]}
                 </span>
-                {/* Animated label sits on top, absolutely centered */}
-                <AnimatePresence mode="wait">
-                  <motion.span
-                    key={btnLabelIdx}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      pointerEvents: "none",
-                    }}
-                  >
-                    {BTN_LABELS[btnLabelIdx]}
-                  </motion.span>
-                </AnimatePresence>
               </button>
               <button className="hero-btn-secondary" onClick={() => navigate("/study-hub")}>Open Study Hub</button>
             </div>
