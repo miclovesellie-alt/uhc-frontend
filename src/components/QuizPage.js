@@ -103,9 +103,9 @@ export default function QuizPage() {
   const [reportReason, setReportReason] = useState("Typo");
   const [showQuitModal, setShowQuitModal] = useState(false);
 
-  const awardPoints = async (amount, reason) => {
+  const awardPoints = async (amount, reason, course, questionsAnswered, totalQuestions) => {
     try {
-      const res = await api.post("points/add", { amount, reason });
+      const res = await api.post("points/add", { amount, reason, course, questionsAnswered, totalQuestions });
       if (user) setUser({ ...user, points: res.data.totalPoints });
     } catch (err) {
       console.error("Failed to award points", err);
@@ -245,11 +245,11 @@ export default function QuizPage() {
       const completedQuizPoints = 1;
       const questionsAnsweredPoints = Math.floor(questions.length / 10) * 3;
       const totalPoints = completedQuizPoints + questionsAnsweredPoints;
-      if (totalPoints > 0) awardPoints(totalPoints, "Quiz Completion");
-      // Save to history
       const fs = answers.filter((a, i) => a === questions[i]?.answer).length;
+      if (totalPoints > 0) awardPoints(totalPoints, "Quiz Completion", selCourse, fs, questions.length);
+      // Save to history
       saveQuizHistory(selCourse, fs, questions.length, bestStreak);
-      playFinish(); // gentle fanfare on quiz completion
+      playFinish();
       setDone(true);
     }
   };

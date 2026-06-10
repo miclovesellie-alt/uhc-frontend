@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+﻿import React, { useState, useEffect, useCallback } from "react";
 import {
   RefreshCw, Check, Send, Trash2, ChevronDown, ChevronUp,
   Bell, X, AlertTriangle, Info, Zap, ExternalLink,
@@ -17,7 +17,7 @@ const PRIORITY_CONFIG = {
   low:      { label: "Low",      color: "#64748b", bg: "rgba(100,116,139,0.1)", icon: <Info size={10}/> },
 };
 
-/* ── Smart route resolver ── */
+/* â”€â”€ Smart route resolver â”€â”€ */
 function resolveActionPath(n) {
   const msg = (n.message || n.desc || "").toLowerCase();
   const title = (n.title || "").toLowerCase();
@@ -85,7 +85,7 @@ function groupNotifications(list) {
   return order.filter(k => groups[k]).map(k => ({ label: k, items: groups[k] }));
 }
 
-/* ── Priority Badge ── */
+/* â”€â”€ Priority Badge â”€â”€ */
 function PriorityBadge({ level }) {
   const cfg = PRIORITY_CONFIG[level] || PRIORITY_CONFIG.low;
   return (
@@ -99,7 +99,7 @@ function PriorityBadge({ level }) {
   );
 }
 
-/* ── Single Notification Card ── */
+/* â”€â”€ Single Notification Card â”€â”€ */
 function NotifCard({ n, idx, onRead, onDelete, navigate }) {
   const [expanded, setExpanded] = useState(false);
   const priority = getPriority(n);
@@ -181,7 +181,7 @@ function NotifCard({ n, idx, onRead, onDelete, navigate }) {
           </button>
         )}
 
-        {/* Action button — always visible if there's a route */}
+        {/* Action button â€” always visible if there's a route */}
         {actionPath && (
           <button
             className="notif-action-btn"
@@ -223,7 +223,7 @@ function NotifCard({ n, idx, onRead, onDelete, navigate }) {
   );
 }
 
-/* ── Group Section ── */
+/* â”€â”€ Group Section â”€â”€ */
 function NotifGroup({ group, collapsed, onToggle, onRead, onDelete, navigate }) {
   const unread = group.items.filter(n => !n.read).length;
   return (
@@ -259,7 +259,7 @@ function NotifGroup({ group, collapsed, onToggle, onRead, onDelete, navigate }) 
   );
 }
 
-/* ── Stats Bar ── */
+/* â”€â”€ Stats Bar â”€â”€ */
 function NotifStats({ notifications }) {
   const total   = notifications.length;
   const unread  = notifications.filter(n => !n.read).length;
@@ -288,7 +288,7 @@ function NotifStats({ notifications }) {
   );
 }
 
-/* ── Main Component ── */
+/* â”€â”€ Main Component â”€â”€ */
 export default function AdminNotifications() {
   const [notifications, setNotifications] = useState([]);
   const [filter, setFilter] = useState("All");
@@ -328,15 +328,15 @@ export default function AdminNotifications() {
 
   const processNotifications = (backendNotifs, ss, mm) => {
     const list = [];
-    if (ss) list.push({ id: "ss", type: "Security", icon: "📵", title: "No-Screenshot Active", desc: "Screenshot protection is enabled for all quizzes", time: "Active now", read: false, color: "blue" });
-    if (mm) list.push({ id: "mm", type: "System", icon: "🔧", title: "Maintenance Mode", desc: "Platform is in maintenance — users cannot log in", time: "Active now", read: false, color: "orange" });
+    if (ss) list.push({ id: "ss", type: "Security", icon: "ðŸ“µ", title: "No-Screenshot Active", desc: "Screenshot protection is enabled for all quizzes", time: "Active now", read: false, color: "blue" });
+    if (mm) list.push({ id: "mm", type: "System", icon: "ðŸ”§", title: "Maintenance Mode", desc: "Platform is in maintenance â€” users cannot log in", time: "Active now", read: false, color: "orange" });
 
     backendNotifs.forEach(n => {
       const isReadByMe = n.readBy?.includes(localStorage.getItem("userId"));
       list.push({
         id: n._id,
         type: n.type === "DANGER" ? "Security" : n.type === "WARNING" ? "Quiz" : "System",
-        icon: n.type === "DANGER" ? "🚫" : n.type === "WARNING" ? "⚠️" : "🔔",
+        icon: n.type === "DANGER" ? "ðŸš«" : n.type === "WARNING" ? "âš ï¸" : "ðŸ””",
         title: n.sender?.name || "System Alert",
         desc: n.message,
         message: n.message,
@@ -437,7 +437,7 @@ export default function AdminNotifications() {
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div>
             <h1 style={{ fontSize: "1.4rem", fontWeight: 800, color: "var(--admin-text)", margin: 0, display: "flex", alignItems: "center", gap: 10 }}>
-              🔔 Notifications
+              ðŸ”” Notifications
               {unread > 0 && (
                 <span style={{
                   fontSize: ".75rem", background: "#ef4444", color: "white",
@@ -453,12 +453,12 @@ export default function AdminNotifications() {
                   borderRadius: 99, padding: "2px 8px", fontWeight: 700,
                   animation: "newBadgePop .4s cubic-bezier(.34,1.56,.64,1)",
                 }}>
-                  ✨ New
+                  âœ¨ New
                 </span>
               )}
             </h1>
             <p style={{ fontSize: ".82rem", color: "var(--admin-muted)", margin: "4px 0 0" }}>
-              {notifications.length} total · {unread} unread · Click a notification to go directly to the relevant section
+              {notifications.length} total Â· {unread} unread Â· Click a notification to go directly to the relevant section
             </p>
           </div>
         </div>
@@ -526,7 +526,7 @@ export default function AdminNotifications() {
       {/* Notification groups */}
       {filtered.length === 0 ? (
         <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--admin-muted)" }}>
-          <div style={{ fontSize: "3rem", marginBottom: 12 }}>📭</div>
+          <div style={{ fontSize: "3rem", marginBottom: 12 }}>ðŸ“­</div>
           <div style={{ fontWeight: 700, fontSize: "1rem", marginBottom: 6 }}>All clear!</div>
           <div style={{ fontSize: ".85rem" }}>No notifications in this category.</div>
         </div>
@@ -544,13 +544,13 @@ export default function AdminNotifications() {
         ))
       )}
 
-      {/* ── Broadcast Modal ── */}
+      {/* â”€â”€ Broadcast Modal â”€â”€ */}
       {showBroadcast && (
         <div className="admin-modal-overlay" onClick={() => setShowBroadcast(false)}>
           <div className="admin-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 480 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
               <h3 style={{ margin: 0, display: "flex", alignItems: "center", gap: 8 }}><Send size={18}/> Send Broadcast</h3>
-              <button className="admin-btn secondary sm" onClick={() => setShowBroadcast(false)}>✕</button>
+              <button className="admin-btn secondary sm" onClick={() => setShowBroadcast(false)}>âœ•</button>
             </div>
             <p style={{ fontSize: ".85rem", color: "var(--admin-muted)", marginBottom: 16 }}>
               Send a notification to users on the platform. It appears in their notification feed.
@@ -596,7 +596,7 @@ export default function AdminNotifications() {
               className="admin-input"
               rows={4}
               style={{ width: "100%", boxSizing: "border-box", resize: "vertical", fontFamily: "inherit", padding: "10px 14px" }}
-              placeholder="Type your announcement here…"
+              placeholder="Type your announcement hereâ€¦"
               value={broadcastMsg}
               maxLength={charLimit}
               onChange={e => setBroadcastMsg(e.target.value)}
@@ -618,7 +618,7 @@ export default function AdminNotifications() {
                       target: broadcastTarget,
                       priority: broadcastPriority,
                     });
-                    showBToast("Broadcast sent successfully! ✅");
+                    showBToast("Broadcast sent successfully! âœ…");
                     setBroadcastMsg(""); setBroadcastTitle(""); setShowBroadcast(false);
                     load();
                   } catch (err) {
@@ -626,14 +626,14 @@ export default function AdminNotifications() {
                   } finally { setBroadcasting(false); }
                 }}
               >
-                <Send size={14}/> {broadcasting ? "Sending…" : "Send Now"}
+                <Send size={14}/> {broadcasting ? "Sendingâ€¦" : "Send Now"}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* ── Toast ── */}
+      {/* â”€â”€ Toast â”€â”€ */}
       {bToast && (
         <div style={{
           position: "fixed", top: 70, right: 24, zIndex: 9999,
@@ -648,3 +648,4 @@ export default function AdminNotifications() {
     </div>
   );
 }
+
