@@ -186,10 +186,10 @@ html,body,#root{height:auto!important;min-height:100%;overflow-x:hidden!importan
 
 .hero-actions { display: flex; gap: 16px; align-items: center; }
 .hero-btn{
-  padding:16px 44px;background:var(--primary);color:white;
-  border:none;border-radius:var(--radius);cursor:pointer;font-weight:800;font-size:1.05rem;
+  padding:16px 32px;background:var(--primary);color:white;
+  border:none;border-radius:var(--radius);cursor:pointer;font-weight:800;font-size:1rem;
   transition:all .25s;box-shadow: 0 10px 25px rgba(16, 185, 129, 0.25);
-  min-width: 240px; white-space: nowrap;
+  white-space: nowrap;
 }
 .hero-btn:hover{transform:translateY(-2px);box-shadow: 0 15px 35px rgba(16, 185, 129, 0.35);background:var(--primary-dark)}
 

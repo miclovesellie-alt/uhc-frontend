@@ -198,22 +198,6 @@ export default function LandingPage() {
   const [contactStatus,   setContactStatus]    = useState(null);
   const [siteContact,     setSiteContact]      = useState({ email:"boafokyei3@gmail.com", phone:"", whatsapp:"+233598173019", facebook:"", instagram:"", tiktok:"", twitter:"", youtube:"" });
 
-  // Hero button cycling label
-  const BTN_LABELS = ["Create Free Account", "Log In"];
-  const [btnLabelIdx, setBtnLabelIdx] = useState(0);
-  const [btnVisible, setBtnVisible] = useState(true);
-  useEffect(() => {
-    const t = setInterval(() => {
-      setBtnVisible(false);
-      setTimeout(() => {
-        setBtnLabelIdx(i => (i + 1) % BTN_LABELS.length);
-        setBtnVisible(true);
-      }, 300);
-    }, 2800);
-    return () => clearInterval(t);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   // Quiz
   const [course,   setCourse]   = useState(0);
   const [qIdx,     setQIdx]     = useState(0);
@@ -308,17 +292,7 @@ export default function LandingPage() {
               a Study Hub with flashcards and notes, and a live leaderboard — completely free.
             </p>
             <div className="hero-actions">
-              <button
-                className="hero-btn"
-                onClick={() => navigate("/auth")}
-              >
-                <span style={{
-                  opacity: btnVisible ? 1 : 0,
-                  transition: "opacity 0.3s ease",
-                }}>
-                  {BTN_LABELS[btnLabelIdx]}
-                </span>
-              </button>
+              <button className="hero-btn" onClick={() => navigate("/auth")}>Create Free Account</button>
               <button className="hero-btn-secondary" onClick={() => navigate("/study-hub")}>Open Study Hub</button>
             </div>
           </motion.div>
