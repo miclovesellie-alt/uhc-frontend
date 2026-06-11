@@ -8,11 +8,13 @@ import {
   LayoutDashboard, Users, HelpCircle, Upload, Bell, Settings, LogOut,
   Menu, X, FileText, Shield, Library, Mail, Layout, Trash2, Megaphone,
   Clock, ChevronLeft, ChevronRight, Search, Check, ExternalLink,
-  Sun, Moon, ChevronRight as Crumb, ArrowRight, CalendarDays
+  Sun, Moon, ArrowRight, CalendarDays
 } from "lucide-react";
 import CommandPalette from "./CommandPalette";
 import AdminQuickDock from "./AdminQuickDock";
 import { playToastSound, unlockAudio } from "../../utils/sounds";
+
+const Crumb = ChevronRight;
 
 /* ── Resolve a navigation path from notification content ── */
 function resolveNotifPath(n) {
@@ -545,7 +547,7 @@ export default function AdminLayout() {
               {item.icon}
               {!collapsed && <span style={{ flex: 1 }}>{item.label}</span>}
               {item.path === "/admin/pending" && pendingCount > 0 && !collapsed && (
-                <span style={{ background: "#ef4444", color: "white", fontSize: ".65rem", fontWeight: 700, padding: "1px 6px", borderRadius: 10 }}>{pendingCount}</span>
+                <span className="sidebar-badge">{pendingCount}</span>
               )}
             </NavLink>
           ))}
@@ -560,7 +562,10 @@ export default function AdminLayout() {
               {item.icon}
               {!collapsed && <span style={{ flex: 1 }}>{item.label}</span>}
               {item.label === "Notifications" && unreadCount > 0 && !collapsed && (
-                <span style={{ background: "#ef4444", color: "white", fontSize: ".65rem", fontWeight: 700, padding: "1px 6px", borderRadius: 10 }}>{unreadCount}</span>
+                <span className="sidebar-badge">{unreadCount}</span>
+              )}
+              {item.label === "Messages" && unreadMsgCount > 0 && !collapsed && (
+                <span className="sidebar-badge">{unreadMsgCount}</span>
               )}
             </NavLink>
           ))}
