@@ -102,16 +102,6 @@ function ToastStack({ toasts, onDismiss }) {
 
 /* ── Mail Dropdown Panel ── */
 function MailDropdown({ messages, unreadCount, onMarkRead, onViewAll, onClose, onNavigate }) {
-  const panelRef = useRef(null);
-
-  useEffect(() => {
-    function handleClick(e) {
-      if (panelRef.current && !panelRef.current.contains(e.target)) onClose();
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [onClose]);
-
   const handleItemClick = (m) => {
     onMarkRead(m._id);
     onNavigate(`/admin/messages?id=${m._id}`);
@@ -121,7 +111,7 @@ function MailDropdown({ messages, unreadCount, onMarkRead, onViewAll, onClose, o
   const userMsgs = messages.filter(m => m.source !== "admin_reply");
 
   return (
-    <div ref={panelRef} style={{
+    <div style={{
       position: "absolute", top: "calc(100% + 12px)", right: 0,
       width: 360, background: "var(--admin-card)", border: "1px solid var(--admin-border)",
       borderRadius: 18, boxShadow: "0 16px 48px rgba(0,0,0,0.18)", zIndex: 600,
@@ -206,16 +196,6 @@ function MailDropdown({ messages, unreadCount, onMarkRead, onViewAll, onClose, o
 
 /* ── Bell Dropdown Panel ── */
 function BellDropdown({ notifications, unreadCount, onMarkRead, onMarkAllRead, onViewAll, onClose, onNavigate }) {
-  const panelRef = useRef(null);
-
-  useEffect(() => {
-    function handleClick(e) {
-      if (panelRef.current && !panelRef.current.contains(e.target)) onClose();
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [onClose]);
-
   const colorMap = { blue: "#4255ff", green: "#22c55e", orange: "#f59e0b", red: "#ef4444" };
 
   const handleItemClick = (n) => {
@@ -227,7 +207,7 @@ function BellDropdown({ notifications, unreadCount, onMarkRead, onMarkAllRead, o
   };
 
   return (
-    <div ref={panelRef} style={{
+    <div style={{
       position: "absolute", top: "calc(100% + 12px)", right: 0,
       width: 360, background: "var(--admin-card)", border: "1px solid var(--admin-border)",
       borderRadius: 18, boxShadow: "0 16px 48px rgba(0,0,0,0.18)", zIndex: 600,
@@ -344,6 +324,7 @@ export default function AdminLayout() {
   const [bellOpen, setBellOpen] = useState(false);
   const [bellNotifs, setBellNotifs] = useState([]);
   const bellRef = useRef(null);
+  const mailRef = useRef(null);
   const isDark = adminTheme === "dark";
 
   // Message states
@@ -392,6 +373,20 @@ export default function AdminLayout() {
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
+  }, []);
+
+  // ── Close dropdowns on click outside ──
+  useEffect(() => {
+    const handler = (e) => {
+      if (bellRef.current && !bellRef.current.contains(e.target)) {
+        setBellOpen(false);
+      }
+      if (mailRef.current && !mailRef.current.contains(e.target)) {
+        setMailOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, []);
 
   // ── Socket ──
@@ -657,7 +652,7 @@ export default function AdminLayout() {
             </button>
 
             {/* Mail with dropdown */}
-            <div style={{ position: "relative" }}>
+            <div style={{ position: "relative" }} ref={mailRef}>
               <button
                 onClick={() => { setMailOpen(v => !v); setBellOpen(false); if (!mailOpen) loadMessages(); }}
                 style={{ position: "relative", width: 36, height: 36, borderRadius: 10, border: "1px solid var(--admin-border)", background: "transparent", color: "var(--admin-text)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }}
@@ -686,7 +681,7 @@ export default function AdminLayout() {
             {/* Bell with dropdown */}
             <div style={{ position: "relative" }} ref={bellRef}>
               <button
-                onClick={() => { setBellOpen(v => !v); if (!bellOpen) loadBellNotifs(); }}
+                onClick={() => { setBellOpen(v => !v); setMailOpen(false); if (!bellOpen) loadBellNotifs(); }}
                 style={{ position: "relative", width: 36, height: 36, borderRadius: 10, border: "1px solid var(--admin-border)", background: "transparent", color: "var(--admin-text)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }}
                 title="Notifications"
               >
