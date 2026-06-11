@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Cell, Legend
+  Tooltip, ResponsiveContainer, Legend
 } from "recharts";
 import api from "../../api/api";
 import { UserContext } from "../../context/UserContext";
