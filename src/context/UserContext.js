@@ -117,12 +117,23 @@ export const UserProvider = ({ children }) => {
     }
   };
 
+  const markSingleNotificationRead = async (id) => {
+    try {
+      await api.put(`user/notifications/${id}/read`);
+      setNotifications(prev => prev.map(n => n._id === id ? { ...n, read: true } : n));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (err) {
+      console.error("Failed to mark notification read", err);
+    }
+  };
+
   return (
     <UserContext.Provider value={{
       user, setUser: updateUser, loading, logout,
       theme, setTheme,
       adminTheme, setAdminTheme,
-      notifications, unreadCount, markNotificationsRead
+      notifications, unreadCount, markNotificationsRead,
+      markSingleNotificationRead
     }}>
       {children}
     </UserContext.Provider>

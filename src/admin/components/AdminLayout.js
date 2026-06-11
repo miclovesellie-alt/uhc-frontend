@@ -715,7 +715,7 @@ export default function AdminLayout() {
 
         {/* Page content */}
         <div className="admin-page-wrapper">
-          <Outlet context={{ setUnreadCount, presence }}/>
+          <Outlet context={{ setUnreadCount, setUnreadMsgCount, presence }}/>
         </div>
       </div>
 

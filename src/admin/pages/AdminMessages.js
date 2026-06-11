@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from "react";
+import { useSearchParams, useOutletContext } from "react-router-dom";
 import api from "../../api/api";
 import {
   Mail, Trash2, Clock, Search, MessageSquare, Send,
@@ -50,6 +50,7 @@ const categoryBadge = (cat) => {
 
 export default function AdminMessages() {
   const [searchParams]                      = useSearchParams();
+  const { setUnreadMsgCount }               = useOutletContext() || {};
   const [messages, setMessages]             = useState([]);
   const [loading, setLoading]               = useState(true);
   const [searchTerm, setSearchTerm]         = useState("");
@@ -62,7 +63,32 @@ export default function AdminMessages() {
 
   const msgIdParam = searchParams.get("id");
 
-  useEffect(() => { fetchMessages(); }, []);
+  const fetchMessages = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await api.get("contact/messages");
+      setMessages(res.data);
+    } catch (err) {
+      console.error("Fetch messages failed", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const markAsRead = useCallback(async (id) => {
+    try {
+      await api.patch(`/contact/messages/${id}`, { status: "read" });
+      setMessages(prev => prev.map(m => m._id === id ? { ...m, status: "read" } : m));
+      setSelectedMessage(prev => prev?._id === id ? { ...prev, status: "read" } : prev);
+      if (setUnreadMsgCount) {
+        setUnreadMsgCount(p => Math.max(0, p - 1));
+      }
+    } catch (err) {
+      console.error("Update status failed", err);
+    }
+  }, [setUnreadMsgCount]);
+
+  useEffect(() => { fetchMessages(); }, [fetchMessages]);
 
   useEffect(() => {
     if (msgIdParam && messages.length > 0) {
@@ -74,30 +100,7 @@ export default function AdminMessages() {
         }
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [msgIdParam, messages]);
-
-  const fetchMessages = async () => {
-    setLoading(true);
-    try {
-      const res = await api.get("contact/messages");
-      setMessages(res.data);
-    } catch (err) {
-      console.error("Fetch messages failed", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const markAsRead = async (id) => {
-    try {
-      await api.patch(`/contact/messages/${id}`, { status: "read" });
-      setMessages(prev => prev.map(m => m._id === id ? { ...m, status: "read" } : m));
-      if (selectedMessage?._id === id) setSelectedMessage(prev => ({ ...prev, status: "read" }));
-    } catch (err) {
-      console.error("Update status failed", err);
-    }
-  };
+  }, [msgIdParam, messages, markAsRead]);
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this message?")) return;

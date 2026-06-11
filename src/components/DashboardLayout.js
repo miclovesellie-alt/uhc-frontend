@@ -77,7 +77,7 @@ function EmailVerifyBanner({ email }) {
 function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout, notifications, unreadCount, markNotificationsRead } = useContext(UserContext);
+  const { user, logout, notifications, unreadCount, markNotificationsRead, markSingleNotificationRead } = useContext(UserContext);
   const [searchQuery, setSearchQuery] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -106,7 +106,7 @@ function DashboardLayout() {
       const res = await api.get("contact/my-messages");
       const msgs = Array.isArray(res.data) ? res.data : [];
       setUserMessages(msgs);
-      const unread = msgs.filter(m => m.status === "unread" && m.source === "admin_reply").length;
+      const unread = msgs.filter(m => m.userRead === false).length;
       setMsgUnreadCount(unread);
     } catch {}
   };
@@ -442,7 +442,14 @@ function DashboardLayout() {
                   notifications.map(n => (
                     <div key={n._id} style={{ padding: "16px", borderRadius: 12, background: n.read ? "transparent" : "var(--accent-pale)", marginBottom: 8, display: "flex", gap: 12, border: "1px solid var(--border)", cursor: "pointer", transition: "all 0.2s" }}
                       onClick={() => {
-                        if (n.actionLink) {
+                        if (!n.read && markSingleNotificationRead) {
+                          markSingleNotificationRead(n._id);
+                        }
+                        if (n.type === "MESSAGE") {
+                          setShowNotifications(false);
+                          setShowMsgPanel(true);
+                          fetchUserMessages();
+                        } else if (n.actionLink) {
                           navigate(n.actionLink);
                           setShowNotifications(false);
                         }
@@ -495,7 +502,7 @@ function DashboardLayout() {
                   </div>
                 ) : (
                   userMessages.map(m => {
-                    const isUnread = m.status === "unread" && m.source === "admin_reply";
+                    const isUnread = m.userRead === false;
                     const isExpanded = selectedMsgId === m._id;
                     const catLabel = m.category ? m.category.charAt(0).toUpperCase() + m.category.slice(1) : "Message";
                     
