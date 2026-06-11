@@ -9,7 +9,7 @@ import { isSoundEnabled, setSoundEnabled, playNavigate } from "../utils/sounds";
 import {
   Home, BookOpen, ClipboardList, User, LogOut,
   Search, BarChart2, ChevronRight, X, Bell, PenSquare, Trophy, Settings,
-  Volume2, VolumeX,
+  Volume2, VolumeX, Mail,
 } from "lucide-react";
 
 function EmailVerifyBanner({ email }) {
@@ -86,6 +86,13 @@ function DashboardLayout() {
   const [showTour, setShowTour] = useState(!localStorage.getItem('uhc_tour_done'));
   const [soundOn, setSoundOn] = useState(isSoundEnabled());
   const logoDropdownRef = useRef();
+  // Message admin state
+  const [showMsgModal, setShowMsgModal] = useState(false);
+  const [msgSubject,   setMsgSubject]   = useState("");
+  const [msgBody,      setMsgBody]      = useState("");
+  const [msgSending,   setMsgSending]   = useState(false);
+  const [msgSent,      setMsgSent]      = useState(false);
+  const [msgError,     setMsgError]     = useState("");
 
   const toggleSound = () => {
     const next = !soundOn;
@@ -113,6 +120,18 @@ function DashboardLayout() {
     localStorage.removeItem(`activeQuiz_${userId}`);
     logout();
     navigate("/");
+  };
+
+  const sendMsgToAdmin = async () => {
+    if (!msgBody.trim()) { setMsgError("Message is required"); return; }
+    setMsgSending(true); setMsgError("");
+    try {
+      await api.post("/contact/suggestions", { subject: msgSubject.trim(), message: msgBody.trim() });
+      setMsgSent(true);
+      setTimeout(() => { setMsgSent(false); setShowMsgModal(false); setMsgSubject(""); setMsgBody(""); }, 3000);
+    } catch (e) {
+      setMsgError(e.response?.data?.message || "Failed to send. Try again.");
+    } finally { setMsgSending(false); }
   };
 
   // Close logo dropdown on outside click
@@ -205,6 +224,16 @@ function DashboardLayout() {
             }}
           >
             {soundOn ? <Volume2 size={17} /> : <VolumeX size={17} />}
+          </button>
+
+          {/* Message Admin */}
+          <button
+            className="topbar-avatar-btn"
+            onClick={() => setShowMsgModal(true)}
+            title="Message Admin"
+            style={{ width:36, height:36, borderRadius:"50%", background:"var(--surface)", border:"1px solid var(--border)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"var(--text-muted)" }}
+          >
+            <Mail size={17}/>
           </button>
 
           {/* Notifications */}
@@ -403,7 +432,57 @@ function DashboardLayout() {
           <LogOut size={20} />
           <span>Exit</span>
         </button>
+        <button
+          className="uhc-bottom-nav__item"
+          onClick={() => setShowMsgModal(true)}
+        >
+          <Mail size={20} />
+          <span>Contact</span>
+        </button>
       </nav>
+
+      {/* ===== MESSAGE ADMIN MODAL ===== */}
+      {showMsgModal && (
+        <div onClick={e => e.target===e.currentTarget && setShowMsgModal(false)}
+          style={{ position:"fixed", inset:0, zIndex:9999, background:"rgba(15,23,42,.55)", backdropFilter:"blur(6px)", display:"flex", alignItems:"flex-end", justifyContent:"center" }}>
+          <div style={{ width:"100%", maxWidth:520, background:"var(--surface,#fff)", borderRadius:"22px 22px 0 0", padding:"26px 22px 32px", boxShadow:"0 -8px 40px rgba(0,0,0,.18)", animation:"slideUp .26s cubic-bezier(.34,1.56,.64,1)" }}>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:18 }}>
+              <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                <div style={{ width:36, height:36, borderRadius:11, background:"linear-gradient(135deg,#4255ff,#8b5cf6)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                  <Mail size={16} color="white"/>
+                </div>
+                <div>
+                  <div style={{ fontWeight:800, fontSize:".95rem", color:"var(--text-heading)" }}>Message Admin</div>
+                  <div style={{ fontSize:".7rem", color:"var(--text-muted)" }}>We'll reply to your email</div>
+                </div>
+              </div>
+              <button onClick={() => setShowMsgModal(false)} style={{ background:"var(--bg-input,#f1f3f8)", border:"none", borderRadius:99, width:30, height:30, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", color:"var(--text-muted)" }}><X size={14}/></button>
+            </div>
+            {msgSent ? (
+              <div style={{ textAlign:"center", padding:"20px 0" }}>
+                <div style={{ fontSize:"2rem", marginBottom:8 }}>✅</div>
+                <div style={{ fontWeight:800, color:"#16a34a" }}>Message Sent!</div>
+                <div style={{ fontSize:".8rem", color:"var(--text-muted)", marginTop:4 }}>Admin will reply via email and notification.</div>
+              </div>
+            ) : (
+              <>
+                <input type="text" placeholder="Subject (optional)" value={msgSubject} onChange={e => setMsgSubject(e.target.value)}
+                  style={{ width:"100%", padding:"9px 12px", borderRadius:9, border:"1.5px solid var(--border,#e2e8f0)", background:"var(--bg-input,#f1f3f8)", color:"var(--text-heading)", fontSize:".86rem", outline:"none", marginBottom:10, boxSizing:"border-box", fontFamily:"inherit" }}/>
+                <textarea placeholder="Your message…" value={msgBody} rows={4}
+                  onChange={e => { setMsgBody(e.target.value); if (msgError) setMsgError(""); }}
+                  style={{ width:"100%", padding:"9px 12px", borderRadius:9, border:`1.5px solid ${msgError?"#ef4444":"var(--border,#e2e8f0)"}`, background:"var(--bg-input,#f1f3f8)", color:"var(--text-heading)", fontSize:".86rem", outline:"none", resize:"vertical", fontFamily:"inherit", lineHeight:1.55, boxSizing:"border-box" }}/>
+                {msgError && <div style={{ color:"#ef4444", fontSize:".72rem", fontWeight:600, marginTop:4 }}>{msgError}</div>}
+                <button onClick={sendMsgToAdmin} disabled={msgSending || !msgBody.trim()}
+                  style={{ width:"100%", marginTop:12, padding:"12px", borderRadius:11, border:"none", background:msgSending?"#94a3b8":"linear-gradient(135deg,#4255ff,#8b5cf6)", color:"white", fontWeight:800, fontSize:".9rem", cursor:msgSending?"not-allowed":"pointer", opacity:!msgBody.trim()?.6:1 }}>
+                  {msgSending ? "Sending…" : "Send Message"}
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      <style>{`@keyframes slideUp { from { transform:translateY(100%); opacity:0; } to { transform:translateY(0); opacity:1; } }`}</style>
 
       {/* ===== ONBOARDING TOUR ===== */}
       {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}

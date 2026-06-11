@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useOutletContext } from "react-router-dom";
 import api from "../../api/api";
-import { Search, Shield, Ban, Key, Trash2, RefreshCw, Eye, EyeOff, Download, Clock, CheckSquare, Square, Edit } from "lucide-react";
+import { Search, Shield, Ban, Key, Trash2, RefreshCw, Eye, EyeOff, Download, Clock, CheckSquare, Square, Edit, Mail, Send } from "lucide-react";
 import { UserContext } from "../../context/UserContext";
 import { useToast } from "../../hooks/useToast";
 
@@ -68,6 +68,12 @@ export default function AdminUsers() {
   const [sortBy, setSortBy] = useState("joined_desc");
   const [editMode, setEditMode] = useState(false);
   const [editForm, setEditForm] = useState({ name: "", phone: "", country: "", category: "", points: 0 });
+  // Message user state
+  const [msgModal,   setMsgModal]   = useState(false);
+  const [msgSubject, setMsgSubject] = useState("");
+  const [msgText,    setMsgText]    = useState("");
+  const [msgSending, setMsgSending] = useState(false);
+  const [msgSent,    setMsgSent]    = useState(false);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fetchUsers(); }, []);
@@ -146,6 +152,18 @@ export default function AdminUsers() {
     } catch (err) {
       showToast(err.response?.data?.message || "Failed to update details", "error");
     }
+  };
+
+  const sendMessageToUser = async () => {
+    if (!msgText.trim()) return;
+    setMsgSending(true);
+    try {
+      await api.post(`/contact/message-user/${selectedUser._id}`, { subject: msgSubject.trim(), messageText: msgText.trim() });
+      setMsgSent(true);
+      showToast(`Message sent to ${selectedUser.name}`);
+      setTimeout(() => { setMsgSent(false); setMsgModal(false); setMsgSubject(""); setMsgText(""); }, 2500);
+    } catch { showToast("Failed to send message", "error"); }
+    finally { setMsgSending(false); }
   };
 
   // Bulk ban selected users
@@ -365,6 +383,9 @@ export default function AdminUsers() {
                     </div>
 
                     <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                      <button className="admin-btn secondary" style={{justifyContent:"flex-start",gap:10,color:"#4255ff"}} onClick={()=>setMsgModal(true)}>
+                        <Mail size={15}/> Message User
+                      </button>
                       <button className="admin-btn secondary" style={{justifyContent:"flex-start",gap:10}} onClick={startEditing}>
                         <Edit size={15}/> Edit User Info
                       </button>
@@ -454,6 +475,42 @@ export default function AdminUsers() {
               <button className="admin-btn secondary" onClick={()=>setSuspendModal(false)}>Cancel</button>
               <button className="admin-btn danger" onClick={doSuspend}>Suspend</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Message User Modal */}
+      {msgModal && selectedUser && (
+        <div className="admin-modal-overlay" onClick={() => { setMsgModal(false); setMsgSubject(""); setMsgText(""); setMsgSent(false); }}>
+          <div className="admin-modal" onClick={e=>e.stopPropagation()} style={{maxWidth:400, width:"100%"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+              <h3 style={{margin:0}}>✉️ Message {selectedUser.name}</h3>
+              <button className="admin-btn secondary sm" onClick={() => { setMsgModal(false); setMsgSubject(""); setMsgText(""); setMsgSent(false); }}>✕</button>
+            </div>
+            {msgSent ? (
+              <div style={{textAlign:"center",padding:"30px 10px"}}>
+                <div style={{fontSize:"3rem",marginBottom:12}}>✅</div>
+                <h4 style={{margin:"0 0 8px"}}>Message Sent!</h4>
+                <p style={{color:"var(--admin-muted)",fontSize:".85rem",margin:0}}>The message has been sent to their account & email.</p>
+              </div>
+            ) : (
+              <div style={{display:"flex",flexDirection:"column",gap:12}}>
+                <div>
+                  <label style={{fontSize:".75rem",color:"var(--admin-muted)",fontWeight:600,display:"block",marginBottom:4}}>SUBJECT</label>
+                  <input className="admin-input" style={{width:"100%",boxSizing:"border-box"}} placeholder="Message subject..." value={msgSubject} onChange={e=>setMsgSubject(e.target.value)}/>
+                </div>
+                <div>
+                  <label style={{fontSize:".75rem",color:"var(--admin-muted)",fontWeight:600,display:"block",marginBottom:4}}>MESSAGE</label>
+                  <textarea className="admin-input" style={{width:"100%",boxSizing:"border-box",minHeight:120,fontFamily:"inherit",resize:"vertical"}} placeholder="Type your message here..." value={msgText} onChange={e=>setMsgText(e.target.value)}/>
+                </div>
+                <div style={{display:"flex",gap:10,justifyContent:"flex-end",marginTop:8}}>
+                  <button className="admin-btn secondary" onClick={() => { setMsgModal(false); setMsgSubject(""); setMsgText(""); }}>Cancel</button>
+                  <button className="admin-btn primary" onClick={sendMessageToUser} disabled={msgSending || !msgText.trim()} style={{display:"flex",alignItems:"center",gap:6}}>
+                    {msgSending ? "Sending..." : <><Send size={14}/> Send Message</>}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
