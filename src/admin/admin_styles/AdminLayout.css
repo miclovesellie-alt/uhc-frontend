@@ -474,7 +474,6 @@
   .admin-stat-card { padding: 12px; }
   .admin-stat-value { font-size: 1.4rem; }
   .admin-topbar-title { font-size: 0.82rem; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .admin-topbar-actions { display: none; }
   .admin-btn { padding: 8px 14px; font-size: 0.8rem; }
   .admin-btn.primary, .admin-btn.secondary { flex: 1; justify-content: center; }
   .admin-section-title { font-size: 0.9rem; }

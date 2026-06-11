@@ -636,21 +636,25 @@ export default function AdminLayout() {
           </div>
 
           <div className="admin-topbar-actions">
-            <LiveClock />
-            <span style={{ fontSize: ".78rem", color: "var(--admin-muted)" }}>
+            <span className="desktop-only">
+              <LiveClock />
+            </span>
+            <span className="desktop-only" style={{ fontSize: ".78rem", color: "var(--admin-muted)" }}>
               {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
             </span>
 
             {/* Ctrl+K search trigger */}
             <button onClick={() => setCmdOpen(true)}
+              className="desktop-only"
               style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 12px", borderRadius: 10, border: "1px solid var(--admin-border)", background: "var(--admin-bg)", cursor: "pointer", color: "var(--admin-muted)", fontSize: ".78rem" }}>
               <Search size={14}/>
-              <span className="desktop-only">Search</span>
+              <span>Search</span>
               <kbd style={{ background: "var(--admin-border)", borderRadius: 4, padding: "0 5px", fontSize: ".65rem", fontWeight: 700, fontFamily: "monospace" }}>⌃K</kbd>
             </button>
 
             {/* Dark mode toggle */}
             <button onClick={toggleDark}
+              className="desktop-only"
               title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
               style={{ width: 34, height: 34, borderRadius: 10, border: "1px solid var(--admin-border)", background: "transparent", color: "var(--admin-text)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }}>
               {isDark ? <Sun size={16}/> : <Moon size={16}/>}
