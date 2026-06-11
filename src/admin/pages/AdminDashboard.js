@@ -7,6 +7,7 @@ import {
 import api from "../../api/api";
 import { UserContext } from "../../context/UserContext";
 import { RefreshCw, TrendingUp, Users, BookOpen, Zap, Activity, Library, Layers, UserPlus, Calendar, CalendarDays, LogIn, Key, Flag } from "lucide-react";
+import "../admin_styles/AdminDashboard.css";
 
 const COLORS = ["#4255ff","#16a34a","#d97706","#dc2626","#8b5cf6"];
 

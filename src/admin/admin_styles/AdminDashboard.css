@@ -376,73 +376,75 @@ ADMIN DASHBOARD DARK MODE OVERRIDES
 /* ======================================================
 DASHBOARD HEADER: NEON GLOW & BREATHING ANIMATION
 ====================================================== */
-.db-header-centered {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    text-align: center;
+.admin-section-header.db-header-centered {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    text-align: center !important;
+    flex-direction: row !important;
 }
 
 .db-title-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .db-refresh-btn {
-    position: absolute;
-    right: 0;
+    position: absolute !important;
+    right: 0 !important;
 }
 
 .db-glow-title {
     font-size: 1.6rem !important;
     font-weight: 800 !important;
-    color: var(--admin-text);
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    animation: db-title-float 3.5s ease-in-out infinite alternate;
-    transition: text-shadow 0.3s ease;
+    color: var(--admin-text) !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    animation: db-title-float 3.5s ease-in-out infinite alternate !important;
+    transition: text-shadow 0.3s ease !important;
 }
 
 .db-subtitle-glow {
-    font-size: 0.82rem;
-    color: var(--admin-muted);
-    margin: 6px 0 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    font-size: 0.82rem !important;
+    color: var(--admin-muted) !important;
+    margin: 6px 0 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
 }
 
 /* Floating & Glow Breathing Keyframes */
 @keyframes db-title-float {
     0% {
         transform: translateY(0);
-        text-shadow: 0 0 5px rgba(66, 85, 255, 0.1),
-                     0 0 10px rgba(66, 85, 255, 0.05);
+        text-shadow: 0 0 5px rgba(66, 85, 255, 0.2),
+                     0 0 10px rgba(66, 85, 255, 0.15),
+                     0 0 15px rgba(66, 85, 255, 0.05);
     }
     50% {
-        text-shadow: 0 0 15px rgba(66, 85, 255, 0.3),
-                     0 0 25px rgba(66, 85, 255, 0.15),
-                     0 0 35px rgba(66, 85, 255, 0.08);
+        text-shadow: 0 0 20px rgba(66, 85, 255, 0.4),
+                     0 0 30px rgba(66, 85, 255, 0.25),
+                     0 0 45px rgba(66, 85, 255, 0.1);
     }
     100% {
         transform: translateY(-3px);
-        text-shadow: 0 0 20px rgba(66, 85, 255, 0.45),
-                     0 0 35px rgba(66, 85, 255, 0.25),
-                     0 0 50px rgba(66, 85, 255, 0.12);
+        text-shadow: 0 0 25px rgba(66, 85, 255, 0.65),
+                     0 0 45px rgba(66, 85, 255, 0.35),
+                     0 0 65px rgba(66, 85, 255, 0.15);
     }
 }
 
 /* Mobile responsive layout */
 @media (max-width: 768px) {
-    .db-header-centered {
+    .admin-section-header.db-header-centered {
         flex-direction: column !important;
         align-items: center !important;
         gap: 16px !important;
@@ -452,4 +454,5 @@ DASHBOARD HEADER: NEON GLOW & BREATHING ANIMATION
         position: static !important;
     }
 }
+
 
