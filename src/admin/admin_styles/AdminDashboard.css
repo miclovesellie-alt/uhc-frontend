@@ -371,4 +371,85 @@ ADMIN DASHBOARD DARK MODE OVERRIDES
     background: #0f172a;
     color: #f1f5f9;
     border-color: #334155;
-}
+}
+
+/* ======================================================
+DASHBOARD HEADER: NEON GLOW & BREATHING ANIMATION
+====================================================== */
+.db-header-centered {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    text-align: center;
+}
+
+.db-title-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.db-refresh-btn {
+    position: absolute;
+    right: 0;
+}
+
+.db-glow-title {
+    font-size: 1.6rem !important;
+    font-weight: 800 !important;
+    color: var(--admin-text);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    animation: db-title-float 3.5s ease-in-out infinite alternate;
+    transition: text-shadow 0.3s ease;
+}
+
+.db-subtitle-glow {
+    font-size: 0.82rem;
+    color: var(--admin-muted);
+    margin: 6px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Floating & Glow Breathing Keyframes */
+@keyframes db-title-float {
+    0% {
+        transform: translateY(0);
+        text-shadow: 0 0 5px rgba(66, 85, 255, 0.1),
+                     0 0 10px rgba(66, 85, 255, 0.05);
+    }
+    50% {
+        text-shadow: 0 0 15px rgba(66, 85, 255, 0.3),
+                     0 0 25px rgba(66, 85, 255, 0.15),
+                     0 0 35px rgba(66, 85, 255, 0.08);
+    }
+    100% {
+        transform: translateY(-3px);
+        text-shadow: 0 0 20px rgba(66, 85, 255, 0.45),
+                     0 0 35px rgba(66, 85, 255, 0.25),
+                     0 0 50px rgba(66, 85, 255, 0.12);
+    }
+}
+
+/* Mobile responsive layout */
+@media (max-width: 768px) {
+    .db-header-centered {
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 16px !important;
+        margin-bottom: 20px !important;
+    }
+    .db-refresh-btn {
+        position: static !important;
+    }
+}
+

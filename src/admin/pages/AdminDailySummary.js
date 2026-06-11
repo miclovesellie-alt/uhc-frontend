@@ -9,7 +9,7 @@ import { UserContext } from "../../context/UserContext";
 import {
   RefreshCw, Users, LogIn, Key, Flag, Shield,
   CalendarDays, TrendingUp, TrendingDown, Minus,
-  BarChart2, Clock, Activity, Download
+  BarChart2, Clock, Activity, Download, ArrowLeft
 } from "lucide-react";
 import "../admin_styles/AdminDailySummary.css";
 
@@ -185,6 +185,9 @@ export default function AdminDailySummary() {
       {/* ── Header ── */}
       <div className="ds-header">
         <div className="ds-header-left">
+          <button className="ds-back-to-dashboard" onClick={() => navigate("/admin")}>
+            <ArrowLeft size={14} /> Back to Dashboard
+          </button>
           <h1>
             <CalendarDays size={22} color="var(--admin-accent)"/>
             Daily Summary

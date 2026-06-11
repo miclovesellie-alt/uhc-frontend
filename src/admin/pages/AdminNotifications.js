@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import {
   RefreshCw, Check, Send, Trash2, ChevronDown, ChevronUp,
   Bell, X, AlertTriangle, Info, Zap, ExternalLink,
-  Users, HelpCircle, Shield, FileText, Settings, ArrowRight,
+  Users, HelpCircle, Shield, FileText, Settings, ArrowRight, ArrowLeft
 } from "lucide-react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import api from "../../api/api";
@@ -413,6 +413,33 @@ export default function AdminNotifications() {
   return (
     <div className="admin-page">
       <style>{`
+        .notif-back-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          background: rgba(66, 85, 255, 0.08);
+          color: var(--admin-accent, #4255ff);
+          border: 1px solid rgba(66, 85, 255, 0.15);
+          padding: 5px 12px;
+          border-radius: 99px;
+          font-size: 0.75rem;
+          font-weight: 700;
+          cursor: pointer;
+          margin-bottom: 12px;
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .notif-back-btn:hover {
+          background: var(--admin-accent, #4255ff);
+          color: white;
+          transform: translateX(-4px);
+          box-shadow: 0 4px 12px rgba(66, 85, 255, 0.2);
+        }
+        .notif-back-btn svg {
+          transition: transform 0.25s ease;
+        }
+        .notif-back-btn:hover svg {
+          transform: translateX(-2px);
+        }
         @keyframes notifSlideIn {
           from { opacity:0; transform:translateY(12px); }
           to   { opacity:1; transform:translateY(0); }
@@ -445,6 +472,9 @@ export default function AdminNotifications() {
       <div className="admin-section-header" style={{ marginBottom: 20 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div>
+            <button className="notif-back-btn" onClick={() => navigate(-1)}>
+              <ArrowLeft size={13} /> Back
+            </button>
             <h1 style={{ fontSize: "1.4rem", fontWeight: 800, color: "var(--admin-text)", margin: 0, display: "flex", alignItems: "center", gap: 10 }}>
               🔔 Notifications
               {unread > 0 && (

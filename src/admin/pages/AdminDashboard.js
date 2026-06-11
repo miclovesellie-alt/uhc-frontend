@@ -167,14 +167,14 @@ export default function AdminDashboard() {
   return (
     <div className="admin-page">
       {/* ── Header ── */}
-      <div className="admin-section-header" style={{marginBottom:24}}>
-        <div>
-          <h1 style={{fontSize:"1.4rem",fontWeight:800,color:"var(--admin-text)",margin:0}}>📊 Dashboard Overview</h1>
-          <p style={{fontSize:".82rem",color:"var(--admin-muted)",margin:"4px 0 0",display:"flex",alignItems:"center",gap:8}}>
+      <div className="admin-section-header db-header-centered" style={{marginBottom:24}}>
+        <div className="db-title-container">
+          <h1 className="db-glow-title">📊 Dashboard Overview</h1>
+          <p className="db-subtitle-glow">
             Last refreshed: {lastRefresh.toLocaleTimeString()} &nbsp;<LiveDot/>
           </p>
         </div>
-        <button className="admin-btn secondary sm" onClick={() => { fetchAll(); fetchSignups(signupRange); }} disabled={loading}>
+        <button className="admin-btn secondary sm db-refresh-btn" onClick={() => { fetchAll(); fetchSignups(signupRange); }} disabled={loading}>
           <RefreshCw size={13} style={{animation:loading?"spin 1s linear infinite":"none"}}/> Refresh
         </button>
       </div>

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useSearchParams, useOutletContext } from "react-router-dom";
+import { useSearchParams, useOutletContext, useNavigate } from "react-router-dom";
 import api from "../../api/api";
 import {
   Mail, Trash2, Clock, Search, MessageSquare, Send,
-  X, User, Reply, CheckCircle, Tag
+  X, User, Reply, CheckCircle, Tag, ArrowLeft
 } from "lucide-react";
 import "../../admin_styles/AdminMessages.css";
 
@@ -49,6 +49,7 @@ const categoryBadge = (cat) => {
 };
 
 export default function AdminMessages() {
+  const navigate = useNavigate();
   const [searchParams]                      = useSearchParams();
   const { setUnreadMsgCount }               = useOutletContext() || {};
   const [messages, setMessages]             = useState([]);
@@ -152,6 +153,9 @@ export default function AdminMessages() {
     <div className="admin-page">
       <div className="admin-section-header">
         <div>
+          <button className="msg-back-btn" onClick={() => navigate(-1)}>
+            <ArrowLeft size={13} /> Back
+          </button>
           <h1 className="admin-title">Messages & Mail</h1>
           <p className="admin-subtitle">Contact form messages and user suggestions</p>
         </div>

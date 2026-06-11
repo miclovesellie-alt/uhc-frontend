@@ -193,3 +193,35 @@
     grid-template-columns: 1fr;
   }
 }
+
+.msg-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(66, 85, 255, 0.08);
+  color: var(--admin-accent, #4255ff);
+  border: 1px solid rgba(66, 85, 255, 0.15);
+  padding: 5px 12px;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.msg-back-btn:hover {
+  background: var(--admin-accent, #4255ff);
+  color: white;
+  transform: translateX(-4px);
+  box-shadow: 0 4px 12px rgba(66, 85, 255, 0.2);
+}
+
+.msg-back-btn svg {
+  transition: transform 0.25s ease;
+}
+
+.msg-back-btn:hover svg {
+  transform: translateX(-2px);
+}
+
