@@ -100,6 +100,110 @@ function ToastStack({ toasts, onDismiss }) {
   );
 }
 
+/* ── Mail Dropdown Panel ── */
+function MailDropdown({ messages, unreadCount, onMarkRead, onViewAll, onClose, onNavigate }) {
+  const panelRef = useRef(null);
+
+  useEffect(() => {
+    function handleClick(e) {
+      if (panelRef.current && !panelRef.current.contains(e.target)) onClose();
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [onClose]);
+
+  const handleItemClick = (m) => {
+    onMarkRead(m._id);
+    onNavigate(`/admin/messages?id=${m._id}`);
+    onClose();
+  };
+
+  const userMsgs = messages.filter(m => m.source !== "admin_reply");
+
+  return (
+    <div ref={panelRef} style={{
+      position: "absolute", top: "calc(100% + 12px)", right: 0,
+      width: 360, background: "var(--admin-card)", border: "1px solid var(--admin-border)",
+      borderRadius: 18, boxShadow: "0 16px 48px rgba(0,0,0,0.18)", zIndex: 600,
+      overflow: "hidden", animation: "bellDropIn .22s cubic-bezier(.34,1.56,.64,1)",
+    }}>
+      <style>{`
+        @keyframes bellDropIn {
+          from { opacity:0; transform:translateY(-10px) scale(.96); }
+          to   { opacity:1; transform:translateY(0) scale(1); }
+        }
+      `}</style>
+
+      {/* Header */}
+      <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--admin-border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <span style={{ fontWeight: 800, fontSize: ".9rem", color: "var(--admin-text)", display: "flex", alignItems: "center", gap: 8 }}>
+          User Messages
+          {unreadCount > 0 && (
+            <span style={{ background: "#ef4444", color: "white", fontSize: ".65rem", fontWeight: 700, padding: "1px 7px", borderRadius: 99 }}>{unreadCount}</span>
+          )}
+        </span>
+        <button onClick={onViewAll}
+          style={{ background: "none", border: "none", fontSize: ".72rem", color: "var(--admin-accent)", fontWeight: 700, cursor: "pointer" }}>
+          View all messages
+        </button>
+      </div>
+
+      {/* Message list */}
+      <div style={{ maxHeight: 320, overflowY: "auto", padding: "6px 0" }}>
+        {userMsgs.length === 0 ? (
+          <div style={{ padding: "32px 16px", textAlign: "center", color: "var(--admin-muted)", fontSize: ".85rem" }}>
+            <div style={{ fontSize: "1.8rem", marginBottom: 6 }}>📭</div>
+            No messages
+          </div>
+        ) : userMsgs.slice(0, 8).map((m) => {
+          const isRead = m.status === "read";
+          const catLabel = m.category ? m.category.charAt(0).toUpperCase() + m.category.slice(1) : m.source === "suggestion" ? "Suggestion" : "Contact";
+          return (
+            <div
+              key={m._id}
+              className="bell-notif-item"
+              onClick={() => handleItemClick(m)}
+              style={{
+                display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 16px",
+                cursor: "pointer",
+                background: isRead ? "transparent" : "rgba(66,85,255,0.04)",
+                borderLeft: isRead ? "3px solid transparent" : "3px solid var(--admin-accent)",
+              }}
+            >
+              <div style={{
+                width: 34, height: 34, borderRadius: 10, flexShrink: 0,
+                background: isRead ? "rgba(255,255,255,0.05)" : "var(--admin-accent-pale)",
+                display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem",
+                color: isRead ? "var(--admin-muted)" : "var(--admin-accent)"
+              }}>
+                <Mail size={16}/>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 600, fontSize: ".82rem", color: "var(--admin-text)", marginBottom: 2, display: "flex", alignItems: "center", gap: 5 }}>
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
+                    {m.name}
+                  </span>
+                  {!isRead && (
+                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--admin-accent)", flexShrink: 0, display: "inline-block" }}/>
+                  )}
+                </div>
+                <div style={{ fontSize: ".72rem", color: "var(--admin-muted)", display: "flex", gap: 6, alignItems: "center" }}>
+                  <span style={{ fontWeight: 700, color: m.category === "password" ? "#ef4444" : "var(--admin-accent)" }}>{catLabel}</span>
+                  <span>•</span>
+                  <span>{new Date(m.createdAt).toLocaleDateString()}</span>
+                </div>
+                <div style={{ fontSize: ".75rem", color: "var(--admin-muted)", marginTop: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {m.message}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /* ── Bell Dropdown Panel ── */
 function BellDropdown({ notifications, unreadCount, onMarkRead, onMarkAllRead, onViewAll, onClose, onNavigate }) {
   const panelRef = useRef(null);
@@ -242,6 +346,31 @@ export default function AdminLayout() {
   const bellRef = useRef(null);
   const isDark = adminTheme === "dark";
 
+  // Message states
+  const [unreadMsgCount, setUnreadMsgCount] = useState(0);
+  const [messages, setMessages] = useState([]);
+  const [mailOpen, setMailOpen] = useState(false);
+
+  const loadMessages = useCallback(async () => {
+    try {
+      const { default: api } = await import("../../api/api");
+      const res = await api.get("contact/messages");
+      const msgs = Array.isArray(res.data) ? res.data : [];
+      setMessages(msgs);
+      const count = msgs.filter(m => m.status === "unread" && m.source !== "admin_reply").length;
+      setUnreadMsgCount(count);
+    } catch {}
+  }, []);
+
+  const markMessageAsRead = async (id) => {
+    try {
+      const { default: api } = await import("../../api/api");
+      await api.patch(`/contact/messages/${id}`, { status: "read" });
+      setMessages(prev => prev.map(m => m._id === id ? { ...m, status: "read" } : m));
+      setUnreadMsgCount(p => Math.max(0, p - 1));
+    } catch {}
+  };
+
   // ── Unlock AudioContext on first user gesture (browser autoplay policy) ──
   useEffect(() => {
     const unlock = () => unlockAudio();
@@ -273,10 +402,8 @@ export default function AdminLayout() {
 
     socket.on("ADMIN_NOTIFICATION", d => {
       const id = Date.now();
-      // Play a gentle notification sound based on severity
       const soundType = d.type === "SUCCESS" ? "success" : d.type === "DANGER" ? "error" : d.type === "WARNING" ? "warning" : "info";
       playToastSound(soundType);
-      // Smart route resolution for toast
       const msg = (d.message || "").toLowerCase();
       let actionPath = "/admin/notifications";
       if (d.type === "DANGER" || d.color === "red") actionPath = "/admin/logs";
@@ -295,16 +422,19 @@ export default function AdminLayout() {
         actionPath,
       }]);
       setUnreadCount(p => p + 1);
-      // Auto-dismiss after 6s
       setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 6500);
-      // Refresh bell notifs
       loadBellNotifs();
+      loadMessages();
+    });
+
+    socket.on("NEW_MESSAGE", () => {
+      loadMessages();
     });
 
     socket.on("PRESENCE_UPDATE", d => setPresence(d));
     return () => socket.disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loadMessages]);
 
   // ── Load initial data ──
   const loadBellNotifs = useCallback(async () => {
@@ -336,7 +466,8 @@ export default function AdminLayout() {
       }).catch(() => {});
     });
     loadBellNotifs();
-  }, [location.pathname, loadBellNotifs]);
+    loadMessages();
+  }, [location.pathname, loadBellNotifs, loadMessages]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -524,6 +655,33 @@ export default function AdminLayout() {
               style={{ width: 34, height: 34, borderRadius: 10, border: "1px solid var(--admin-border)", background: "transparent", color: "var(--admin-text)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }}>
               {isDark ? <Sun size={16}/> : <Moon size={16}/>}
             </button>
+
+            {/* Mail with dropdown */}
+            <div style={{ position: "relative" }}>
+              <button
+                onClick={() => { setMailOpen(v => !v); setBellOpen(false); if (!mailOpen) loadMessages(); }}
+                style={{ position: "relative", width: 36, height: 36, borderRadius: 10, border: "1px solid var(--admin-border)", background: "transparent", color: "var(--admin-text)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }}
+                title="Messages"
+              >
+                <Mail size={18}/>
+                {unreadMsgCount > 0 && (
+                  <span style={{ position: "absolute", top: -5, right: -6, background: "#ef4444", color: "white", fontSize: ".62rem", fontWeight: 700, minWidth: 18, height: 18, borderRadius: "9px", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 4px", border: "2px solid var(--admin-card)", animation: "bellBounce .4s cubic-bezier(.34,1.56,.64,1)" }}>
+                    {unreadMsgCount > 99 ? "99+" : unreadMsgCount}
+                  </span>
+                )}
+              </button>
+
+              {mailOpen && (
+                <MailDropdown
+                  messages={messages}
+                  unreadCount={unreadMsgCount}
+                  onMarkRead={markMessageAsRead}
+                  onViewAll={() => { navigate("/admin/messages"); setMailOpen(false); }}
+                  onClose={() => setMailOpen(false)}
+                  onNavigate={(path) => { navigate(path); setMailOpen(false); }}
+                />
+              )}
+            </div>
 
             {/* Bell with dropdown */}
             <div style={{ position: "relative" }} ref={bellRef}>

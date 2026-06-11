@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import api from "../../api/api";
 import {
   Mail, Trash2, Clock, Search, MessageSquare, Send,
@@ -29,7 +30,26 @@ const sourceBadge = (source) => {
   );
 };
 
+const categoryBadge = (cat) => {
+  if (!cat) return null;
+  const map = {
+    password:   { label: "Password Reset", color: "#ef4444", bg: "rgba(239,68,68,.1)" },
+    suggestion: { label: "Suggestion",     color: "#10b981", bg: "rgba(16,185,129,.1)" },
+    others:     { label: "Others",         color: "#64748b", bg: "rgba(100,116,139,.1)" },
+  };
+  const c = map[cat] || { label: cat, color: "#94a3b8", bg: "rgba(148,163,184,.1)" };
+  return (
+    <span style={{
+      fontSize: ".65rem", fontWeight: 700, padding: "2px 7px", borderRadius: 99,
+      color: c.color, background: c.bg, textTransform: "uppercase", letterSpacing: ".05em",
+    }}>
+      {c.label}
+    </span>
+  );
+};
+
 export default function AdminMessages() {
+  const [searchParams]                      = useSearchParams();
   const [messages, setMessages]             = useState([]);
   const [loading, setLoading]               = useState(true);
   const [searchTerm, setSearchTerm]         = useState("");
@@ -40,7 +60,22 @@ export default function AdminMessages() {
   const [replySending, setReplySending]     = useState(false);
   const [replySuccess, setReplySuccess]     = useState(false);
 
+  const msgIdParam = searchParams.get("id");
+
   useEffect(() => { fetchMessages(); }, []);
+
+  useEffect(() => {
+    if (msgIdParam && messages.length > 0) {
+      const found = messages.find(m => m._id === msgIdParam);
+      if (found) {
+        setSelectedMessage(found);
+        if (found.status === "unread") {
+          markAsRead(found._id);
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [msgIdParam, messages]);
 
   const fetchMessages = async () => {
     setLoading(true);
@@ -179,6 +214,7 @@ export default function AdminMessages() {
                   <div className="msg-preview">{m.message?.slice(0, 80)}{m.message?.length > 80 ? "…" : ""}</div>
                   <div style={{ marginTop: 5, display: "flex", gap: 5, flexWrap: "wrap" }}>
                     {sourceBadge(m.source)}
+                    {categoryBadge(m.category)}
                     {m.adminReply && (
                       <span style={{ fontSize: ".62rem", fontWeight: 700, color: "#16a34a", background: "rgba(22,163,74,.1)", borderRadius: 99, padding: "1px 6px" }}>
                         ✓ Replied
@@ -215,6 +251,7 @@ export default function AdminMessages() {
                   </div>
                   <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap", marginTop: 4 }}>
                     {sourceBadge(selectedMessage.source)}
+                    {categoryBadge(selectedMessage.category)}
                     {selectedMessage.status === "unread" && (
                       <span className="status-badge unread">New</span>
                     )}

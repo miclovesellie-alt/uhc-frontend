@@ -5,6 +5,7 @@ import api from "../api/api";
 import OnboardingTour from "./OnboardingTour";
 import "../styles/dashboard.css";
 import { isSoundEnabled, setSoundEnabled, playNavigate } from "../utils/sounds";
+import { io } from "socket.io-client";
 
 import {
   Home, BookOpen, ClipboardList, User, LogOut,
@@ -87,12 +88,43 @@ function DashboardLayout() {
   const [soundOn, setSoundOn] = useState(isSoundEnabled());
   const logoDropdownRef = useRef();
   // Message admin state
+  const [showMsgPanel, setShowMsgPanel] = useState(false);
+  const [userMessages, setUserMessages] = useState([]);
+  const [msgUnreadCount, setMsgUnreadCount] = useState(0);
+  const [selectedMsgId, setSelectedMsgId] = useState(null);
+
   const [showMsgModal, setShowMsgModal] = useState(false);
+  const [msgCategory,  setMsgCategory]  = useState("");
   const [msgSubject,   setMsgSubject]   = useState("");
   const [msgBody,      setMsgBody]      = useState("");
   const [msgSending,   setMsgSending]   = useState(false);
   const [msgSent,      setMsgSent]      = useState(false);
   const [msgError,     setMsgError]     = useState("");
+
+  const fetchUserMessages = async () => {
+    try {
+      const res = await api.get("contact/my-messages");
+      const msgs = Array.isArray(res.data) ? res.data : [];
+      setUserMessages(msgs);
+      const unread = msgs.filter(m => m.status === "unread" && m.source === "admin_reply").length;
+      setMsgUnreadCount(unread);
+    } catch {}
+  };
+
+  useEffect(() => {
+    if (!user?._id) return;
+    fetchUserMessages();
+    const socketUrl = window.location.hostname === "localhost"
+      ? "http://localhost:5000"
+      : "https://uhc-backend.onrender.com";
+    const socket = io(socketUrl);
+
+    socket.on("USER_NOTIFICATION", () => {
+      fetchUserMessages();
+    });
+
+    return () => socket.disconnect();
+  }, [user?._id]);
 
   const toggleSound = () => {
     const next = !soundOn;
@@ -123,12 +155,24 @@ function DashboardLayout() {
   };
 
   const sendMsgToAdmin = async () => {
+    if (!msgCategory) { setMsgError("Please select a category"); return; }
     if (!msgBody.trim()) { setMsgError("Message is required"); return; }
     setMsgSending(true); setMsgError("");
     try {
-      await api.post("/contact/suggestions", { subject: msgSubject.trim(), message: msgBody.trim() });
+      await api.post("/contact/suggestions", {
+        subject: msgSubject.trim(),
+        message: msgBody.trim(),
+        category: msgCategory
+      });
       setMsgSent(true);
-      setTimeout(() => { setMsgSent(false); setShowMsgModal(false); setMsgSubject(""); setMsgBody(""); }, 3000);
+      fetchUserMessages();
+      setTimeout(() => {
+        setMsgSent(false);
+        setShowMsgModal(false);
+        setMsgSubject("");
+        setMsgBody("");
+        setMsgCategory("");
+      }, 3000);
     } catch (e) {
       setMsgError(e.response?.data?.message || "Failed to send. Try again.");
     } finally { setMsgSending(false); }
@@ -226,14 +270,23 @@ function DashboardLayout() {
             {soundOn ? <Volume2 size={17} /> : <VolumeX size={17} />}
           </button>
 
-          {/* Message Admin */}
+          {/* Messages */}
           <button
             className="topbar-avatar-btn"
-            onClick={() => setShowMsgModal(true)}
-            title="Message Admin"
-            style={{ width:36, height:36, borderRadius:"50%", background:"var(--surface)", border:"1px solid var(--border)", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", color:"var(--text-muted)" }}
+            style={{ position: "relative", width: 36, height: 36, borderRadius: "50%", background: "var(--surface)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--text-muted)" }}
+            onClick={() => {
+              setShowMsgPanel(prev => !prev);
+              setShowNotifications(false);
+              fetchUserMessages();
+            }}
+            title="Messages"
           >
             <Mail size={17}/>
+            {msgUnreadCount > 0 && (
+              <span style={{ position: "absolute", top: -2, right: -2, background: "#ef4444", color: "white", fontSize: "0.6rem", fontWeight: "bold", padding: "2px 6px", borderRadius: "10px", border: "2px solid var(--bg)" }}>
+                {msgUnreadCount}
+              </span>
+            )}
           </button>
 
           {/* Notifications */}
@@ -410,6 +463,144 @@ function DashboardLayout() {
           </div>
         )}
 
+        {/* ===== MESSAGES SLIDE-OUT ===== */}
+        {showMsgPanel && (
+          <div className="modal-overlay" onClick={() => setShowMsgPanel(false)} style={{ justifyContent: "flex-end", alignItems: "stretch", padding: 0 }}>
+            <div className="notifications-panel" onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 380, background: "var(--surface)", height: "100%", boxShadow: "-10px 0 40px rgba(0,0,0,0.1)", display: "flex", flexDirection: "column", animation: "slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1)" }}>
+              <div style={{ padding: "20px 24px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <h2 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 800, color: "var(--text-heading)" }}>Messages</h2>
+                <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                  <button
+                    onClick={() => {
+                      setShowMsgModal(true);
+                      setMsgCategory("");
+                      setMsgSubject("");
+                      setMsgBody("");
+                    }}
+                    style={{ padding: "6px 12px", background: "var(--accent)", color: "white", border: "none", borderRadius: 8, fontSize: "0.8rem", fontWeight: 700, cursor: "pointer" }}
+                  >
+                    New Message
+                  </button>
+                  <button onClick={() => setShowMsgPanel(false)} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", padding: 4 }}>
+                    <X size={20} />
+                  </button>
+                </div>
+              </div>
+              
+              <div style={{ flex: 1, overflowY: "auto", padding: 12 }}>
+                {userMessages.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--text-muted)" }}>
+                    <Mail size={40} style={{ opacity: 0.2, margin: "0 auto 16px" }} />
+                    <p style={{ fontSize: "0.9rem" }}>No messages yet.</p>
+                  </div>
+                ) : (
+                  userMessages.map(m => {
+                    const isUnread = m.status === "unread" && m.source === "admin_reply";
+                    const isExpanded = selectedMsgId === m._id;
+                    const catLabel = m.category ? m.category.charAt(0).toUpperCase() + m.category.slice(1) : "Message";
+                    
+                    return (
+                      <div
+                        key={m._id}
+                        onClick={async () => {
+                          setSelectedMsgId(isExpanded ? null : m._id);
+                          if (isUnread) {
+                            try {
+                              await api.patch(`/contact/my-messages/${m._id}/read`);
+                              fetchUserMessages();
+                            } catch {}
+                          }
+                        }}
+                        style={{
+                          padding: "16px",
+                          borderRadius: 12,
+                          background: isExpanded ? "var(--surface-hover, rgba(255,255,255,0.02))" : "transparent",
+                          border: isUnread ? "1.5px solid var(--accent)" : "1px solid var(--border)",
+                          marginBottom: 8,
+                          cursor: "pointer",
+                          transition: "all 0.2s"
+                        }}
+                      >
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                          <span style={{
+                            fontSize: "0.68rem",
+                            fontWeight: 700,
+                            padding: "2px 8px",
+                            borderRadius: 99,
+                            background: m.category === "password" ? "rgba(239,68,68,0.15)" : m.category === "suggestion" ? "rgba(16,185,129,0.15)" : "rgba(148,163,184,0.15)",
+                            color: m.category === "password" ? "#f87171" : m.category === "suggestion" ? "#34d399" : "#94a3b8"
+                          }}>
+                            {catLabel}
+                          </span>
+                          <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
+                            {new Date(m.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                        
+                        <div style={{ fontWeight: 700, fontSize: "0.88rem", marginTop: 8, color: "var(--text-heading)" }}>
+                          {m.subject || "No Subject"}
+                        </div>
+                        
+                        <div style={{
+                          fontSize: "0.82rem",
+                          color: "var(--text-muted)",
+                          marginTop: 6,
+                          lineHeight: 1.4,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: isExpanded ? "normal" : "nowrap"
+                        }}>
+                          {m.message}
+                        </div>
+                        
+                        {isExpanded && (
+                          <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px dashed var(--border)" }}>
+                            {m.adminReply ? (
+                              <div style={{ background: "rgba(66,85,255,0.06)", padding: 12, borderRadius: 10, border: "1px solid rgba(66,85,255,0.15)", marginBottom: 12 }}>
+                                <div style={{ fontWeight: 700, fontSize: "0.78rem", color: "var(--accent)", display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
+                                  <span>👤 Admin Reply:</span>
+                                </div>
+                                <div style={{ fontSize: "0.82rem", color: "var(--text-heading)", lineHeight: 1.4 }}>
+                                  {m.adminReply}
+                                </div>
+                                <div style={{ fontSize: "0.7rem", color: "var(--text-muted)", marginTop: 6, textAlign: "right" }}>
+                                  {m.repliedAt ? new Date(m.repliedAt).toLocaleString() : ""}
+                                </div>
+                              </div>
+                            ) : (
+                              <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", fontStyle: "italic", marginBottom: 12 }}>
+                                Waiting for admin reply…
+                              </div>
+                            )}
+                            
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setMsgCategory(m.category || "others");
+                                setMsgSubject(`Re: ${m.subject || "Message"}`);
+                                setMsgBody("");
+                                setShowMsgModal(true);
+                              }}
+                              style={{
+                                display: "inline-flex", alignItems: "center", gap: 4,
+                                padding: "6px 12px", background: "rgba(255,255,255,0.1)",
+                                color: "var(--text-heading)", border: "none", borderRadius: 6,
+                                fontSize: "0.75rem", fontWeight: 700, cursor: "pointer"
+                              }}
+                            >
+                              Reply
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
       {/* ===== MOBILE BOTTOM NAV ===== */}
       <nav className="uhc-bottom-nav" aria-label="Main navigation">
         {/* Skip Home (now in topbar), show Study Hub → Ranks */}
@@ -434,10 +625,19 @@ function DashboardLayout() {
         </button>
         <button
           className="uhc-bottom-nav__item"
-          onClick={() => setShowMsgModal(true)}
+          onClick={() => {
+            setShowMsgPanel(prev => !prev);
+            fetchUserMessages();
+          }}
+          style={{ position: "relative" }}
         >
           <Mail size={20} />
-          <span>Contact</span>
+          {msgUnreadCount > 0 && (
+            <span style={{ position: "absolute", top: 2, right: 10, background: "#ef4444", color: "white", fontSize: "0.55rem", fontWeight: "bold", padding: "1px 5px", borderRadius: "8px" }}>
+              {msgUnreadCount}
+            </span>
+          )}
+          <span>Messages</span>
         </button>
       </nav>
 
@@ -466,14 +666,73 @@ function DashboardLayout() {
               </div>
             ) : (
               <>
-                <input type="text" placeholder="Subject (optional)" value={msgSubject} onChange={e => setMsgSubject(e.target.value)}
-                  style={{ width:"100%", padding:"9px 12px", borderRadius:9, border:"1.5px solid var(--border,#e2e8f0)", background:"var(--bg-input,#f1f3f8)", color:"var(--text-heading)", fontSize:".86rem", outline:"none", marginBottom:10, boxSizing:"border-box", fontFamily:"inherit" }}/>
-                <textarea placeholder="Your message…" value={msgBody} rows={4}
+                <div style={{ marginBottom: 10 }}>
+                  <select
+                    value={msgCategory}
+                    onChange={(e) => {
+                      setMsgCategory(e.target.value);
+                      if (msgError) setMsgError("");
+                    }}
+                    style={{
+                      width: "100%", padding: "9px 12px", borderRadius: 9,
+                      border: "1.5px solid var(--border,#e2e8f0)",
+                      background: "var(--bg-input,#f1f3f8)", color: "var(--text-heading)",
+                      fontSize: ".86rem", outline: "none", boxSizing: "border-box",
+                      fontFamily: "inherit", cursor: "pointer"
+                    }}
+                  >
+                    <option value="" disabled>Select a Category *</option>
+                    <option value="password">Password Issue / Reset</option>
+                    <option value="suggestion">Suggestion</option>
+                    <option value="others">Others</option>
+                  </select>
+                </div>
+
+                <input
+                  type="text"
+                  placeholder={msgCategory ? "Subject (optional)" : "Please select a category first..."}
+                  value={msgSubject}
+                  disabled={!msgCategory}
+                  onChange={e => setMsgSubject(e.target.value)}
+                  style={{
+                    width:"100%", padding:"9px 12px", borderRadius:9,
+                    border:"1.5px solid var(--border,#e2e8f0)",
+                    background: msgCategory ? "var(--bg-input,#f1f3f8)" : "rgba(255,255,255,0.03)",
+                    color:"var(--text-heading)", fontSize:".86rem", outline:"none",
+                    marginBottom:10, boxSizing:"border-box", fontFamily:"inherit",
+                    cursor: msgCategory ? "text" : "not-allowed"
+                  }}
+                />
+
+                <textarea
+                  placeholder={msgCategory ? "Your message…" : "Please select a category first..."}
+                  value={msgBody}
+                  rows={4}
+                  disabled={!msgCategory}
                   onChange={e => { setMsgBody(e.target.value); if (msgError) setMsgError(""); }}
-                  style={{ width:"100%", padding:"9px 12px", borderRadius:9, border:`1.5px solid ${msgError?"#ef4444":"var(--border,#e2e8f0)"}`, background:"var(--bg-input,#f1f3f8)", color:"var(--text-heading)", fontSize:".86rem", outline:"none", resize:"vertical", fontFamily:"inherit", lineHeight:1.55, boxSizing:"border-box" }}/>
+                  style={{
+                    width:"100%", padding:"9px 12px", borderRadius:9,
+                    border:`1.5px solid ${msgError?"#ef4444":"var(--border,#e2e8f0)"}`,
+                    background: msgCategory ? "var(--bg-input,#f1f3f8)" : "rgba(255,255,255,0.03)",
+                    color:"var(--text-heading)", fontSize:".86rem", outline:"none",
+                    resize:"vertical", fontFamily:"inherit", lineHeight:1.55,
+                    boxSizing:"border-box", cursor: msgCategory ? "text" : "not-allowed"
+                  }}
+                />
+
                 {msgError && <div style={{ color:"#ef4444", fontSize:".72rem", fontWeight:600, marginTop:4 }}>{msgError}</div>}
-                <button onClick={sendMsgToAdmin} disabled={msgSending || !msgBody.trim()}
-                  style={{ width:"100%", marginTop:12, padding:"12px", borderRadius:11, border:"none", background:msgSending?"#94a3b8":"linear-gradient(135deg,#4255ff,#8b5cf6)", color:"white", fontWeight:800, fontSize:".9rem", cursor:msgSending?"not-allowed":"pointer", opacity:!msgBody.trim()?.6:1 }}>
+
+                <button
+                  onClick={sendMsgToAdmin}
+                  disabled={msgSending || !msgCategory || !msgBody.trim()}
+                  style={{
+                    width:"100%", marginTop:12, padding:"12px", borderRadius:11,
+                    border:"none",
+                    background: (msgSending || !msgCategory || !msgBody.trim()) ? "#94a3b8" : "linear-gradient(135deg,#4255ff,#8b5cf6)",
+                    color:"white", fontWeight:800, fontSize:".9rem",
+                    cursor: (msgSending || !msgCategory || !msgBody.trim()) ? "not-allowed" : "pointer"
+                  }}
+                >
                   {msgSending ? "Sending…" : "Send Message"}
                 </button>
               </>
