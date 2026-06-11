@@ -407,7 +407,7 @@ DASHBOARD HEADER: NEON GLOW & BREATHING ANIMATION
     align-items: center !important;
     justify-content: center !important;
     gap: 8px !important;
-    animation: db-title-float 3.5s ease-in-out infinite alternate !important;
+    animation: db-glow-pulse 4s ease-in-out infinite alternate !important;
     transition: text-shadow 0.3s ease !important;
 }
 
@@ -421,26 +421,19 @@ DASHBOARD HEADER: NEON GLOW & BREATHING ANIMATION
     gap: 8px !important;
 }
 
-/* Floating & Glow Breathing Keyframes */
-@keyframes db-title-float {
+/* Subtle Breathing Neon Glow Keyframes */
+@keyframes db-glow-pulse {
     0% {
-        transform: translateY(0);
-        text-shadow: 0 0 5px rgba(66, 85, 255, 0.2),
-                     0 0 10px rgba(66, 85, 255, 0.15),
-                     0 0 15px rgba(66, 85, 255, 0.05);
-    }
-    50% {
-        text-shadow: 0 0 20px rgba(66, 85, 255, 0.4),
-                     0 0 30px rgba(66, 85, 255, 0.25),
-                     0 0 45px rgba(66, 85, 255, 0.1);
+        text-shadow: 0 0 5px rgba(66, 85, 255, 0.15),
+                     0 0 10px rgba(66, 85, 255, 0.1);
     }
     100% {
-        transform: translateY(-3px);
-        text-shadow: 0 0 25px rgba(66, 85, 255, 0.65),
-                     0 0 45px rgba(66, 85, 255, 0.35),
-                     0 0 65px rgba(66, 85, 255, 0.15);
+        text-shadow: 0 0 16px rgba(66, 85, 255, 0.45),
+                     0 0 28px rgba(66, 85, 255, 0.25),
+                     0 0 40px rgba(66, 85, 255, 0.1);
     }
 }
+
 
 /* Mobile responsive layout */
 @media (max-width: 768px) {
