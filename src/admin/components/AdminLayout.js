@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Users, HelpCircle, Upload, Bell, Settings, LogOut,
   Menu, X, FileText, Shield, Library, Mail, Layout, Trash2, Megaphone,
   Clock, ChevronLeft, ChevronRight, Search, Check, ExternalLink,
-  Sun, Moon, ChevronRight as Crumb, ArrowRight
+  Sun, Moon, ChevronRight as Crumb, ArrowRight, CalendarDays
 } from "lucide-react";
 import CommandPalette from "./CommandPalette";
 import AdminQuickDock from "./AdminQuickDock";
@@ -31,23 +31,24 @@ function resolveNotifPath(n) {
 }
 
 const baseNavItems = [
-  { icon: <LayoutDashboard size={17}/>, label: "Dashboard",     path: "/admin"               },
-  { icon: <Users size={17}/>,           label: "Users",          path: "/admin/users"         },
-  { icon: <HelpCircle size={17}/>,      label: "Questions",      path: "/admin/questions"     },
-  { icon: <Library size={17}/>,         label: "Library",        path: "/admin/userlibrary"   },
-  { icon: <Layout size={17}/>,          label: "Feed Manager",   path: "/admin/feed"          },
-  { icon: <Upload size={17}/>,          label: "Bulk Upload",    path: "/admin/uploads"       },
-  { icon: <Clock size={17}/>,           label: "Pending Review", path: "/admin/pending"       },
-  { icon: <FileText size={17}/>,        label: "Activity Logs",  path: "/admin/logs"          },
-  { icon: <Bell size={17}/>,            label: "Notifications",  path: "/admin/notifications" },
-  { icon: <Megaphone size={17}/>,       label: "Announcements",  path: "/admin/announcements" },
-  { icon: <Trash2 size={17}/>,          label: "Recycle Bin",    path: "/admin/recycle-bin"   },
-  { icon: <Mail size={17}/>,            label: "Messages",       path: "/admin/messages"      },
-  { icon: <Settings size={17}/>,        label: "Settings",       path: "/admin/settings"      },
+  { icon: <LayoutDashboard size={17}/>, label: "Dashboard",      path: "/admin"                  },
+  { icon: <Users size={17}/>,           label: "Users",           path: "/admin/users"            },
+  { icon: <HelpCircle size={17}/>,      label: "Questions",       path: "/admin/questions"        },
+  { icon: <Library size={17}/>,         label: "Library",         path: "/admin/userlibrary"      },
+  { icon: <Layout size={17}/>,          label: "Feed Manager",    path: "/admin/feed"             },
+  { icon: <Upload size={17}/>,          label: "Bulk Upload",     path: "/admin/uploads"          },
+  { icon: <Clock size={17}/>,           label: "Pending Review",  path: "/admin/pending"          },
+  { icon: <FileText size={17}/>,        label: "Activity Logs",   path: "/admin/logs"             },
+  { icon: <CalendarDays size={17}/>,    label: "Daily Summary",   path: "/admin/daily-summary"   },
+  { icon: <Bell size={17}/>,            label: "Notifications",   path: "/admin/notifications"   },
+  { icon: <Megaphone size={17}/>,       label: "Announcements",   path: "/admin/announcements"   },
+  { icon: <Trash2 size={17}/>,          label: "Recycle Bin",     path: "/admin/recycle-bin"     },
+  { icon: <Mail size={17}/>,            label: "Messages",        path: "/admin/messages"        },
+  { icon: <Settings size={17}/>,        label: "Settings",        path: "/admin/settings"        },
 ];
 
 const MAIN       = ["/admin","/admin/users","/admin/admins","/admin/questions","/admin/userlibrary","/admin/feed","/admin/uploads","/admin/pending"];
-const MONITORING = ["/admin/logs","/admin/notifications","/admin/messages","/admin/recycle-bin","/admin/announcements"];
+const MONITORING = ["/admin/logs","/admin/daily-summary","/admin/notifications","/admin/messages","/admin/recycle-bin","/admin/announcements"];
 const SYSTEM     = ["/admin/settings"];
 
 /* ── Live Clock ── */

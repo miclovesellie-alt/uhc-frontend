@@ -468,6 +468,11 @@
   100% { transform: translate(100px, 50px) rotate(30deg); }
 }
 
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
 /* Main Container */
 .profile-container {
   max-width: 1100px;

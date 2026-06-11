@@ -28,6 +28,13 @@ function ProfilePage({ user, setUser }) {
   const [language, setLanguage]     = useState(localStorage.getItem("language") || "English");
   const [resetSent, setResetSent]   = useState(false);
   const [leaderboard, setLeaderboard] = useState([]);
+  // Contact Admin suggestion
+  const [showSuggest, setShowSuggest] = useState(false);
+  const [suggSubject, setSuggSubject] = useState("");
+  const [suggMessage, setSuggMessage] = useState("");
+  const [suggSending, setSuggSending] = useState(false);
+  const [suggSent, setSuggSent]       = useState(false);
+  const [suggError, setSuggError]     = useState("");
 
   /* Institution picker */
   const [instSearch,     setInstSearch]     = useState("");
@@ -114,6 +121,18 @@ function ProfilePage({ user, setUser }) {
       setResetSent(true);
       setTimeout(() => setResetSent(false), 5000);
     } catch { alert("Failed to send reset email."); }
+  };
+
+  const handleSendSuggestion = async () => {
+    if (!suggMessage.trim()) { setSuggError("Message is required"); return; }
+    setSuggSending(true); setSuggError("");
+    try {
+      await api.post("/contact/suggestions", { subject: suggSubject.trim(), message: suggMessage.trim() });
+      setSuggSent(true);
+      setTimeout(() => { setSuggSent(false); setShowSuggest(false); setSuggSubject(""); setSuggMessage(""); }, 3000);
+    } catch (e) {
+      setSuggError(e.response?.data?.message || "Failed to send. Try again.");
+    } finally { setSuggSending(false); }
   };
 
   const initial      = (user.name || "U")[0].toUpperCase();
@@ -367,6 +386,124 @@ function ProfilePage({ user, setUser }) {
             ))}
           </div>
         </>
+      )}
+
+      {/* ── CONTACT ADMIN ── */}
+      <div className="pp-section-label">💬 Contact Admin</div>
+      <div className="pp-card" style={{ marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", padding: "16px 20px" }}>
+        <div>
+          <div style={{ fontWeight: 700, fontSize: ".88rem", color: "var(--text-heading)", marginBottom: 3 }}>Send a Message to Admin</div>
+          <div style={{ fontSize: ".75rem", color: "var(--text-muted)" }}>Suggestions, feedback, or questions — we'd love to hear from you</div>
+        </div>
+        <button
+          onClick={() => setShowSuggest(true)}
+          style={{
+            display: "flex", alignItems: "center", gap: 8,
+            background: "linear-gradient(135deg,#4255ff,#8b5cf6)",
+            color: "white", border: "none", borderRadius: 12, padding: "10px 18px",
+            fontWeight: 700, fontSize: ".82rem", cursor: "pointer", flexShrink: 0,
+            boxShadow: "0 4px 14px rgba(66,85,255,.3)", transition: "transform .15s, box-shadow .15s",
+          }}
+          onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 6px 20px rgba(66,85,255,.4)"; }}
+          onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 4px 14px rgba(66,85,255,.3)"; }}
+        >
+          <FaEnvelope/> Write a Message
+        </button>
+      </div>
+
+      {/* ── SUGGESTION MODAL ── */}
+      {showSuggest && (
+        <div
+          onClick={e => e.target === e.currentTarget && setShowSuggest(false)}
+          style={{
+            position: "fixed", inset: 0, zIndex: 9999,
+            background: "rgba(15,23,42,.55)", backdropFilter: "blur(6px)",
+            display: "flex", alignItems: "flex-end", justifyContent: "center", padding: "0 0 0 0",
+          }}
+        >
+          <div style={{
+            width: "100%", maxWidth: 540, background: "var(--bg-card, #fff)",
+            borderRadius: "24px 24px 0 0", padding: "28px 24px 36px",
+            boxShadow: "0 -8px 40px rgba(0,0,0,.18)",
+            animation: "slideUp .28s cubic-bezier(.34,1.56,.64,1)",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 38, height: 38, borderRadius: 12, background: "linear-gradient(135deg,#4255ff,#8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <FaEnvelope style={{ color: "white", fontSize: "1rem" }}/>
+                </div>
+                <div>
+                  <div style={{ fontWeight: 800, fontSize: "1rem", color: "var(--text-heading)" }}>Message Admin</div>
+                  <div style={{ fontSize: ".72rem", color: "var(--text-muted)" }}>Your message goes directly to the super admin</div>
+                </div>
+              </div>
+              <button onClick={() => setShowSuggest(false)}
+                style={{ background: "var(--bg-input)", border: "none", borderRadius: 99, width: 32, height: 32, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-muted)", fontSize: "1rem" }}>
+                ✕
+              </button>
+            </div>
+
+            {suggSent ? (
+              <div style={{ textAlign: "center", padding: "24px 0" }}>
+                <div style={{ fontSize: "2.5rem", marginBottom: 10 }}>✅</div>
+                <div style={{ fontWeight: 800, fontSize: "1rem", color: "#16a34a" }}>Message Sent!</div>
+                <div style={{ fontSize: ".8rem", color: "var(--text-muted)", marginTop: 4 }}>The admin will reply to you shortly via email and in-app notification.</div>
+              </div>
+            ) : (
+              <>
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ fontSize: ".75rem", fontWeight: 700, color: "var(--text-muted)", display: "block", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".05em" }}>Subject (optional)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Bug report, Suggestion, Question…"
+                    value={suggSubject}
+                    onChange={e => setSuggSubject(e.target.value)}
+                    style={{
+                      width: "100%", padding: "10px 12px", borderRadius: 10, boxSizing: "border-box",
+                      border: "1.5px solid var(--border, #e2e8f0)", background: "var(--bg-input, #f1f3f8)",
+                      color: "var(--text-heading)", fontSize: ".87rem", fontWeight: 500, outline: "none",
+                    }}
+                  />
+                </div>
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ fontSize: ".75rem", fontWeight: 700, color: "var(--text-muted)", display: "block", marginBottom: 6, textTransform: "uppercase", letterSpacing: ".05em" }}>Your Message *</label>
+                  <textarea
+                    placeholder="Tell us anything — we read every message…"
+                    value={suggMessage}
+                    onChange={e => { setSuggMessage(e.target.value); if (suggError) setSuggError(""); }}
+                    rows={4}
+                    style={{
+                      width: "100%", padding: "10px 12px", borderRadius: 10, boxSizing: "border-box",
+                      border: `1.5px solid ${suggError ? "#ef4444" : "var(--border, #e2e8f0)"}`,
+                      background: "var(--bg-input, #f1f3f8)", color: "var(--text-heading)",
+                      fontSize: ".87rem", outline: "none", fontFamily: "inherit",
+                      resize: "vertical", lineHeight: 1.55,
+                    }}
+                  />
+                  {suggError && <div style={{ fontSize: ".72rem", color: "#ef4444", fontWeight: 600, marginTop: 4 }}>{suggError}</div>}
+                </div>
+                <button
+                  onClick={handleSendSuggestion}
+                  disabled={suggSending || !suggMessage.trim()}
+                  style={{
+                    width: "100%", padding: "13px", borderRadius: 12, border: "none",
+                    background: suggSending ? "#94a3b8" : "linear-gradient(135deg,#4255ff,#8b5cf6)",
+                    color: "white", fontWeight: 800, fontSize: ".92rem", cursor: suggSending ? "not-allowed" : "pointer",
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                    boxShadow: "0 4px 16px rgba(66,85,255,.3)", transition: "opacity .15s",
+                    opacity: !suggMessage.trim() ? .6 : 1,
+                  }}
+                >
+                  <FaEnvelope/>
+                  {suggSending ? "Sending…" : "Send Message"}
+                </button>
+                <p style={{ fontSize: ".7rem", color: "var(--text-muted)", textAlign: "center", margin: "10px 0 0" }}>
+                  The admin will reply to your email: <strong>{user.email}</strong>
+                </p>
+              </>
+            )}
+          </div>
+        </div>
       )}
 
       {/* ── SETTINGS MODAL ── */}

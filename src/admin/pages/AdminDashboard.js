@@ -6,7 +6,7 @@ import {
 } from "recharts";
 import api from "../../api/api";
 import { UserContext } from "../../context/UserContext";
-import { RefreshCw, TrendingUp, Users, BookOpen, Zap, Activity, Library, Layers, UserPlus, Calendar } from "lucide-react";
+import { RefreshCw, TrendingUp, Users, BookOpen, Zap, Activity, Library, Layers, UserPlus, Calendar, CalendarDays, LogIn, Key, Flag } from "lucide-react";
 
 const COLORS = ["#4255ff","#16a34a","#d97706","#dc2626","#8b5cf6"];
 
@@ -78,6 +78,7 @@ export default function AdminDashboard() {
   const [chartType, setChartType]     = useState("bar");
   const [loading, setLoading]         = useState(false);
   const [lastRefresh, setLastRefresh] = useState(new Date());
+  const [todaySummary, setTodaySummary] = useState(null);
 
   /* ── Fetch main stats ── */
   const fetchAll = async () => {
@@ -98,6 +99,11 @@ export default function AdminDashboard() {
       if (logsRes.status === "fulfilled") {
         setAdminLogs(Array.isArray(logsRes.value.data) ? logsRes.value.data.slice(0,8) : []);
       }
+      // Fetch today at-a-glance summary
+      try {
+        const todayRes = await api.get("admin/daily-summary");
+        setTodaySummary(todayRes.data);
+      } catch { /* non-critical */ }
       setLastRefresh(new Date());
     } finally { setLoading(false); }
   };
@@ -183,6 +189,52 @@ export default function AdminDashboard() {
             <div className="admin-stat-trend"><TrendingUp size={11}/> {k.trend}</div>
           </div>
         ))}
+      </div>
+
+      {/* ── Today at a Glance Widget ── */}
+      <div onClick={() => navigate("/admin/daily-summary")}
+        style={{
+          background:"linear-gradient(135deg,rgba(66,85,255,.06),rgba(139,92,246,.06))",
+          border:"1px solid rgba(66,85,255,.18)",
+          borderRadius:16, padding:"16px 20px", marginBottom:24,
+          cursor:"pointer", transition:"box-shadow .2s",
+        }}
+        onMouseEnter={e=>e.currentTarget.style.boxShadow="0 6px 24px rgba(66,85,255,.12)"}
+        onMouseLeave={e=>e.currentTarget.style.boxShadow="none"}
+      >
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12,flexWrap:"wrap",gap:8}}>
+          <div style={{display:"flex",alignItems:"center",gap:9}}>
+            <CalendarDays size={18} color="#4255ff"/>
+            <span style={{fontWeight:800,fontSize:".95rem",color:"var(--admin-text)"}}>Today at a Glance</span>
+            <span style={{fontSize:".7rem",fontWeight:700,color:"#4255ff",background:"rgba(66,85,255,.1)",padding:"2px 8px",borderRadius:99}}>Live</span>
+          </div>
+          <span style={{fontSize:".75rem",color:"var(--admin-accent)",fontWeight:700}}>View Full Summary →</span>
+        </div>
+        <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
+          {[
+            { icon:<Users size={14}/>,  label:"Signups",  val: todaySummary?.signups?.count ?? "—",         color:"#4255ff" },
+            { icon:<LogIn size={14}/>,  label:"Logins",   val: todaySummary?.logins?.count ?? "—",          color:"#16a34a" },
+            { icon:<Key size={14}/>,    label:"Resets",   val: todaySummary?.passwordResets?.count ?? "—",  color:"#d97706" },
+            { icon:<Flag size={14}/>,   label:"Reported", val: todaySummary?.reportedQuestions?.count ?? "—",color:"#ef4444" },
+          ].map((item,i) => (
+            <div key={i} style={{
+              background:"var(--admin-card,#fff)", borderRadius:12, padding:"10px 16px",
+              display:"flex", alignItems:"center", gap:9, flex:"1", minWidth:110,
+              border:"1px solid var(--admin-border,#e2e8f0)",
+            }}>
+              <span style={{color:item.color}}>{item.icon}</span>
+              <div>
+                <div style={{fontSize:"1.3rem",fontWeight:900,color:"var(--admin-text)",lineHeight:1}}>{item.val}</div>
+                <div style={{fontSize:".68rem",color:"var(--admin-muted)",fontWeight:600}}>{item.label}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+        {todaySummary?.insights?.[0] && (
+          <div style={{marginTop:10,fontSize:".75rem",color:"var(--admin-muted)",fontStyle:"italic",paddingLeft:2}}>
+            💡 {todaySummary.insights[0].text}
+          </div>
+        )}
       </div>
 
       {/* ── Signup Trend with Range Selector ── */}

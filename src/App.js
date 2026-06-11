@@ -43,6 +43,7 @@ import DuplicateQuestions from "./admin/pages/DuplicateQuestions";
 import AdminAnnouncements from "./admin/pages/AdminAnnouncements";
 import AdminPending from "./admin/pages/AdminPending";
 import AdminInstitutions from "./admin/pages/AdminInstitutions";
+import AdminDailySummary from "./admin/pages/AdminDailySummary";
 
 // ===== USER PAGES =====
 import Leaderboard from "./pages/Leaderboard";
@@ -204,7 +205,8 @@ function AppRoutes() {
           <Route path="duplicates"    element={<DuplicateQuestions />} />
           <Route path="announcements" element={<AdminAnnouncements />} />
           <Route path="pending"       element={<AdminPending />} />
-          <Route path="institutions"   element={<AdminInstitutions />} />
+          <Route path="institutions"    element={<AdminInstitutions />} />
+          <Route path="daily-summary"   element={<AdminDailySummary />} />
         </Route>
 
         {/* ===== PUBLIC STUDY HUB (GUEST ACCESS — static, no conditionals) ===== */}
