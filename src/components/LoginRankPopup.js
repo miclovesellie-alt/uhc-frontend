@@ -1,20 +1,20 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Trophy, TrendingUp, X, Flame, Star } from "lucide-react";
 
-/* ──────────────────────────────────────────────────────────
+/* ??????????????????????????????????????????????????????????
    LoginRankPopup
    Shows once per session after login, slides up from bottom.
    Props:
-     rank       {number}  — current leaderboard position
-     overtook   {number}  — how many users were passed (0 = none)
-     gainedPoint{boolean} — whether a point was earned this login
-     streak     {number}  — current day streak
-     points     {number}  — total points
-     onClose    {fn}      — called when dismissed
-     onLeaderboard {fn}   — navigate to leaderboard
-────────────────────────────────────────────────────────── */
+     rank       {number}  - current leaderboard position
+     overtook   {number}  - how many users were passed (0 = none)
+     gainedPoint{boolean} - whether a point was earned this login
+     streak     {number}  - current day streak
+     points     {number}  - total points
+     onClose    {fn}      - called when dismissed
+     onLeaderboard {fn}   - navigate to leaderboard
+?????????????????????????????????????????????????????????? */
 
-const MEDAL = ["🥇", "🥈", "🥉"];
+const MEDAL = ["??", "??", "??"];
 const AUTO_DISMISS_MS = 8000;
 
 function Particle({ delay, color }) {
@@ -121,7 +121,7 @@ export default function LoginRankPopup({ rank, overtook, gainedPoint, streak, po
         maxWidth: 380,
         animation: `${visible ? "rankSlideUp" : "rankSlideDown"} .45s cubic-bezier(.34,1.56,.64,1) both`,
       }}>
-        {/* ── Card ── */}
+        {/* ?? Card ?? */}
         <div style={{
           background: isOvertake
             ? "linear-gradient(135deg,rgba(245,158,11,.95),rgba(239,68,68,.92))"
@@ -160,7 +160,7 @@ export default function LoginRankPopup({ rank, overtook, gainedPoint, streak, po
             <X size={14}/>
           </button>
 
-          {/* ── Content ── */}
+          {/* ?? Content ?? */}
           <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
 
             {/* Trophy / icon */}
@@ -171,7 +171,7 @@ export default function LoginRankPopup({ rank, overtook, gainedPoint, streak, po
               fontSize: "1.8rem",
               animation: isOvertake ? "trophySpin 1.5s ease-in-out infinite" : "rankPulse 2s ease infinite",
             }}>
-              {isOvertake ? "⚡" : isTopThree ? MEDAL[rank - 1] : "🏆"}
+              {isOvertake ? "?" : isTopThree ? MEDAL[rank - 1] : "??"}
             </div>
 
             {/* Text */}
@@ -188,7 +188,7 @@ export default function LoginRankPopup({ rank, overtook, gainedPoint, streak, po
                     <TrendingUp size={11}/> YOU MOVED UP!
                   </div>
                   <div style={{ fontWeight: 900, fontSize: "1.1rem", lineHeight: 1.2, marginBottom: 3 }}>
-                    Overtook {overtook} {overtook === 1 ? "player" : "players"}! 🔥
+                    Overtook {overtook} {overtook === 1 ? "player" : "players"}! ??
                   </div>
                   <div style={{ fontSize: ".82rem", opacity: .85 }}>
                     You're now ranked <strong>#{rank}</strong> on the leaderboard
@@ -204,7 +204,7 @@ export default function LoginRankPopup({ rank, overtook, gainedPoint, streak, po
                     {isTopThree && <span style={{ fontSize: ".85rem", marginLeft: 6, opacity: .9 }}>on the leaderboard</span>}
                   </div>
                   <div style={{ fontSize: ".82rem", opacity: .8 }}>
-                    {isTopThree ? "You're in the top 3 — keep it up!" : "Your current leaderboard position"}
+                    {isTopThree ? "You're in the top 3 - keep it up!" : "Your current leaderboard position"}
                   </div>
                 </>
               )}
@@ -229,7 +229,7 @@ export default function LoginRankPopup({ rank, overtook, gainedPoint, streak, po
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, fontWeight: 800, fontSize: ".82rem" }}>
                   <Flame size={12}/> {streak}d streak
                 </div>
-                <div style={{ fontSize: ".62rem", opacity: .65, marginTop: 1 }}>🔥 Keep going</div>
+                <div style={{ fontSize: ".62rem", opacity: .65, marginTop: 1 }}>?? Keep going</div>
               </div>
             )}
             <button onClick={() => { handleClose(); onLeaderboard(); }} style={{

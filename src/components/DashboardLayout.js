@@ -43,12 +43,12 @@ function EmailVerifyBanner({ email }) {
       flexWrap: "wrap",
       boxShadow: "0 2px 8px rgba(245,158,11,0.12)",
     }}>
-      <span style={{ fontSize: "1.2rem", flexShrink: 0 }}>⚠️</span>
+      <span style={{ fontSize: "1.2rem", flexShrink: 0 }}>??</span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <strong style={{ color: "#92400e", fontSize: "0.88rem" }}>Verify your email address</strong>
         <div style={{ color: "#b45309", fontSize: "0.8rem", marginTop: 2 }}>
           {sent
-            ? `✅ Verification link sent to ${email}. Check your inbox.`
+            ? `? Verification link sent to ${email}. Check your inbox.`
             : `Your account email (${email}) is unverified. Verify it to keep full access.`
           }
         </div>
@@ -63,14 +63,14 @@ function EmailVerifyBanner({ email }) {
             cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap",
           }}
         >
-          {loading ? "Sending…" : "Send Verification Email"}
+          {loading ? "Sending." : "Send Verification Email"}
         </button>
       )}
       <button
         onClick={() => setDismissed(true)}
         style={{ background: "none", border: "none", cursor: "pointer", color: "#b45309", fontSize: "1rem", flexShrink: 0, padding: "4px" }}
         title="Dismiss"
-      >✕</button>
+      >?</button>
     </div>
   );
 }
@@ -100,7 +100,7 @@ function DashboardLayout() {
   const [msgBody,      setMsgBody]      = useState("");
   const [msgSending,   setMsgSending]   = useState(false);
 
-  // ── Login Rank Popup ──
+  // ?? Login Rank Popup ??
   const [rankPopup, setRankPopup] = useState(null); // {rank,overtook,gainedPoint,streak,points}
   const [msgSent,      setMsgSent]      = useState(false);
   const [msgError,     setMsgError]     = useState("");
@@ -227,7 +227,7 @@ function DashboardLayout() {
 
       {/* ===== TOP NAVBAR ===== */}
       <div className="dashboard-topbar">
-        {/* Home for mobile — replaces old logout position */}
+        {/* Home for mobile - replaces old logout position */}
         <button
           className="topbar-hamburger"
           onClick={() => navigate('/dashboard')}
@@ -322,7 +322,7 @@ function DashboardLayout() {
             )}
           </button>
 
-          {/* Settings icon — replaces letter avatar */}
+          {/* Settings icon - replaces letter avatar */}
           <button
             className="topbar-avatar-btn"
             onClick={() => navigate("/profile")}
@@ -377,7 +377,7 @@ function DashboardLayout() {
             Log out
           </button>
 
-          {/* ── Rank / Streak / Points Mini Widget ── */}
+          {/* ?? Rank / Streak / Points Mini Widget ?? */}
           {userObj && (
             <div style={{
               margin: "8px 0",
@@ -404,7 +404,7 @@ function DashboardLayout() {
                 </div>
                 <div style={{ flex: 1, background: "var(--surface)", borderRadius: 9, padding: "6px 0", textAlign: "center", border: "1px solid var(--border)" }}>
                   <div style={{ fontSize: ".88rem", fontWeight: 900, color: "#f59e0b" }}>
-                    {(userObj.streak || 0) > 0 ? `🔥${userObj.streak}` : "—"}
+                    {(userObj.streak || 0) > 0 ? `??${userObj.streak}` : "-"}
                   </div>
                   <div style={{ fontSize: ".58rem", color: "var(--text-muted)", fontWeight: 600 }}>STREAK</div>
                 </div>
@@ -438,12 +438,12 @@ function DashboardLayout() {
           {/* Announcement Banner */}
           {announcement && !announcementDismissed && (
             <div className="uhc-announcement">
-              <span>📢&nbsp;&nbsp;{announcement}</span>
-              <button className="uhc-announcement__close" onClick={() => setAnnouncementDismissed(true)}>✕</button>
+              <span>??&nbsp;&nbsp;{announcement}</span>
+              <button className="uhc-announcement__close" onClick={() => setAnnouncementDismissed(true)}>?</button>
             </div>
           )}
 
-          {/* ── Email Verification Caution Banner ── */}
+          {/* ?? Email Verification Caution Banner ?? */}
           {userObj && !userObj.isEmailVerified && (
             <EmailVerifyBanner email={userObj.email} />
           )}
@@ -616,7 +616,7 @@ function DashboardLayout() {
                             {m.adminReply ? (
                               <div style={{ background: "rgba(66,85,255,0.06)", padding: 12, borderRadius: 10, border: "1px solid rgba(66,85,255,0.15)", marginBottom: 12 }}>
                                 <div style={{ fontWeight: 700, fontSize: "0.78rem", color: "var(--accent)", display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
-                                  <span>👤 Admin Reply:</span>
+                                  <span>?? Admin Reply:</span>
                                 </div>
                                 <div style={{ fontSize: "0.82rem", color: "var(--text-heading)", lineHeight: 1.4 }}>
                                   {m.adminReply}
@@ -627,7 +627,7 @@ function DashboardLayout() {
                               </div>
                             ) : (
                               <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", fontStyle: "italic", marginBottom: 12 }}>
-                                Waiting for admin reply…
+                                Waiting for admin reply.
                               </div>
                             )}
                             
@@ -661,7 +661,7 @@ function DashboardLayout() {
 
       {/* ===== MOBILE BOTTOM NAV ===== */}
       <nav className="uhc-bottom-nav" aria-label="Main navigation">
-        {/* Skip Home (now in topbar), show Study Hub → Ranks */}
+        {/* Skip Home (now in topbar), show Study Hub ? Ranks */}
         {navItems.slice(1, 5).map((item) => (
           <button
             key={item.path}
@@ -718,7 +718,7 @@ function DashboardLayout() {
             </div>
             {msgSent ? (
               <div style={{ textAlign:"center", padding:"20px 0" }}>
-                <div style={{ fontSize:"2rem", marginBottom:8 }}>✅</div>
+                <div style={{ fontSize:"2rem", marginBottom:8 }}>?</div>
                 <div style={{ fontWeight:800, color:"#16a34a" }}>Message Sent!</div>
                 <div style={{ fontSize:".8rem", color:"var(--text-muted)", marginTop:4 }}>Admin will reply via email and notification.</div>
               </div>
@@ -763,7 +763,7 @@ function DashboardLayout() {
                 />
 
                 <textarea
-                  placeholder={msgCategory ? "Your message…" : "Please select a category first..."}
+                  placeholder={msgCategory ? "Your message." : "Please select a category first..."}
                   value={msgBody}
                   rows={4}
                   disabled={!msgCategory}
@@ -791,7 +791,7 @@ function DashboardLayout() {
                     cursor: (msgSending || !msgCategory || !msgBody.trim()) ? "not-allowed" : "pointer"
                   }}
                 >
-                  {msgSending ? "Sending…" : "Send Message"}
+                  {msgSending ? "Sending." : "Send Message"}
                 </button>
               </>
             )}
