@@ -3,6 +3,7 @@ import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 import api from "../api/api";
 import OnboardingTour from "./OnboardingTour";
+import LoginRankPopup from "./LoginRankPopup";
 import "../styles/dashboard.css";
 import { isSoundEnabled, setSoundEnabled, playNavigate } from "../utils/sounds";
 import { io } from "socket.io-client";
@@ -10,7 +11,7 @@ import { io } from "socket.io-client";
 import {
   Home, BookOpen, ClipboardList, User, LogOut,
   Search, BarChart2, ChevronRight, X, Bell, PenSquare, Trophy, Settings,
-  Volume2, VolumeX, Mail,
+  Volume2, VolumeX, Mail, Zap, Flame,
 } from "lucide-react";
 
 function EmailVerifyBanner({ email }) {
@@ -98,6 +99,9 @@ function DashboardLayout() {
   const [msgSubject,   setMsgSubject]   = useState("");
   const [msgBody,      setMsgBody]      = useState("");
   const [msgSending,   setMsgSending]   = useState(false);
+
+  // ── Login Rank Popup ──
+  const [rankPopup, setRankPopup] = useState(null); // {rank,overtook,gainedPoint,streak,points}
   const [msgSent,      setMsgSent]      = useState(false);
   const [msgError,     setMsgError]     = useState("");
 
@@ -110,6 +114,18 @@ function DashboardLayout() {
       setMsgUnreadCount(unread);
     } catch {}
   };
+
+  // Show rank popup once per session after login
+  useEffect(() => {
+    const raw = sessionStorage.getItem("pendingRankData");
+    if (!raw) return;
+    try {
+      const data = JSON.parse(raw);
+      sessionStorage.removeItem("pendingRankData");
+      // Small delay so the dashboard renders first
+      setTimeout(() => setRankPopup(data), 900);
+    } catch { sessionStorage.removeItem("pendingRankData"); }
+  }, []);
 
   useEffect(() => {
     if (!user?._id) return;
@@ -360,6 +376,41 @@ function DashboardLayout() {
             <span className="nav-item-icon"><LogOut size={18} /></span>
             Log out
           </button>
+
+          {/* ── Rank / Streak / Points Mini Widget ── */}
+          {userObj && (
+            <div style={{
+              margin: "8px 0",
+              background: "linear-gradient(135deg,rgba(66,85,255,.08),rgba(139,92,246,.06))",
+              border: "1px solid rgba(66,85,255,.15)",
+              borderRadius: 14, padding: "10px 12px",
+              cursor: "pointer", transition: "all .18s",
+            }}
+              onClick={() => navigate("/leaderboard")}
+              onMouseEnter={e => e.currentTarget.style.boxShadow = "0 4px 16px rgba(66,85,255,.14)"}
+              onMouseLeave={e => e.currentTarget.style.boxShadow = "none"}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <Trophy size={13} color="#f59e0b"/>
+                  <span style={{ fontSize: ".72rem", fontWeight: 800, color: "var(--text-heading)", letterSpacing: ".3px" }}>MY STATS</span>
+                </div>
+                <ChevronRight size={12} style={{ color: "#939bb4" }}/>
+              </div>
+              <div style={{ display: "flex", gap: 6 }}>
+                <div style={{ flex: 1, background: "var(--surface)", borderRadius: 9, padding: "6px 0", textAlign: "center", border: "1px solid var(--border)" }}>
+                  <div style={{ fontSize: ".88rem", fontWeight: 900, color: "#4255ff" }}>{userObj.points || 0}</div>
+                  <div style={{ fontSize: ".58rem", color: "var(--text-muted)", fontWeight: 600 }}>PTS</div>
+                </div>
+                <div style={{ flex: 1, background: "var(--surface)", borderRadius: 9, padding: "6px 0", textAlign: "center", border: "1px solid var(--border)" }}>
+                  <div style={{ fontSize: ".88rem", fontWeight: 900, color: "#f59e0b" }}>
+                    {(userObj.streak || 0) > 0 ? `🔥${userObj.streak}` : "—"}
+                  </div>
+                  <div style={{ fontSize: ".58rem", color: "var(--text-muted)", fontWeight: 600 }}>STREAK</div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Profile mini card at bottom */}
           {userObj && (
@@ -752,6 +803,19 @@ function DashboardLayout() {
 
       {/* ===== ONBOARDING TOUR ===== */}
       {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}
+
+      {/* ===== LOGIN RANK POPUP ===== */}
+      {rankPopup && (
+        <LoginRankPopup
+          rank={rankPopup.rank}
+          overtook={rankPopup.overtook}
+          gainedPoint={rankPopup.gainedPoint}
+          streak={rankPopup.streak || userObj?.streak || 0}
+          points={rankPopup.points || userObj?.points || 0}
+          onClose={() => setRankPopup(null)}
+          onLeaderboard={() => navigate("/leaderboard")}
+        />
+      )}
     </div>
   );
 }
