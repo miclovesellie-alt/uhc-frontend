@@ -19,6 +19,17 @@ function Login({ onFlip, onLoginSuccess }) {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
+      // Store rank data so DashboardLayout can show the popup
+      if (res.data.leaderboardRank) {
+        sessionStorage.setItem("pendingRankData", JSON.stringify({
+          rank:        res.data.leaderboardRank,
+          overtook:    res.data.overtook    || 0,
+          gainedPoint: res.data.gainedPoint || false,
+          streak:      res.data.user?.streak  || 0,
+          points:      res.data.user?.points  || 0,
+        }));
+      }
+
       if (onLoginSuccess) onLoginSuccess(res.data.user);
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong");
