@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Flag, BookOpen, CheckCircle, Clock, AlertTriangle, Search } from "lucide-react";
+import { ArrowLeft, Flag, BookOpen, CheckCircle, Clock, AlertTriangle, Search, Pause, Play, ChevronDown, ChevronUp } from "lucide-react";
 import { UserContext } from "../context/UserContext";
 import { useToast } from "./Toast";
 import "../styles/quiz.css";
@@ -11,6 +11,16 @@ import {
   playSelect, playCorrect, playWrong, playFinish,
   playStreak, playTimerWarn, playRefresh,
 } from "../utils/sounds";
+
+/* ── Shuffle helper ── */
+const shuffleArray = (arr) => {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+};
 
 /* ── Book Loader ── */
 const BookLoader = ({ text = "Loading…" }) => (
@@ -62,19 +72,30 @@ const loadQ = async (course, limit) => {
    MAIN COMPONENT
 ══════════════════════════════════════ */
 export default function QuizPage() {
-  const toast    = useToast();
-  const userId   = localStorage.getItem("userId");
-  const storeKey = `activeQuiz_${userId}`;
-  const userName = (() => { try { return JSON.parse(localStorage.getItem("user") || "{}").name || "Student"; } catch { return "Student"; } })();
+  const toast = useToast();
 
-  // Save a quiz result to history
-  const saveQuizHistory = (course, score, total, bstreak) => {
-    const histKey = `quizHistory_${userId}`;
-    const prev = (() => { try { return JSON.parse(localStorage.getItem(histKey) || '[]'); } catch { return []; } })();
-    const entry = { course, score, total, pct: total ? Math.round((score/total)*100) : 0, bestStreak: bstreak, date: new Date().toISOString() };
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // BUG FIX #1 — Stable storeKey
+  // Previously recomputed from localStorage on every render, causing the
+  // restore useEffect to re-fire with a different key after UserContext
+  // hydrates, wiping quiz state and leaving a blank stage="quiz" screen.
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  const storeKeyRef = useRef(`activeQuiz_${localStorage.getItem("userId")}`);
+  const storeKey = storeKeyRef.current;
+
+  const userName = (() => {
+    try { return JSON.parse(localStorage.getItem("user") || "{}").name || "Student"; }
+    catch { return "Student"; }
+  })();
+
+  const saveQuizHistory = (course, sc, total, bstreak) => {
+    const histKey = `quizHistory_${localStorage.getItem("userId")}`;
+    const prev = (() => { try { return JSON.parse(localStorage.getItem(histKey) || "[]"); } catch { return []; } })();
+    const entry = { course, score: sc, total, pct: total ? Math.round((sc / total) * 100) : 0, bestStreak: bstreak, date: new Date().toISOString() };
     localStorage.setItem(histKey, JSON.stringify([entry, ...prev].slice(0, 30)));
   };
 
+  // ── Core state ──
   const [stage, setStage]               = useState("selectCourse");
   const [courses, setCourses]           = useState([]);
   const [selCourse, setSelCourse]       = useState(null);
@@ -94,6 +115,12 @@ export default function QuizPage() {
   const [showNav, setShowNav]           = useState(false);
   const [timeLeft, setTimeLeft]         = useState(45);
   const [blurred, setBlurred]           = useState(false);
+
+  // ── New state: mode & pause ──
+  const [mode, setMode]               = useState("timed"); // "timed" | "practice"
+  const [paused, setPaused]           = useState(false);
+  const [showBreakdown, setShowBreakdown] = useState(false);
+
   const { user, setUser } = useContext(UserContext);
   const isAdmin = user?.role === "admin" || user?.role === "superadmin";
   const { disabled: quizDisabled, loading: checkingQuizFlag } = usePageEnabled("disableQuiz", isAdmin);
@@ -102,7 +129,20 @@ export default function QuizPage() {
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState("Typo");
   const [showQuitModal, setShowQuitModal] = useState(false);
+  const [noSS, setNoSS] = useState(false);
 
+  // ── Always-fresh refs for functions used in closures/effects ──
+  const confirmAnswerRef = useRef(null);
+  const handleNextRef    = useRef(null);
+  const toggleFlagRef    = useRef(null);
+
+  // ── State snapshot ref for keyboard handler (registered once) ──
+  const kbStateRef = useRef({});
+  kbStateRef.current = { stage, done, locked, selAns, paused, mode };
+
+  /* ─────────────────────────────────────────
+     POINTS
+  ───────────────────────────────────────── */
   const awardPoints = async (amount, reason, course, questionsAnswered, totalQuestions) => {
     try {
       const res = await api.post("points/add", { amount, reason, course, questionsAnswered, totalQuestions });
@@ -112,103 +152,86 @@ export default function QuizPage() {
     }
   };
 
-  const [noSS, setNoSS] = useState(false);
-
-  /* ── Fetch Global Settings ── */
+  /* ─────────────────────────────────────────
+     FETCH GLOBAL SETTINGS
+  ───────────────────────────────────────── */
   useEffect(() => {
     api.get("settings/noScreenshot").then(res => {
       if (res.data.value !== null) setNoSS(res.data.value);
     }).catch(() => {});
   }, []);
 
-  /* ── Fetch courses ── */
-  useEffect(() => { api.get("courses").then(r => setCourses(r.data)).catch(() => {}); }, []);
+  /* ─────────────────────────────────────────
+     FETCH COURSES
+  ───────────────────────────────────────── */
+  useEffect(() => {
+    api.get("courses").then(r => setCourses(r.data)).catch(() => {});
+  }, []);
 
-  /* ── No-screenshot ── */
+  /* ─────────────────────────────────────────
+     NO-SCREENSHOT GUARDS
+  ───────────────────────────────────────── */
   useEffect(() => {
     if (!noSS || stage !== "quiz") return;
-    const blockKey = (e) => { if (e.key === "PrintScreen" || e.key === "F12") e.preventDefault(); };
-    const blockCtx = (e) => e.preventDefault();
-    const onBlur = () => setBlurred(true);
-    const onFocus = () => setBlurred(false);
-    
-    // Attempt to clear clipboard on PrintScreen keyup
-    const handleKeyUp = (e) => {
-      if (e.key === "PrintScreen") {
-        navigator.clipboard.writeText("");
-      }
-    };
+    const blockKey   = (e) => { if (e.key === "PrintScreen" || e.key === "F12") e.preventDefault(); };
+    const blockCtx   = (e) => e.preventDefault();
+    const onBlur     = () => setBlurred(true);
+    const onFocus    = () => setBlurred(false);
+    const handleKeyUp = (e) => { if (e.key === "PrintScreen") navigator.clipboard.writeText(""); };
 
-    document.addEventListener("keydown", blockKey);
-    document.addEventListener("keyup", handleKeyUp);
+    document.addEventListener("keydown",  blockKey);
+    document.addEventListener("keyup",    handleKeyUp);
     document.addEventListener("contextmenu", blockCtx);
-    window.addEventListener("blur", onBlur);
+    window.addEventListener("blur",  onBlur);
     window.addEventListener("focus", onFocus);
     return () => {
-      document.removeEventListener("keydown", blockKey);
-      document.removeEventListener("keyup", handleKeyUp);
+      document.removeEventListener("keydown",     blockKey);
+      document.removeEventListener("keyup",       handleKeyUp);
       document.removeEventListener("contextmenu", blockCtx);
-      window.removeEventListener("blur", onBlur);
+      window.removeEventListener("blur",  onBlur);
       window.removeEventListener("focus", onFocus);
     };
   }, [noSS, stage]);
 
-  /* ── Restore from storage ── */
+  /* ─────────────────────────────────────────
+     RESTORE FROM STORAGE
+  ───────────────────────────────────────── */
   useEffect(() => {
     const s = localStorage.getItem(storeKey);
     if (!s) return;
     try {
       const d = JSON.parse(s);
-      setStage(d.stage); setSelCourse(d.selCourse); setQuestions(d.questions);
-      setIdx(d.idx); setAnswers(d.answers); setFlagged(d.flagged || []);
-      setSelAns(d.selAns); setLocked(d.locked || false);
-      setScore(d.score); setStreak(d.streak || 0); setBestStreak(d.bestStreak || 0);
-      setDone(d.done); setTimeLeft(d.timeLeft || 45);
+      setStage(d.stage);
+      setSelCourse(d.selCourse);
+      setQuestions(d.questions || []);
+      setIdx(d.idx);
+      setAnswers(d.answers);
+      setFlagged(d.flagged || []);
+      setSelAns(d.selAns);
+      setLocked(d.locked || false);
+      setScore(d.score);
+      setStreak(d.streak || 0);
+      setBestStreak(d.bestStreak || 0);
+      setDone(d.done);
+      setTimeLeft(d.timeLeft || 45);
+      setMode(d.mode || "timed");
     } catch {}
   }, [storeKey]);
 
-  /* ── Persist state ── */
+  /* ─────────────────────────────────────────
+     PERSIST STATE
+  ───────────────────────────────────────── */
   useEffect(() => {
     if (stage !== "quiz") return;
     localStorage.setItem(storeKey, JSON.stringify({
       stage, selCourse, questions, idx, answers, flagged,
-      selAns, locked, score, streak, bestStreak, done, timeLeft,
+      selAns, locked, score, streak, bestStreak, done, timeLeft, mode,
     }));
-  }, [stage, selCourse, questions, idx, answers, flagged, selAns, locked, score, streak, bestStreak, done, timeLeft, storeKey]);
+  }, [stage, selCourse, questions, idx, answers, flagged, selAns, locked, score, streak, bestStreak, done, timeLeft, storeKey, mode]);
 
-  /* ── Per-question timer ── */
-  useEffect(() => {
-    if (stage !== "quiz" || done || locked) { clearInterval(timerRef.current); return; }
-    clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setTimeLeft(t => {
-        // Play a gentle warning tick when clock enters danger zone
-        if ((t === 10 || t === 5) && !locked) playTimerWarn();
-        if (t <= 1) { clearInterval(timerRef.current); confirmAnswer(true); return 0; }
-        return t - 1;
-      });
-    }, 1000);
-    return () => clearInterval(timerRef.current);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stage, idx, done, locked]);
-
-  /* ── Load questions handler ── */
-  const handleNumSelect = async (num) => {
-    setLoadingQ(true);
-    const qs = await loadQ(selCourse, num);
-    setLoadingQ(false);
-    if (!qs.length) { toast("No questions found for this course yet.", "warning"); return; }
-    const fixed = qs.map(q => ({ ...q, correctAnswerText: q.options[q.answer] }));
-    setQuestions(fixed);
-    setAnswers(new Array(fixed.length).fill(null));
-    setFlagged(new Array(fixed.length).fill(false));
-    setIdx(0); setSelAns(null); setLocked(false);
-    setScore(0); setStreak(0); setBestStreak(0);
-    setDone(false); setTimeLeft(45); setStage("quiz");
-    playRefresh(); // gentle whoosh when quiz loads
-  };
-
-  /* ── Confirm answer ── */
+  /* ─────────────────────────────────────────
+     CONFIRM ANSWER
+  ───────────────────────────────────────── */
   const confirmAnswer = useCallback((timedOut = false) => {
     clearInterval(timerRef.current);
     const ans = timedOut ? null : selAns;
@@ -222,38 +245,173 @@ export default function QuizPage() {
       const ns = streak + 1;
       setStreak(ns);
       setBestStreak(b => Math.max(b, ns));
-      // Streak milestone gets sparkle, otherwise just correct chime
       if (ns > 0 && ns % 3 === 0) playStreak();
       else playCorrect();
+      // Streak milestone toasts
+      if ([3, 5, 10, 15, 20].includes(ns)) {
+        toast(`🔥 ${ns} in a row! You're on fire!`, "success");
+      }
     } else {
       setStreak(0);
-      if (!timedOut) playWrong(); // timed out = silent (no punishment sound)
+      if (!timedOut) playWrong();
     }
-  }, [selAns, answers, idx, questions, streak]);
+  }, [selAns, answers, idx, questions, streak, toast]);
 
-  /* ── Navigate to question ── */
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // BUG FIX #2 — Always-fresh confirmAnswer in timer
+  // Previously the timer setInterval captured a stale confirmAnswer closure
+  // (since confirmAnswer wasn't in the timer's deps), which could run with
+  // stale answers/questions arrays and corrupt state or cause blank screen.
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  useEffect(() => { confirmAnswerRef.current = confirmAnswer; }, [confirmAnswer]);
+
+  /* ─────────────────────────────────────────
+     PER-QUESTION TIMER
+  ───────────────────────────────────────── */
+  useEffect(() => {
+    // Practice mode — no timer
+    if (mode !== "timed") { clearInterval(timerRef.current); return; }
+    if (stage !== "quiz" || done || locked || paused) { clearInterval(timerRef.current); return; }
+    clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setTimeLeft(t => {
+        if ((t === 10 || t === 5) && !locked) playTimerWarn();
+        if (t <= 1) {
+          clearInterval(timerRef.current);
+          confirmAnswerRef.current(true); // always-fresh via ref
+          return 0;
+        }
+        return t - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timerRef.current);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stage, idx, done, locked, paused, mode]);
+
+  /* ─────────────────────────────────────────
+     NAVIGATION
+  ───────────────────────────────────────── */
   const goTo = (i) => {
     if (i < 0 || i >= questions.length) return;
-    setIdx(i); setSelAns(answers[i]); setLocked(answers[i] !== null);
-    setTimeLeft(45); setShowNav(false);
+    setIdx(i);
+    setSelAns(answers[i]);
+    setLocked(answers[i] !== null);
+    setTimeLeft(45);
+    setShowNav(false);
   };
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (idx < questions.length - 1) {
-      goTo(idx + 1);
+      // Inline goTo to avoid stale closure on the captured goTo fn
+      const nextIdx = idx + 1;
+      setIdx(nextIdx);
+      setSelAns(answers[nextIdx]);
+      setLocked(answers[nextIdx] !== null);
+      setTimeLeft(45);
+      setShowNav(false);
     } else {
       const completedQuizPoints = 1;
       const questionsAnsweredPoints = Math.floor(questions.length / 10) * 3;
       const totalPoints = completedQuizPoints + questionsAnsweredPoints;
       const fs = answers.filter((a, i) => a === questions[i]?.answer).length;
       if (totalPoints > 0) awardPoints(totalPoints, "Quiz Completion", selCourse, fs, questions.length);
-      // Save to history
       saveQuizHistory(selCourse, fs, questions.length, bestStreak);
       playFinish();
       setDone(true);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx, questions, answers, selCourse, bestStreak]);
+
+  useEffect(() => { handleNextRef.current = handleNext; }, [handleNext]);
+
+  const toggleFlag = useCallback(() => {
+    const f = [...flagged];
+    f[idx] = !f[idx];
+    setFlagged(f);
+  }, [flagged, idx]);
+
+  useEffect(() => { toggleFlagRef.current = toggleFlag; }, [toggleFlag]);
+
+  /* ─────────────────────────────────────────
+     KEYBOARD SHORTCUTS (registered once)
+  ───────────────────────────────────────── */
+  useEffect(() => {
+    const handleKey = (e) => {
+      const { stage, done, locked, selAns, paused, mode } = kbStateRef.current;
+      if (stage !== "quiz" || done || paused) return;
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.tagName === "SELECT") return;
+
+      if (!locked) {
+        // A/B/C/D → select answer option
+        const optMap = { a: 0, b: 1, c: 2, d: 3, A: 0, B: 1, C: 2, D: 3 };
+        if (optMap[e.key] !== undefined) {
+          setSelAns(optMap[e.key]);
+          playSelect();
+          return;
+        }
+        // Enter or Space → confirm selected answer
+        if ((e.key === "Enter" || e.key === " ") && selAns !== null) {
+          e.preventDefault();
+          confirmAnswerRef.current(false);
+          return;
+        }
+      } else {
+        // Arrow Right or Enter → next question
+        if (e.key === "ArrowRight" || e.key === "Enter") {
+          e.preventDefault();
+          handleNextRef.current();
+          return;
+        }
+      }
+
+      // F → toggle flag
+      if (e.key === "f" || e.key === "F") {
+        toggleFlagRef.current();
+      }
+
+      // P → pause/resume (timed mode only)
+      if ((e.key === "p" || e.key === "P") && mode === "timed") {
+        setPaused(prev => !prev);
+      }
+    };
+
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, []); // Intentionally register once — state accessed via kbStateRef
+
+  /* ─────────────────────────────────────────
+     LOAD QUESTIONS
+  ───────────────────────────────────────── */
+  const handleNumSelect = async (num) => {
+    setLoadingQ(true);
+    const qs = await loadQ(selCourse, num);
+    setLoadingQ(false);
+    if (!qs.length) { toast("No questions found for this course yet.", "warning"); return; }
+
+    // Shuffle question order
+    const shuffledQs = shuffleArray(qs);
+
+    // Shuffle options within each question and remap the correct answer index
+    const fixed = shuffledQs.map(q => {
+      const correctText = q.options[q.answer];
+      const shuffledOptions = shuffleArray([...q.options]);
+      const newAnswerIdx = shuffledOptions.indexOf(correctText);
+      return { ...q, options: shuffledOptions, answer: newAnswerIdx, correctAnswerText: correctText };
+    });
+
+    setQuestions(fixed);
+    setAnswers(new Array(fixed.length).fill(null));
+    setFlagged(new Array(fixed.length).fill(false));
+    setIdx(0); setSelAns(null); setLocked(false);
+    setScore(0); setStreak(0); setBestStreak(0);
+    setDone(false); setTimeLeft(45); setPaused(false);
+    setStage("quiz");
+    playRefresh();
   };
 
+  /* ─────────────────────────────────────────
+     REPORT
+  ───────────────────────────────────────── */
   const submitReport = async () => {
     if (!reportReason) return;
     const q = questions[idx];
@@ -261,25 +419,27 @@ export default function QuizPage() {
       await api.post("questions/report", {
         questionId: q._id || q.id || idx,
         questionText: q.question,
-        reason: reportReason
+        reason: reportReason,
       });
       toast("Question reported — thank you for your feedback!", "success");
       setShowReportModal(false);
-    } catch (err) {
+    } catch {
       toast("Failed to send report. Please try again.", "error");
     }
   };
 
-  const toggleFlag = () => {
-    const f = [...flagged]; f[idx] = !f[idx]; setFlagged(f);
-  };
-
-  const handleReview = () => {
+  /* ─────────────────────────────────────────
+     REVIEW
+  ───────────────────────────────────────── */
+  const handleReview = (startIdx = 0) => {
     setReviewMode(true);
     setDone(false);
-    goTo(0);
+    goTo(startIdx);
   };
 
+  /* ─────────────────────────────────────────
+     DERIVED
+  ───────────────────────────────────────── */
   const q = questions[idx];
   const finalScore = answers.filter((a, i) => a === questions[i]?.answer).length;
   const pct = questions.length ? Math.round((finalScore / questions.length) * 100) : 0;
@@ -287,9 +447,13 @@ export default function QuizPage() {
   if (checkingQuizFlag) return null;
   if (quizDisabled) return <MaintenanceScreen pageName="Quiz / Questions" />;
 
+  /* ─────────────────────────────────────────
+     RENDER
+  ───────────────────────────────────────── */
   return (
     <div className={`quiz-page-wrap ${noSS && stage === "quiz" ? "no-screenshot-mode" : ""}`}>
-      {/* Watermark */}
+
+      {/* ── Watermark ── */}
       {noSS && stage === "quiz" && (
         <div className="quiz-watermark-overlay">
           {Array(15).fill(0).map((_, i) => (
@@ -300,40 +464,75 @@ export default function QuizPage() {
         </div>
       )}
 
-      {/* Blur overlay */}
+      {/* ── Blur overlay (window-focus loss) ── */}
       {noSS && stage === "quiz" && blurred && (
         <div className="quiz-blur-overlay" onClick={() => setBlurred(false)}>
-          <div className="quiz-blur-inner">🔒<br /><b>Quiz Paused</b><br /><small>Click to resume</small></div>
+          <div className="quiz-blur-inner">
+            🔒<br /><b>Quiz Paused</b><br /><small>Click to resume</small>
+          </div>
+        </div>
+      )}
+
+      {/* ── Pause overlay (manual pause) ── */}
+      {paused && stage === "quiz" && !done && (
+        <div className="quiz-pause-overlay" onClick={() => setPaused(false)}>
+          <motion.div
+            className="quiz-pause-card"
+            initial={{ scale: 0.88, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ fontSize: "3.2rem", marginBottom: 8 }}>⏸️</div>
+            <h3>Quiz Paused</h3>
+            <p>Timer stopped. Resume when you're ready.</p>
+            <button className="quiz-btn primary" style={{ marginTop: 8 }} onClick={() => setPaused(false)}>
+              <Play size={14} style={{ marginRight: 6, verticalAlign: "middle" }} />
+              Resume
+            </button>
+            <p className="quiz-pause-hint">Press <kbd>P</kbd> to toggle pause</p>
+          </motion.div>
         </div>
       )}
 
       <AnimatePresence mode="wait">
 
-        {/* ══ COURSE SELECT ══ */}
+        {/* ══════════ COURSE SELECT ══════════ */}
         {stage === "selectCourse" && (
-          <motion.div key="course" initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 30 }} className="quiz-card scrollable-card">
-            <motion.button className="quiz-back-button" onClick={() => window.history.back()} animate={{ x: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 1.5 }}>
+          <motion.div
+            key="course"
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 30 }}
+            className="quiz-card scrollable-card"
+          >
+            <motion.button
+              className="quiz-back-button"
+              onClick={() => window.history.back()}
+              animate={{ x: [0, -5, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+            >
               <ArrowLeft size={22} />
             </motion.button>
             <div className="quiz-header-badge"><BookOpen size={16} /> Quiz Arena</div>
             <h1 className="quiz-card-title">Choose a Course</h1>
             <p className="quiz-card-sub">Select the subject you want to practice</p>
 
-            {/* Search bar */}
-            <div style={{ position: 'relative', marginBottom: 16 }}>
-              <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted, #94a3b8)' }} />
+            {/* Search */}
+            <div style={{ position: "relative", marginBottom: 16 }}>
+              <Search size={15} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted, #94a3b8)" }} />
               <input
                 type="text"
                 placeholder="Search courses..."
                 value={courseSearch}
                 onChange={e => setCourseSearch(e.target.value)}
                 style={{
-                  width: '100%', boxSizing: 'border-box',
-                  padding: '10px 14px 10px 38px', borderRadius: 12,
-                  border: '1.5px solid var(--border, #e2e8f0)',
-                  background: 'var(--card-bg, #f8fafc)',
-                  color: 'var(--text, #0f172a)',
-                  fontSize: '.875rem', outline: 'none',
+                  width: "100%", boxSizing: "border-box",
+                  padding: "10px 14px 10px 38px", borderRadius: 12,
+                  border: "1.5px solid var(--border, #e2e8f0)",
+                  background: "var(--card-bg, #f8fafc)",
+                  color: "var(--text, #0f172a)",
+                  fontSize: ".875rem", outline: "none",
                 }}
               />
             </div>
@@ -342,15 +541,18 @@ export default function QuizPage() {
               {(courses.length > 0 ? courses.map(c => c.name) : Object.keys(coursesTopics))
                 .filter(name => name.toLowerCase().includes(courseSearch.toLowerCase()))
                 .map(name => (
-                  <button key={name} className="quiz-course-card" onClick={() => { setSelCourse(name); setStage("selectNumber"); }}>
+                  <button
+                    key={name}
+                    className="quiz-course-card"
+                    onClick={() => { setSelCourse(name); setStage("selectNumber"); }}
+                  >
                     <span className="quiz-course-icon">📚</span>
                     <span>{name}</span>
                   </button>
-                ))
-              }
+                ))}
               {(courses.length > 0 ? courses.map(c => c.name) : Object.keys(coursesTopics))
                 .filter(name => name.toLowerCase().includes(courseSearch.toLowerCase())).length === 0 && (
-                <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '20px', color: 'var(--text-muted, #94a3b8)', fontSize: '.875rem' }}>
+                <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "20px", color: "var(--text-muted, #94a3b8)", fontSize: ".875rem" }}>
                   No courses match "{courseSearch}"
                 </div>
               )}
@@ -358,9 +560,15 @@ export default function QuizPage() {
           </motion.div>
         )}
 
-        {/* ══ NUMBER SELECT ══ */}
+        {/* ══════════ NUMBER + MODE SELECT ══════════ */}
         {stage === "selectNumber" && (
-          <motion.div key="num" initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 30 }} className="quiz-card scrollable-card">
+          <motion.div
+            key="num"
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 30 }}
+            className="quiz-card scrollable-card"
+          >
             <motion.button className="quiz-back-button" onClick={() => setStage("selectCourse")}>
               <ArrowLeft size={22} />
             </motion.button>
@@ -375,12 +583,32 @@ export default function QuizPage() {
                 fontWeight: 700, cursor: "pointer",
                 display: "flex", alignItems: "center", gap: 4,
               }}
-            >
-              ✕ Exit
-            </button>
+            >✕ Exit</button>
+
             <div className="quiz-header-badge"><Clock size={16} /> Select Mode</div>
             <h1 className="quiz-card-title">How Many Questions?</h1>
             <p className="quiz-card-sub">Course: <strong>{selCourse}</strong></p>
+
+            {/* ── Mode Toggle ── */}
+            <div className="quiz-mode-toggle">
+              <button
+                className={`quiz-mode-btn${mode === "timed" ? " active" : ""}`}
+                onClick={() => setMode("timed")}
+              >
+                <span className="qmb-icon">⏱️</span>
+                <span className="qmb-label">Timed</span>
+                <span className="qmb-desc">45s per question</span>
+              </button>
+              <button
+                className={`quiz-mode-btn${mode === "practice" ? " active" : ""}`}
+                onClick={() => setMode("practice")}
+              >
+                <span className="qmb-icon">📖</span>
+                <span className="qmb-label">Practice</span>
+                <span className="qmb-desc">No time limit</span>
+              </button>
+            </div>
+
             {loadingQ ? <BookLoader text="Loading questions…" /> : (
               <div className="quiz-num-grid">
                 {[
@@ -390,7 +618,12 @@ export default function QuizPage() {
                   { n: 50,  label: "Advanced", icon: "🔥", desc: "~38 min", col: "#f59e0b" },
                   { n: 100, label: "Marathon", icon: "🏆", desc: "~75 min", col: "#ef4444" },
                 ].map(({ n, label, icon, desc, col }) => (
-                  <button key={n} className="quiz-num-card" style={{ "--nc": col }} onClick={() => handleNumSelect(n)}>
+                  <button
+                    key={n}
+                    className="quiz-num-card"
+                    style={{ "--nc": col }}
+                    onClick={() => handleNumSelect(n)}
+                  >
                     <span className="qnc-icon">{icon}</span>
                     <span className="qnc-count">{n}</span>
                     <span className="qnc-label">{label}</span>
@@ -402,23 +635,23 @@ export default function QuizPage() {
           </motion.div>
         )}
 
-        {/* ══ ACTIVE QUIZ ══ */}
+        {/* ══════════ ACTIVE QUIZ ══════════ */}
         {stage === "quiz" && !done && q && (
-          <motion.div 
-            key={`q${idx}`} 
-            initial={{ x: 60, opacity: 0 }} 
-            animate={{ x: 0, opacity: 1 }} 
-            exit={{ x: -60, opacity: 0 }} 
-            transition={{ type: "spring", stiffness: 300, damping: 30 }} 
+          <motion.div
+            key={`q${idx}`}
+            initial={{ x: 60, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -60, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className="quiz-card quiz-active-card"
             style={noSS ? { userSelect: "none", MozUserSelect: "none", WebkitUserSelect: "none", msUserSelect: "none" } : {}}
           >
 
             {/* Review Mode Banner */}
             {reviewMode && (
-              <div style={{ background: 'linear-gradient(135deg,rgba(66,85,255,0.1),rgba(139,92,246,0.1))', border: '1px solid rgba(66,85,255,0.2)', borderRadius: 10, padding: '8px 14px', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--accent)' }}>📝 Review Mode — Q{idx + 1} of {questions.length}</span>
-                <button onClick={() => { setReviewMode(false); setDone(true); }} style={{ background: 'none', border: '1px solid rgba(66,85,255,0.3)', borderRadius: 6, padding: '3px 10px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent)', cursor: 'pointer' }}>✕ Exit Review</button>
+              <div style={{ background: "linear-gradient(135deg,rgba(66,85,255,0.1),rgba(139,92,246,0.1))", border: "1px solid rgba(66,85,255,0.2)", borderRadius: 10, padding: "8px 14px", marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--accent)" }}>📝 Review Mode — Q{idx + 1} of {questions.length}</span>
+                <button onClick={() => { setReviewMode(false); setDone(true); }} style={{ background: "none", border: "1px solid rgba(66,85,255,0.3)", borderRadius: 6, padding: "3px 10px", fontSize: "0.75rem", fontWeight: 600, color: "var(--accent)", cursor: "pointer" }}>✕ Exit Review</button>
               </div>
             )}
 
@@ -427,43 +660,45 @@ export default function QuizPage() {
               <div className="quiz-tb-left">
                 <span className="quiz-q-counter">{idx + 1} / {questions.length}</span>
                 {streak >= 3 && <span className="quiz-streak-badge">🔥 {streak}</span>}
+                {mode === "practice" && <span className="quiz-mode-badge">📖 Practice</span>}
               </div>
               <div className="quiz-tb-right">
                 <button
                   onClick={() => setShowQuitModal(true)}
                   title="Exit quiz"
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '4px',
-                    padding: '4px 8px', borderRadius: '6px',
-                    border: '1px solid #fecaca', background: '#fef2f2',
-                    color: '#ef4444', fontSize: '0.65rem',
-                    fontWeight: 700, cursor: 'pointer'
-                  }}
-                >
-                  ✕ Exit
-                </button>
-                <button 
-                  className="quiz-report-btn-header" 
+                  style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 8px", borderRadius: 6, border: "1px solid #fecaca", background: "#fef2f2", color: "#ef4444", fontSize: "0.65rem", fontWeight: 700, cursor: "pointer" }}
+                >✕ Exit</button>
+
+                <button
+                  className="quiz-report-btn-header"
                   onClick={() => setShowReportModal(true)}
-                  style={{ 
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    padding: '4px 8px',
-                    borderRadius: '6px',
-                    border: '1px solid #fecaca',
-                    background: '#fef2f2',
-                    color: '#ef4444',
-                    fontSize: '0.65rem',
-                    fontWeight: 700,
-                    cursor: 'pointer'
-                  }}
+                  style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 8px", borderRadius: 6, border: "1px solid #fecaca", background: "#fef2f2", color: "#ef4444", fontSize: "0.65rem", fontWeight: 700, cursor: "pointer" }}
                 >
                   <AlertTriangle size={12} /> Report
                 </button>
-                <button className={`quiz-flag-btn${flagged[idx] ? " flagged" : ""}`} onClick={toggleFlag}><Flag size={14} /></button>
+
+                <button className={`quiz-flag-btn${flagged[idx] ? " flagged" : ""}`} onClick={toggleFlag} title="Flag (F)">
+                  <Flag size={14} />
+                </button>
+
                 <button className="quiz-nav-toggle-btn" onClick={() => setShowNav(s => !s)}>⊞</button>
-                <CircleTimer timeLeft={timeLeft} total={45} />
+
+                {/* Pause button — timed mode only, not in review */}
+                {mode === "timed" && !reviewMode && (
+                  <button
+                    className="quiz-pause-btn"
+                    onClick={() => setPaused(p => !p)}
+                    title={paused ? "Resume (P)" : "Pause (P)"}
+                  >
+                    {paused ? <Play size={14} /> : <Pause size={14} />}
+                  </button>
+                )}
+
+                {/* Timer or infinity badge */}
+                {mode === "timed"
+                  ? <CircleTimer timeLeft={timeLeft} total={45} />
+                  : <span className="quiz-practice-badge">∞</span>
+                }
               </div>
             </div>
 
@@ -477,10 +712,11 @@ export default function QuizPage() {
               <div className="quiz-nav-panel">
                 <div className="quiz-nav-grid">
                   {questions.map((_, i) => (
-                    <button key={i} onClick={() => goTo(i)}
-                      className={`qnd${i === idx ? " cur" : ""}${answers[i] !== null ? (answers[i] === questions[i]?.answer ? " ok" : " bad") : ""}${flagged[i] ? " flag" : ""}`}>
-                      {i + 1}
-                    </button>
+                    <button
+                      key={i}
+                      onClick={() => goTo(i)}
+                      className={`qnd${i === idx ? " cur" : ""}${answers[i] !== null ? (answers[i] === questions[i]?.answer ? " ok" : " bad") : ""}${flagged[i] ? " flag" : ""}`}
+                    >{i + 1}</button>
                   ))}
                 </div>
                 <div className="quiz-nav-legend">
@@ -489,12 +725,11 @@ export default function QuizPage() {
                   <span><b className="qnd bad" />Wrong</span>
                   <span><b className="qnd flag" />Flagged</span>
                 </div>
-
               </div>
             )}
 
             {/* Question */}
-            <div className="quiz-q-wrap" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+            <div className="quiz-q-wrap" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
               <div style={{ flex: 1 }}>
                 {q.difficulty && <span className={`qdiff qdiff-${(q.difficulty || "medium").toLowerCase()}`}>{q.difficulty}</span>}
                 <h2 className="quiz-question">{q.question}</h2>
@@ -508,10 +743,10 @@ export default function QuizPage() {
                 const effectiveLocked = reviewMode || locked;
                 const effectiveSel = reviewMode ? answers[idx] : selAns;
                 if (effectiveLocked) {
-                  if (i === q.answer) cls += " correct";
+                  if (i === q.answer)      cls += " correct";
                   else if (i === effectiveSel) cls += " wrong";
-                  else cls += " dimmed";
-                } else if (selAns === i) cls += " selected";
+                  else                         cls += " dimmed";
+                } else if (selAns === i)   cls += " selected";
                 return (
                   <div
                     key={i}
@@ -519,8 +754,8 @@ export default function QuizPage() {
                     onClick={() => { if (!effectiveLocked) { setSelAns(i); playSelect(); } }}
                     role="button"
                     tabIndex={0}
-                    onKeyDown={(e) => { if(!effectiveLocked && (e.key === 'Enter' || e.key === ' ')) { setSelAns(i); playSelect(); } }}
-                    style={{ cursor: effectiveLocked ? 'default' : 'pointer' }}
+                    onKeyDown={(e) => { if (!effectiveLocked && (e.key === "Enter" || e.key === " ")) { setSelAns(i); playSelect(); } }}
+                    style={{ cursor: effectiveLocked ? "default" : "pointer" }}
                   >
                     <span className="opt-letter">{String.fromCharCode(65 + i)}</span>
                     <div className="opt-text">{opt}</div>
@@ -529,6 +764,17 @@ export default function QuizPage() {
                 );
               })}
             </div>
+
+            {/* Keyboard shortcut hints */}
+            {!reviewMode && (
+              <div className="quiz-kb-hints">
+                <span><kbd>A</kbd>–<kbd>D</kbd> Select</span>
+                {!locked && selAns !== null && <span><kbd>Enter</kbd> Confirm</span>}
+                {locked && <span><kbd>→</kbd> Next</span>}
+                <span><kbd>F</kbd> Flag</span>
+                {mode === "timed" && <span><kbd>P</kbd> Pause</span>}
+              </div>
+            )}
 
             {/* Explanation */}
             {locked && q.explanation && (
@@ -540,15 +786,19 @@ export default function QuizPage() {
             {/* Actions */}
             <div className="quiz-act-row">
               {reviewMode ? (
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center", width: "100%" }}>
                   <button className="quiz-btn ghost" disabled={idx === 0} onClick={() => goTo(idx - 1)}>← Prev</button>
                   <button className="quiz-btn primary" onClick={() => { setReviewMode(false); setDone(true); }}>Back to Results</button>
                   <button className="quiz-btn ghost" disabled={idx === questions.length - 1} onClick={() => goTo(idx + 1)}>Next →</button>
                 </div>
               ) : !locked ? (
-                <button className="quiz-btn primary" disabled={selAns === null} onClick={() => confirmAnswer(false)}>Confirm Answer</button>
+                <button className="quiz-btn primary" disabled={selAns === null} onClick={() => confirmAnswer(false)}>
+                  Confirm Answer
+                </button>
               ) : (
-                <button className="quiz-btn success" onClick={handleNext}>{idx < questions.length - 1 ? "Next →" : "Finish 🏁"}</button>
+                <button className="quiz-btn success" onClick={handleNext}>
+                  {idx < questions.length - 1 ? "Next →" : "Finish 🏁"}
+                </button>
               )}
             </div>
 
@@ -562,9 +812,15 @@ export default function QuizPage() {
           </motion.div>
         )}
 
-        {/* ══ RESULTS ══ */}
+        {/* ══════════ RESULTS ══════════ */}
         {done && (
-          <motion.div key="result" initial={{ scale: .9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 200, damping: 22 }} className="quiz-card quiz-result-card">
+          <motion.div
+            key="result"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 200, damping: 22 }}
+            className="quiz-card quiz-result-card"
+          >
             <div className="qr-avatar" style={{ background: avatarColor(userName) }}>{userName[0]?.toUpperCase()}</div>
             <h1 className="qr-title">Quiz Complete!</h1>
 
@@ -600,67 +856,114 @@ export default function QuizPage() {
             </div>
 
             <div className="qr-actions">
-              <button className="quiz-btn primary" onClick={handleReview}>Review Answers</button>
-              <button className="quiz-btn ghost" onClick={() => { localStorage.removeItem(storeKey); setStage("selectCourse"); setDone(false); setReviewMode(false); }}>New Quiz</button>
+              <button className="quiz-btn primary" onClick={() => handleReview(0)}>Review Answers</button>
+              <button className="quiz-btn ghost" onClick={() => {
+                localStorage.removeItem(storeKey);
+                setStage("selectCourse"); setDone(false); setReviewMode(false);
+              }}>New Quiz</button>
               {pct >= 70 && (
-                <button className="quiz-btn secondary"
-                  onClick={() => {
-                    const date = new Date().toLocaleDateString("en-GB", { day:"numeric", month:"long", year:"numeric" });
-                    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>UHC Certificate</title>
-                    <style>
-                      body{margin:0;font-family:'Georgia',serif;background:#f8fafc;display:flex;align-items:center;justify-content:center;min-height:100vh}
-                      .cert{width:760px;padding:60px;border:12px double #4255ff;background:white;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.15)}
-                      .logo{font-size:2.2rem;font-weight:900;color:#4255ff;letter-spacing:4px;margin-bottom:4px}
-                      .tagline{font-size:.85rem;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;margin-bottom:36px}
-                      h2{font-size:1.1rem;color:#64748b;font-weight:400;margin:0 0 8px}
-                      .name{font-size:2.6rem;color:#0f172a;font-weight:700;margin:8px 0 20px;border-bottom:2px solid #4255ff;padding-bottom:16px}
-                      .desc{font-size:1rem;color:#374151;line-height:1.7;margin-bottom:24px}
-                      .score{display:inline-block;padding:10px 28px;background:#4255ff;color:white;border-radius:99px;font-size:1.1rem;font-weight:700;margin-bottom:28px}
-                      .date{font-size:.85rem;color:#94a3b8;margin-top:24px}
-                      .seal{font-size:3rem;margin:20px 0 0}
-                      @media print{body{background:white}.cert{box-shadow:none;border-color:#4255ff}}
-                    </style></head><body>
-                    <div class="cert">
-                      <div class="logo">UHC</div>
-                      <div class="tagline">Universal Health Campus</div>
-                      <h2>This is to certify that</h2>
-                      <div class="name">${userName}</div>
-                      <div class="desc">has successfully completed the<br><strong>${selCourse}</strong><br>quiz assessment with distinction</div>
-                      <div class="score">Score: ${pct}% &nbsp;·&nbsp; ${finalScore}/${questions.length} correct</div>
-                      <div class="date">Awarded on ${date}</div>
-                      <div class="seal">🎓</div>
-                    </div>
-                    <script>setTimeout(()=>window.print(),600)</script>
-                    </body></html>`;
-                    const w = window.open("","_blank");
-                    w.document.write(html);
-                    w.document.close();
-                  }}>
-                  🎓 Download Certificate
-                </button>
+                <button className="quiz-btn secondary" onClick={() => {
+                  const date = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+                  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>UHC Certificate</title>
+                  <style>
+                    body{margin:0;font-family:'Georgia',serif;background:#f8fafc;display:flex;align-items:center;justify-content:center;min-height:100vh}
+                    .cert{width:760px;padding:60px;border:12px double #4255ff;background:white;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+                    .logo{font-size:2.2rem;font-weight:900;color:#4255ff;letter-spacing:4px;margin-bottom:4px}
+                    .tagline{font-size:.85rem;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;margin-bottom:36px}
+                    h2{font-size:1.1rem;color:#64748b;font-weight:400;margin:0 0 8px}
+                    .name{font-size:2.6rem;color:#0f172a;font-weight:700;margin:8px 0 20px;border-bottom:2px solid #4255ff;padding-bottom:16px}
+                    .desc{font-size:1rem;color:#374151;line-height:1.7;margin-bottom:24px}
+                    .score{display:inline-block;padding:10px 28px;background:#4255ff;color:white;border-radius:99px;font-size:1.1rem;font-weight:700;margin-bottom:28px}
+                    .date{font-size:.85rem;color:#94a3b8;margin-top:24px}
+                    .seal{font-size:3rem;margin:20px 0 0}
+                    @media print{body{background:white}.cert{box-shadow:none;border-color:#4255ff}}
+                  </style></head><body>
+                  <div class="cert">
+                    <div class="logo">UHC</div>
+                    <div class="tagline">Universal Health Campus</div>
+                    <h2>This is to certify that</h2>
+                    <div class="name">${userName}</div>
+                    <div class="desc">has successfully completed the<br><strong>${selCourse}</strong><br>quiz assessment with distinction</div>
+                    <div class="score">Score: ${pct}% &nbsp;·&nbsp; ${finalScore}/${questions.length} correct</div>
+                    <div class="date">Awarded on ${date}</div>
+                    <div class="seal">🎓</div>
+                  </div>
+                  <script>setTimeout(()=>window.print(),600)</script>
+                  </body></html>`;
+                  const w = window.open("", "_blank");
+                  w.document.write(html);
+                  w.document.close();
+                }}>🎓 Download Certificate</button>
               )}
+            </div>
+
+            {/* ── Per-question breakdown ── */}
+            <div className="qr-breakdown-section">
+              <button className="qr-breakdown-toggle" onClick={() => setShowBreakdown(s => !s)}>
+                {showBreakdown ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                {showBreakdown ? "Hide" : "View"} Question Breakdown
+              </button>
+
+              <AnimatePresence>
+                {showBreakdown && (
+                  <motion.div
+                    className="qr-breakdown"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    style={{ overflow: "hidden" }}
+                  >
+                    {questions.map((question, i) => {
+                      const userAnswer  = answers[i];
+                      const isCorrect   = userAnswer === question.answer;
+                      const wasAnswered = userAnswer !== null;
+                      return (
+                        <div key={i} className={`qr-bd-item ${isCorrect ? "bd-correct" : wasAnswered ? "bd-wrong" : "bd-skipped"}`}>
+                          <div className="qr-bd-icon">{isCorrect ? "✅" : wasAnswered ? "❌" : "⏭️"}</div>
+                          <div className="qr-bd-content">
+                            <div className="qr-bd-q">
+                              Q{i + 1}: {question.question.length > 90 ? question.question.slice(0, 90) + "…" : question.question}
+                            </div>
+                            <div className="qr-bd-ans">
+                              {wasAnswered
+                                ? isCorrect
+                                  ? <span className="bd-ans-correct">✓ {question.options[userAnswer]}</span>
+                                  : <>
+                                      <span className="bd-ans-wrong">✗ {question.options[userAnswer]}</span>
+                                      <span className="bd-ans-correct"> → {question.options[question.answer]}</span>
+                                    </>
+                                : <span className="bd-ans-skip">Timed out → {question.options[question.answer]}</span>
+                              }
+                            </div>
+                          </div>
+                          <button
+                            className="qr-bd-goto"
+                            onClick={() => {
+                              setShowBreakdown(false);
+                              setReviewMode(true);
+                              setDone(false);
+                              goTo(i);
+                            }}
+                          >Review</button>
+                        </div>
+                      );
+                    })}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ══ QUIT MODAL ══ */}
+      {/* ══════════ QUIT MODAL ══════════ */}
       {showQuitModal && (
-        <div style={{
-          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-          background: "rgba(0,0,0,0.55)", zIndex: 1100,
-          display: "flex", alignItems: "center", justifyContent: "center"
-        }}>
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.55)", zIndex: 1100, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <motion.div
             initial={{ scale: 0.88, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            style={{
-              background: "var(--card-bg, #fff)", padding: "28px 28px 24px",
-              borderRadius: "18px", width: "90%", maxWidth: "400px",
-              boxShadow: "0 16px 40px rgba(0,0,0,0.25)",
-              textAlign: "center",
-            }}
+            style={{ background: "var(--card-bg, #fff)", padding: "28px 28px 24px", borderRadius: 18, width: "90%", maxWidth: 400, boxShadow: "0 16px 40px rgba(0,0,0,0.25)", textAlign: "center" }}
           >
             <div style={{ fontSize: "2.4rem", marginBottom: 8 }}>🚪</div>
             <h3 style={{ margin: "0 0 8px", color: "var(--text, #0f172a)", fontSize: "1.15rem" }}>Leave Quiz?</h3>
@@ -672,18 +975,8 @@ export default function QuizPage() {
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {stage === "quiz" && (
                 <button
-                  onClick={() => {
-                    // progress is already persisted continuously — just navigate away
-                    setShowQuitModal(false);
-                    clearInterval(timerRef.current);
-                    setStage("selectCourse");
-                    setDone(false); setReviewMode(false);
-                  }}
-                  style={{
-                    padding: "11px 0", borderRadius: 10, border: "none",
-                    background: "linear-gradient(135deg,#4255ff,#7c3aed)",
-                    color: "#fff", fontWeight: 700, fontSize: "0.9rem", cursor: "pointer"
-                  }}
+                  onClick={() => { setShowQuitModal(false); clearInterval(timerRef.current); setStage("selectCourse"); setDone(false); setReviewMode(false); }}
+                  style={{ padding: "11px 0", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#4255ff,#7c3aed)", color: "#fff", fontWeight: 700, fontSize: "0.9rem", cursor: "pointer" }}
                 >
                   💾 Save Progress &amp; Exit
                 </button>
@@ -691,86 +984,46 @@ export default function QuizPage() {
               <button
                 onClick={() => {
                   localStorage.removeItem(storeKey);
-                  setShowQuitModal(false);
-                  clearInterval(timerRef.current);
-                  setStage("selectCourse");
-                  setDone(false); setReviewMode(false);
+                  setShowQuitModal(false); clearInterval(timerRef.current);
+                  setStage("selectCourse"); setDone(false); setReviewMode(false);
                   setQuestions([]); setAnswers([]); setFlagged([]);
                   setIdx(0); setSelAns(null); setLocked(false);
                   setScore(0); setStreak(0); setBestStreak(0); setTimeLeft(45);
                 }}
-                style={{
-                  padding: "11px 0", borderRadius: 10,
-                  border: "1.5px solid #fca5a5",
-                  background: "#fef2f2", color: "#ef4444",
-                  fontWeight: 700, fontSize: "0.9rem", cursor: "pointer"
-                }}
+                style={{ padding: "11px 0", borderRadius: 10, border: "1.5px solid #fca5a5", background: "#fef2f2", color: "#ef4444", fontWeight: 700, fontSize: "0.9rem", cursor: "pointer" }}
               >
                 🗑️ {stage === "quiz" ? "Discard Progress & Exit" : "Yes, Go Back"}
               </button>
               <button
                 onClick={() => setShowQuitModal(false)}
-                style={{
-                  padding: "9px 0", borderRadius: 10,
-                  border: "1px solid #e2e8f0",
-                  background: "var(--bg, #f8fafc)", color: "#64748b",
-                  fontWeight: 600, fontSize: "0.85rem", cursor: "pointer"
-                }}
-              >
-                Cancel
-              </button>
+                style={{ padding: "9px 0", borderRadius: 10, border: "1px solid #e2e8f0", background: "var(--bg, #f8fafc)", color: "#64748b", fontWeight: 600, fontSize: "0.85rem", cursor: "pointer" }}
+              >Cancel</button>
             </div>
           </motion.div>
         </div>
       )}
 
-      {/* ══ REPORT MODAL ══ */}
+      {/* ══════════ REPORT MODAL ══════════ */}
       {showReportModal && (
-        <div style={{
-          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-          background: "rgba(0,0,0,0.5)", zIndex: 1000,
-          display: "flex", alignItems: "center", justifyContent: "center"
-        }}>
-          <div style={{
-            background: "#fff", padding: "24px", borderRadius: "16px",
-            width: "90%", maxWidth: "400px", boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
-          }}>
-            <h3 style={{ margin: "0 0 16px 0", display: "flex", alignItems: "center", gap: "8px", color: "#0f172a" }}>
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ background: "#fff", padding: 24, borderRadius: 16, width: "90%", maxWidth: 400, boxShadow: "0 10px 25px rgba(0,0,0,0.2)" }}>
+            <h3 style={{ margin: "0 0 16px 0", display: "flex", alignItems: "center", gap: 8, color: "#0f172a" }}>
               <AlertTriangle size={20} color="#ef4444" /> Report Question
             </h3>
-            <p style={{ fontSize: "0.85rem", color: "#64748b", marginBottom: "16px" }}>
+            <p style={{ fontSize: "0.85rem", color: "#64748b", marginBottom: 16 }}>
               Please select the reason for reporting this question.
             </p>
-            
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "20px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
               {["Typo", "Wrong Answer"].map(reason => (
-                <label key={reason} style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "0.9rem", color: "#334155" }}>
-                  <input 
-                    type="radio" 
-                    name="reportReason" 
-                    value={reason}
-                    checked={reportReason === reason}
-                    onChange={(e) => setReportReason(e.target.value)}
-                    style={{ cursor: "pointer" }}
-                  />
+                <label key={reason} style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: "0.9rem", color: "#334155" }}>
+                  <input type="radio" name="reportReason" value={reason} checked={reportReason === reason} onChange={e => setReportReason(e.target.value)} style={{ cursor: "pointer" }} />
                   {reason}
                 </label>
               ))}
             </div>
-
-            <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
-              <button 
-                onClick={() => setShowReportModal(false)}
-                style={{ padding: "8px 16px", borderRadius: "8px", border: "1px solid #e2e8f0", background: "#f8fafc", cursor: "pointer", fontWeight: 600, color: "#64748b" }}
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={submitReport}
-                style={{ padding: "8px 16px", borderRadius: "8px", border: "none", background: "#ef4444", cursor: "pointer", fontWeight: 600, color: "white" }}
-              >
-                Submit Report
-              </button>
+            <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
+              <button onClick={() => setShowReportModal(false)} style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid #e2e8f0", background: "#f8fafc", cursor: "pointer", fontWeight: 600, color: "#64748b" }}>Cancel</button>
+              <button onClick={submitReport} style={{ padding: "8px 16px", borderRadius: 8, border: "none", background: "#ef4444", cursor: "pointer", fontWeight: 600, color: "white" }}>Submit Report</button>
             </div>
           </div>
         </div>
