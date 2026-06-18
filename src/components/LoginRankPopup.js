@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Trophy, TrendingUp, X, Zap, Flame, Star } from "lucide-react";
+import { Trophy, TrendingUp, X, Flame, Star } from "lucide-react";
 
 /* ──────────────────────────────────────────────────────────
    LoginRankPopup
