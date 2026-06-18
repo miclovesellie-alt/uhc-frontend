@@ -11,7 +11,7 @@ import { io } from "socket.io-client";
 import {
   Home, BookOpen, ClipboardList, User, LogOut,
   Search, BarChart2, ChevronRight, X, Bell, PenSquare, Trophy, Settings,
-  Volume2, VolumeX, Mail, Zap, Flame,
+  Volume2, VolumeX, Mail,
 } from "lucide-react";
 
 function EmailVerifyBanner({ email }) {
