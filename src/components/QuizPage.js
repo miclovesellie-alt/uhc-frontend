@@ -140,13 +140,22 @@ export default function QuizPage() {
   const kbStateRef = useRef({});
   kbStateRef.current = { stage, done, locked, selAns, paused, mode };
 
-  /* ─────────────────────────────────────────
-     POINTS
-  ───────────────────────────────────────── */
   const awardPoints = async (amount, reason, course, questionsAnswered, totalQuestions) => {
     try {
       const res = await api.post("points/add", { amount, reason, course, questionsAnswered, totalQuestions });
       if (user) setUser({ ...user, points: res.data.totalPoints });
+
+      // Dispatch rank toast event if rank changed (climbed)
+      if (res.data.rankAfter && res.data.rankBefore && res.data.rankAfter < res.data.rankBefore) {
+        const event = new CustomEvent("show-rank-toast", {
+          detail: {
+            rank: res.data.rankAfter,
+            overtook: res.data.overtook || 0,
+            gainedPoint: false
+          }
+        });
+        window.dispatchEvent(event);
+      }
     } catch (err) {
       console.error("Failed to award points", err);
     }
@@ -864,31 +873,361 @@ export default function QuizPage() {
               {pct >= 70 && (
                 <button className="quiz-btn secondary" onClick={() => {
                   const date = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
-                  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>UHC Certificate</title>
+                  const logoSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" style="width:100%;height:100%">
+                    <path d="M50,8 C75,8 85,18 85,45 C85,72 50,90 50,90 C50,90 15,72 15,45 C15,18 25,8 50,8 Z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+                    <!-- Graduation Cap -->
+                    <polygon points="50,11 68,17 50,23 32,17" fill="currentColor"/>
+                    <path d="M39,19.5 L39,23.5 C39,23.5 50,27 61,23.5 L61,19.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M50,17 L35,20 L35,26" fill="none" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/>
+                    <circle cx="35" cy="26.5" r="1" fill="currentColor"/>
+                    <!-- Medical Cross -->
+                    <path d="M47,34 H53 V39 H58 V45 H53 V50 H47 V45 H42 V39 H47 Z" fill="currentColor"/>
+                    <!-- Open Book -->
+                    <path d="M50,75 C37,67 24,76 24,76 L24,62 C24,62 37,53 50,61" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M50,75 C63,67 76,76 76,76 L76,62 C76,62 63,53 50,61" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M50,61 L50,75" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <!-- Book lines -->
+                    <line x1="30" y1="65" x2="44" y2="65" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+                    <line x1="30" y1="69" x2="44" y2="69" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+                    <line x1="56" y1="65" x2="70" y2="65" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+                    <line x1="56" y1="69" x2="70" y2="69" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+                    <!-- Syringe -->
+                    <rect x="37" y="80" width="26" height="4" rx="1" fill="currentColor"/>
+                    <line x1="25" y1="82" x2="37" y2="82" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+                    <line x1="25" y1="79.5" x2="25" y2="84.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="37" y1="78" x2="37" y2="86" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <polygon points="63,80.5 66,81 66,83 63,83.5" fill="currentColor"/>
+                    <line x1="66" y1="82" x2="74" y2="82" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/>
+                  </svg>`;
+
+                  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>UHC Certificate of Achievement</title>
+                  <link rel="preconnect" href="https://fonts.googleapis.com">
+                  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Montserrat:wght@400;500;600;700;800&family=Great+Vibes&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
                   <style>
-                    body{margin:0;font-family:'Georgia',serif;background:#f8fafc;display:flex;align-items:center;justify-content:center;min-height:100vh}
-                    .cert{width:760px;padding:60px;border:12px double #4255ff;background:white;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.15)}
-                    .logo{font-size:2.2rem;font-weight:900;color:#4255ff;letter-spacing:4px;margin-bottom:4px}
-                    .tagline{font-size:.85rem;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;margin-bottom:36px}
-                    h2{font-size:1.1rem;color:#64748b;font-weight:400;margin:0 0 8px}
-                    .name{font-size:2.6rem;color:#0f172a;font-weight:700;margin:8px 0 20px;border-bottom:2px solid #4255ff;padding-bottom:16px}
-                    .desc{font-size:1rem;color:#374151;line-height:1.7;margin-bottom:24px}
-                    .score{display:inline-block;padding:10px 28px;background:#4255ff;color:white;border-radius:99px;font-size:1.1rem;font-weight:700;margin-bottom:28px}
-                    .date{font-size:.85rem;color:#94a3b8;margin-top:24px}
-                    .seal{font-size:3rem;margin:20px 0 0}
-                    @media print{body{background:white}.cert{box-shadow:none;border-color:#4255ff}}
+                    :root {
+                      --uhc-green: #10b981;
+                      --uhc-green-dark: #059669;
+                      --uhc-green-light: #d1fae5;
+                      --uhc-green-pale: #f0fdf4;
+                      --text-dark: #0f172a;
+                      --text-muted: #475569;
+                    }
+                    body {
+                      margin: 0;
+                      padding: 0;
+                      background: #f1f5f9;
+                      font-family: 'Montserrat', sans-serif;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      min-height: 100vh;
+                      box-sizing: border-box;
+                    }
+                    .cert-card {
+                      width: 900px;
+                      height: 630px;
+                      background: #ffffff;
+                      box-sizing: border-box;
+                      position: relative;
+                      padding: 40px;
+                      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15);
+                      border-radius: 8px;
+                      overflow: hidden;
+                      display: flex;
+                      flex-direction: column;
+                      justify-content: space-between;
+                    }
+                    .cert-border-outer {
+                      position: absolute;
+                      top: 15px;
+                      left: 15px;
+                      right: 15px;
+                      bottom: 15px;
+                      border: 3px solid var(--uhc-green-dark);
+                      pointer-events: none;
+                      border-radius: 4px;
+                    }
+                    .cert-border-inner {
+                      position: absolute;
+                      top: 22px;
+                      left: 22px;
+                      right: 22px;
+                      bottom: 22px;
+                      border: 1px solid var(--uhc-green);
+                      pointer-events: none;
+                      border-radius: 2px;
+                    }
+                    .corner-ornament {
+                      position: absolute;
+                      width: 30px;
+                      height: 30px;
+                      border-color: var(--uhc-green-dark);
+                      border-style: solid;
+                      pointer-events: none;
+                    }
+                    .top-left { top: 28px; left: 28px; border-width: 3px 0 0 3px; }
+                    .top-right { top: 28px; right: 28px; border-width: 3px 3px 0 0; }
+                    .bottom-left { bottom: 28px; left: 28px; border-width: 0 0 3px 3px; }
+                    .bottom-right { bottom: 28px; right: 28px; border-width: 0 3px 3px 0; }
+                    
+                    .watermark-container {
+                      position: absolute;
+                      top: 50%;
+                      left: 50%;
+                      transform: translate(-50%, -50%);
+                      width: 320px;
+                      height: 320px;
+                      opacity: 0.05;
+                      pointer-events: none;
+                      z-index: 0;
+                      color: var(--uhc-green-dark);
+                    }
+                    
+                    .cert-content {
+                      position: relative;
+                      z-index: 1;
+                      height: 100%;
+                      display: flex;
+                      flex-direction: column;
+                      justify-content: space-between;
+                      align-items: center;
+                      text-align: center;
+                    }
+                    
+                    .cert-header {
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                      margin-top: 10px;
+                    }
+                    .header-logo-icon {
+                      width: 50px;
+                      height: 50px;
+                      color: var(--uhc-green);
+                      margin-bottom: 8px;
+                    }
+                    .header-title {
+                      font-size: 0.75rem;
+                      font-weight: 800;
+                      letter-spacing: 4px;
+                      color: var(--uhc-green-dark);
+                      text-transform: uppercase;
+                    }
+                    .header-subtitle {
+                      font-size: 0.6rem;
+                      font-weight: 500;
+                      letter-spacing: 2px;
+                      color: var(--text-muted);
+                      margin-top: 2px;
+                      text-transform: uppercase;
+                    }
+                    
+                    .cert-body {
+                      margin: 20px 0;
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                    }
+                    .cert-title {
+                      font-family: 'Cinzel', serif;
+                      font-size: 2.2rem;
+                      font-weight: 700;
+                      color: var(--text-dark);
+                      letter-spacing: 2px;
+                      margin-bottom: 5px;
+                    }
+                    .cert-award-to {
+                      font-size: 0.85rem;
+                      font-weight: 600;
+                      color: var(--text-muted);
+                      letter-spacing: 3px;
+                      text-transform: uppercase;
+                      margin: 15px 0 10px 0;
+                    }
+                    .recipient-name {
+                      font-family: 'Playfair Display', serif;
+                      font-size: 2.8rem;
+                      font-weight: 700;
+                      color: var(--text-dark);
+                      margin: 5px 0 15px 0;
+                      border-bottom: 2px solid var(--uhc-green);
+                      padding-bottom: 8px;
+                      min-width: 320px;
+                      display: inline-block;
+                    }
+                    .cert-description {
+                      font-size: 0.95rem;
+                      color: var(--text-muted);
+                      line-height: 1.6;
+                      max-width: 600px;
+                      font-weight: 500;
+                    }
+                    .course-title {
+                      color: var(--uhc-green-dark);
+                      font-weight: 700;
+                      font-size: 1.1rem;
+                    }
+                    .cert-score-badge {
+                      display: inline-flex;
+                      align-items: center;
+                      justify-content: center;
+                      margin-top: 15px;
+                      background: var(--uhc-green-pale);
+                      border: 1px solid var(--uhc-green-light);
+                      border-radius: 99px;
+                      padding: 6px 20px;
+                      font-size: 0.85rem;
+                      font-weight: 700;
+                      color: var(--uhc-green-dark);
+                    }
+                    
+                    .cert-footer {
+                      width: 100%;
+                      display: flex;
+                      justify-content: space-between;
+                      align-items: flex-end;
+                      padding: 0 40px;
+                      box-sizing: border-box;
+                      margin-bottom: 10px;
+                    }
+                    .footer-col {
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                      width: 200px;
+                    }
+                    .signature-line {
+                      width: 100%;
+                      border-bottom: 1px solid #cbd5e1;
+                      margin-bottom: 8px;
+                      display: flex;
+                      justify-content: center;
+                      height: 35px;
+                    }
+                    .signature-img {
+                      font-family: 'Great Vibes', cursive;
+                      font-size: 1.8rem;
+                      color: var(--uhc-green-dark);
+                      transform: translateY(-5px);
+                    }
+                    .footer-label {
+                      font-size: 0.65rem;
+                      font-weight: 600;
+                      color: var(--text-muted);
+                      letter-spacing: 1px;
+                      text-transform: uppercase;
+                    }
+                    .award-date {
+                      font-size: 0.7rem;
+                      font-weight: 700;
+                      color: var(--text-dark);
+                      margin-top: 4px;
+                    }
+                    
+                    .seal-col {
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                    }
+                    
+                    @media print {
+                      body {
+                        background: #ffffff;
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
+                      }
+                      .cert-card {
+                        box-shadow: none !important;
+                        border: none !important;
+                        width: 100vw;
+                        height: 100vh;
+                        padding: 40px;
+                      }
+                      @page {
+                        size: landscape;
+                        margin: 0;
+                      }
+                    }
                   </style></head><body>
-                  <div class="cert">
-                    <div class="logo">UHC</div>
-                    <div class="tagline">Universal Health Campus</div>
-                    <h2>This is to certify that</h2>
-                    <div class="name">${userName}</div>
-                    <div class="desc">has successfully completed the<br><strong>${selCourse}</strong><br>quiz assessment with distinction</div>
-                    <div class="score">Score: ${pct}% &nbsp;·&nbsp; ${finalScore}/${questions.length} correct</div>
-                    <div class="date">Awarded on ${date}</div>
-                    <div class="seal">🎓</div>
+                  <div class="cert-card">
+                    <div class="cert-border-outer"></div>
+                    <div class="cert-border-inner"></div>
+                    <div class="corner-ornament top-left"></div>
+                    <div class="corner-ornament top-right"></div>
+                    <div class="corner-ornament bottom-left"></div>
+                    <div class="corner-ornament bottom-right"></div>
+                    
+                    <div class="watermark-container">
+                      ${logoSvg}
+                    </div>
+                    
+                    <div class="cert-content">
+                      <div class="cert-header">
+                        <div class="header-logo-icon">
+                          ${logoSvg}
+                        </div>
+                        <div class="header-title">Universal Health Campus</div>
+                        <div class="header-subtitle">Empowering Healthcare Education</div>
+                      </div>
+                      
+                      <div class="cert-body">
+                        <div class="cert-title">Certificate of Achievement</div>
+                        <div class="cert-award-to">This is proudly presented to</div>
+                        <div class="recipient-name">${userName}</div>
+                        <div class="cert-description">
+                          for successfully completing the quiz assessment in<br>
+                          <span class="course-title">${selCourse}</span><br>
+                          demonstrating excellent academic performance.
+                        </div>
+                        <div class="cert-score-badge">
+                          Score: ${pct}% &nbsp;·&nbsp; ${finalScore}/${questions.length} Correct
+                        </div>
+                      </div>
+                      
+                      <div class="cert-footer">
+                        <div class="footer-col">
+                          <div class="signature-line" style="align-items: flex-end; justify-content: center;">
+                            <span class="award-date">${date}</span>
+                          </div>
+                          <span class="footer-label">Date of Issuance</span>
+                        </div>
+                        
+                        <div class="footer-col seal-col">
+                          <svg class="cert-seal" viewBox="0 0 100 100" width="90" height="90">
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="var(--uhc-green)" stroke-width="1.5" stroke-dasharray="3 2"/>
+                            <circle cx="50" cy="50" r="41" fill="none" stroke="var(--uhc-green-dark)" stroke-width="0.8"/>
+                            
+                            <path id="seal-text-path" d="M 18,50 A 32,32 0 1,1 82,50" fill="none" stroke="none"/>
+                            <text font-size="5" font-family="'Montserrat', sans-serif" font-weight="800" fill="var(--uhc-green-dark)" letter-spacing="1">
+                              <textPath href="#seal-text-path" startOffset="50%" text-anchor="middle">
+                                UNIVERSAL HEALTH CAMPUS
+                              </textPath>
+                            </text>
+                            
+                            <path id="seal-text-path-bottom" d="M 82,50 A 32,32 0 0,1 18,50" fill="none" stroke="none"/>
+                            <text font-size="5" font-family="'Montserrat', sans-serif" font-weight="800" fill="var(--uhc-green-dark)" letter-spacing="1">
+                              <textPath href="#seal-text-path-bottom" startOffset="50%" text-anchor="middle">
+                                SEAL OF EXCELLENCE
+                              </textPath>
+                            </text>
+                            
+                            <path d="M50,38 L63,42 L50,46 L37,42 Z" fill="var(--uhc-green)"/>
+                            <path d="M43,44.5 L43,47.5 C43,47.5 50,50.5 57,47.5 L57,44.5" fill="none" stroke="var(--uhc-green)" stroke-width="1" stroke-linecap="round"/>
+                            <path d="M48,51.5 H52 V54 H54.5 V58 H52 V60.5 H48 V58 H45.5 V54 H48 Z" fill="var(--uhc-green-dark)"/>
+                          </svg>
+                        </div>
+                        
+                        <div class="footer-col">
+                          <div class="signature-line" style="justify-content: center; align-items: flex-end;">
+                            <span class="signature-img">Academic Director</span>
+                          </div>
+                          <span class="footer-label">Authorized Signature</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <script>setTimeout(()=>window.print(),600)</script>
+                  <script>setTimeout(()=>window.print(),1000)</script>
                   </body></html>`;
                   const w = window.open("", "_blank");
                   w.document.write(html);
