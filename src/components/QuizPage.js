@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Flag, BookOpen, CheckCircle, Clock, AlertTriangle, Search, Pause, Play, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, Flag, BookOpen, CheckCircle, Clock, AlertTriangle, Search, Pause, Play, ChevronDown, ChevronUp, Share2, Copy, X } from "lucide-react";
 import { UserContext } from "../context/UserContext";
 import { useToast } from "./Toast";
 import "../styles/quiz.css";
@@ -130,6 +130,10 @@ export default function QuizPage() {
   const [reportReason, setReportReason] = useState("Typo");
   const [showQuitModal, setShowQuitModal] = useState(false);
   const [noSS, setNoSS] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareType, setShareType] = useState("score"); // "score" | "question"
+  const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
+  const [previewDataUrl, setPreviewDataUrl] = useState("");
 
   // ── Always-fresh refs for functions used in closures/effects ──
   const confirmAnswerRef = useRef(null);
@@ -452,6 +456,441 @@ export default function QuizPage() {
   const q = questions[idx];
   const finalScore = answers.filter((a, i) => a === questions[i]?.answer).length;
   const pct = questions.length ? Math.round((finalScore / questions.length) * 100) : 0;
+
+  const generateShareCanvas = (type, selectedIndex) => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1200;
+      canvas.height = 630;
+      const ctx = canvas.getContext("2d");
+
+      if (!questions || !questions.length) {
+        resolve(canvas);
+        return;
+      }
+
+      const isDark = document.body.classList.contains("dark-theme");
+      const primaryColor = "#4255ff";
+      const secondaryColor = "#7c3aed";
+      const cardBg = isDark ? "#1e293b" : "#ffffff";
+      const textColor = isDark ? "#f1f5f9" : "#0f172a";
+      const textMutedColor = isDark ? "#94a3b8" : "#475569";
+      const borderColor = isDark ? "#334155" : "#e2e8f0";
+      const badgeBg = isDark ? "rgba(66, 85, 255, 0.15)" : "rgba(66, 85, 255, 0.08)";
+
+      // 1. Draw Linear Gradient Background
+      const grad = ctx.createLinearGradient(0, 0, 1200, 630);
+      grad.addColorStop(0, primaryColor);
+      grad.addColorStop(1, secondaryColor);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1200, 630);
+
+      // 2. Draw Subtle Background Circles
+      ctx.fillStyle = "rgba(255, 255, 255, 0.06)";
+      ctx.beginPath();
+      ctx.arc(100, 100, 200, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(1100, 530, 250, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 3. Draw Shadowed Rounded Card Container
+      ctx.shadowColor = "rgba(0, 0, 0, 0.25)";
+      ctx.shadowBlur = 35;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 15;
+
+      const drawRoundRect = (x, y, w, h, r) => {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+        ctx.fill();
+      };
+
+      ctx.fillStyle = cardBg;
+      drawRoundRect(80, 50, 1040, 530, 24);
+
+      // Reset shadow
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+
+      // Helper function to draw SVG logo onto canvas
+      const drawLogoPromise = () => {
+        return new Promise((resolveLogo) => {
+          const img = new Image();
+          const logoColor = encodeURIComponent(isDark ? "#818cf8" : primaryColor);
+          const logoSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="50" height="50">
+            <path d="M50,8 C75,8 85,18 85,45 C85,72 50,90 50,90 C50,90 15,72 15,45 C15,18 25,8 50,8 Z" fill="none" stroke="${logoColor}" stroke-width="2.5" stroke-linejoin="round"/>
+            <polygon points="50,11 68,17 50,23 32,17" fill="${logoColor}"/>
+            <path d="M39,19.5 L39,23.5 C39,23.5 50,27 61,23.5 L61,19.5" fill="none" stroke="${logoColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M50,17 L35,20 L35,26" fill="none" stroke="${logoColor}" stroke-width="0.8" stroke-linecap="round"/>
+            <circle cx="35" cy="26.5" r="1" fill="${logoColor}"/>
+            <path d="M47,34 H53 V39 H58 V45 H53 V50 H47 V45 H42 V39 H47 Z" fill="${logoColor}"/>
+            <path d="M50,75 C37,67 24,76 24,76 L24,62 C24,62 37,53 50,61" fill="none" stroke="${logoColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M50,75 C63,67 76,76 76,76 L76,62 C76,62 63,53 50,61" fill="none" stroke="${logoColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M50,61 L50,75" fill="none" stroke="${logoColor}" stroke-width="2" stroke-linecap="round"/>
+          </svg>`;
+          img.src = "data:image/svg+xml;utf8," + logoSvg;
+          img.onload = () => {
+            ctx.drawImage(img, 130, 90, 56, 56);
+            resolveLogo();
+          };
+          img.onerror = () => resolveLogo();
+        });
+      };
+
+      drawLogoPromise().then(() => {
+        // Draw Header Text
+        ctx.fillStyle = isDark ? "#818cf8" : primaryColor;
+        ctx.font = "bold 22px system-ui, -apple-system, sans-serif";
+        ctx.fillText("UNIVERSAL HEALTH CAMPUS", 200, 115);
+
+        ctx.fillStyle = textMutedColor;
+        ctx.font = "14px system-ui, -apple-system, sans-serif";
+        ctx.fillText("Empowering Healthcare Education", 200, 140);
+
+        // Divider line
+        ctx.strokeStyle = borderColor;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(130, 170);
+        ctx.lineTo(1070, 170);
+        ctx.stroke();
+
+        if (type === "score") {
+          // --- SCORE CARD LAYOUT ---
+          ctx.fillStyle = textColor;
+          ctx.font = "bold 42px system-ui, -apple-system, sans-serif";
+          ctx.fillText("Quiz Achievement!", 130, 240);
+
+          ctx.fillStyle = textMutedColor;
+          ctx.font = "500 18px system-ui, -apple-system, sans-serif";
+          ctx.fillText("STUDENT", 130, 295);
+
+          ctx.fillStyle = isDark ? "#818cf8" : primaryColor;
+          ctx.font = "bold 34px system-ui, -apple-system, sans-serif";
+          ctx.fillText(userName, 130, 340);
+
+          ctx.fillStyle = textMutedColor;
+          ctx.font = "500 18px system-ui, -apple-system, sans-serif";
+          ctx.fillText("COURSE / TOPIC", 130, 400);
+
+          ctx.fillStyle = textColor;
+          ctx.font = "bold 26px system-ui, -apple-system, sans-serif";
+          const displayCourse = selCourse.length > 42 ? selCourse.slice(0, 42) + "..." : selCourse;
+          ctx.fillText(displayCourse, 130, 440);
+
+          // Draw bottom date & website link
+          ctx.fillStyle = textMutedColor;
+          ctx.font = "14px system-ui, -apple-system, sans-serif";
+          const dateStr = new Date().toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" });
+          ctx.fillText(dateStr + "  •  uhc-learning.com", 130, 520);
+
+          // Draw circular score ring on the right
+          const ringX = 860;
+          const ringY = 320;
+          const ringRadius = 90;
+
+          // Background gray ring
+          ctx.strokeStyle = isDark ? "#334155" : "#e2e8f0";
+          ctx.lineWidth = 18;
+          ctx.beginPath();
+          ctx.arc(ringX, ringY, ringRadius, 0, Math.PI * 2);
+          ctx.stroke();
+
+          // Active colored ring based on score
+          const pctColor = pct >= 70 ? "#10b981" : pct >= 50 ? "#f59e0b" : "#ef4444";
+          ctx.strokeStyle = pctColor;
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.arc(ringX, ringY, ringRadius, -Math.PI / 2, -Math.PI / 2 + (pct / 100) * Math.PI * 2);
+          ctx.stroke();
+
+          // Draw score text inside ring
+          ctx.fillStyle = textColor;
+          ctx.font = "bold 44px system-ui, -apple-system, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(`${pct}%`, ringX, ringY + 8);
+
+          ctx.fillStyle = textMutedColor;
+          ctx.font = "bold 16px system-ui, -apple-system, sans-serif";
+          ctx.fillText(`${finalScore}/${questions.length} Correct`, ringX, ringY + 36);
+
+          // Restore text alignment
+          ctx.textAlign = "left";
+
+        } else {
+          // --- QUIZ QUESTION LAYOUT ---
+          const qObj = questions[selectedIndex];
+          const userAns = answers[selectedIndex];
+          const isCorrect = userAns === qObj.answer;
+          const wasAnswered = userAns !== null;
+
+          // Draw Question badge
+          ctx.fillStyle = badgeBg;
+          drawRoundRect(130, 195, 180, 30, 15);
+          ctx.fillStyle = isDark ? "#818cf8" : primaryColor;
+          ctx.font = "bold 13px system-ui, -apple-system, sans-serif";
+          ctx.fillText(`QUESTION ${selectedIndex + 1} OF ${questions.length}`, 150, 215);
+
+          // Draw status badge
+          const statusText = isCorrect ? "CORRECT" : wasAnswered ? "INCORRECT" : "SKIPPED";
+          const statusColor = isCorrect ? "#10b981" : wasAnswered ? "#ef4444" : "#f59e0b";
+          const statusBg = isCorrect 
+            ? "rgba(16, 185, 129, 0.12)" 
+            : wasAnswered 
+              ? "rgba(239, 68, 68, 0.12)" 
+              : "rgba(245, 158, 11, 0.12)";
+          
+          ctx.fillStyle = statusBg;
+          drawRoundRect(325, 195, 110, 30, 15);
+          ctx.fillStyle = statusColor;
+          ctx.fillText(statusText, 345, 215);
+
+          // Draw Course name tag right-aligned
+          ctx.fillStyle = textMutedColor;
+          ctx.font = "italic 13px system-ui, -apple-system, sans-serif";
+          ctx.textAlign = "right";
+          const courseTag = selCourse.length > 40 ? selCourse.slice(0, 40) + "..." : selCourse;
+          ctx.fillText(courseTag, 1070, 215);
+          ctx.textAlign = "left";
+
+          // Wrap question text
+          ctx.fillStyle = textColor;
+          ctx.font = "bold 22px system-ui, -apple-system, sans-serif";
+          
+          const wrapText = (text, x, y, maxWidth, lineHeight) => {
+            const words = text.split(" ");
+            let line = "";
+            let currentY = y;
+            const lines = [];
+
+            for (let n = 0; n < words.length; n++) {
+              const testLine = line + words[n] + " ";
+              const metrics = ctx.measureText(testLine);
+              if (metrics.width > maxWidth && n > 0) {
+                lines.push(line);
+                line = words[n] + " ";
+              } else {
+                line = testLine;
+              }
+            }
+            lines.push(line);
+
+            const displayLines = lines.slice(0, 4);
+            displayLines.forEach((l, i) => {
+              if (i === 3 && lines.length > 4) {
+                ctx.fillText(l.trim() + "...", x, currentY);
+              } else {
+                ctx.fillText(l.trim(), x, currentY);
+              }
+              currentY += lineHeight;
+            });
+            return currentY;
+          };
+
+          const endQuestionY = wrapText(qObj.question, 130, 270, 940, 30);
+
+          // Draw Option box
+          const drawOptionBox = (yPos, titleText, optIndex, typeStyle) => {
+            const boxHeight = 65;
+            const boxWidth = 940;
+            const radius = 12;
+
+            let bColor = borderColor;
+            let bgColor = isDark ? "#0f172a" : "#f8fafc";
+            let optLetBg = isDark ? "#334155" : "#e2e8f0";
+            let optLetColor = textColor;
+
+            if (typeStyle === "correct") {
+              bColor = "#10b981";
+              bgColor = isDark ? "rgba(16, 185, 129, 0.12)" : "rgba(16, 185, 129, 0.05)";
+              optLetBg = "#10b981";
+              optLetColor = "#ffffff";
+            } else if (typeStyle === "wrong") {
+              bColor = "#ef4444";
+              bgColor = isDark ? "rgba(239, 68, 68, 0.12)" : "rgba(239, 68, 68, 0.05)";
+              optLetBg = "#ef4444";
+              optLetColor = "#ffffff";
+            }
+
+            ctx.strokeStyle = bColor;
+            ctx.fillStyle = bgColor;
+            ctx.lineWidth = 1.5;
+            drawRoundRect(130, yPos, boxWidth, boxHeight, radius);
+            ctx.stroke();
+
+            ctx.fillStyle = typeStyle === "correct" ? "#10b981" : typeStyle === "wrong" ? "#ef4444" : textMutedColor;
+            ctx.font = "bold 11px system-ui, -apple-system, sans-serif";
+            ctx.fillText(titleText, 145, yPos + 18);
+
+            const circleX = 160;
+            const circleY = yPos + 41;
+            ctx.fillStyle = optLetBg;
+            ctx.beginPath();
+            ctx.arc(circleX, circleY, 15, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = optLetColor;
+            ctx.font = "bold 13px system-ui, -apple-system, sans-serif";
+            ctx.textAlign = "center";
+            const optLetter = String.fromCharCode(65 + optIndex);
+            ctx.fillText(optLetter, circleX, circleY + 5);
+            ctx.textAlign = "left";
+
+            ctx.fillStyle = textColor;
+            ctx.font = "500 15px system-ui, -apple-system, sans-serif";
+            const fullText = qObj.options[optIndex] || "";
+            const optionText = fullText.length > 85 ? fullText.slice(0, 82) + "..." : fullText;
+            ctx.fillText(optionText, 190, yPos + 46);
+
+            const indicatorX = 1040;
+            const indicatorY = yPos + boxHeight / 2;
+            if (typeStyle === "correct") {
+              ctx.fillStyle = "#10b981";
+              ctx.beginPath();
+              ctx.arc(indicatorX, indicatorY, 12, 0, Math.PI * 2);
+              ctx.fill();
+              
+              ctx.strokeStyle = "#ffffff";
+              ctx.lineWidth = 2.5;
+              ctx.beginPath();
+              ctx.moveTo(indicatorX - 5, indicatorY);
+              ctx.lineTo(indicatorX - 1, indicatorY + 4);
+              ctx.lineTo(indicatorX + 5, indicatorY - 4);
+              ctx.stroke();
+            } else if (typeStyle === "wrong") {
+              ctx.fillStyle = "#ef4444";
+              ctx.beginPath();
+              ctx.arc(indicatorX, indicatorY, 12, 0, Math.PI * 2);
+              ctx.fill();
+
+              ctx.strokeStyle = "#ffffff";
+              ctx.lineWidth = 2.5;
+              ctx.beginPath();
+              ctx.moveTo(indicatorX - 4, indicatorY - 4);
+              ctx.lineTo(indicatorX + 4, indicatorY + 4);
+              ctx.moveTo(indicatorX + 4, indicatorY - 4);
+              ctx.lineTo(indicatorX - 4, indicatorY + 4);
+              ctx.stroke();
+            }
+          };
+
+          const box1Y = Math.min(endQuestionY + 15, 410);
+          if (wasAnswered) {
+            if (isCorrect) {
+              drawOptionBox(box1Y, "YOUR ANSWER (CORRECT)", userAns, "correct");
+            } else {
+              drawOptionBox(box1Y, "YOUR ANSWER (INCORRECT)", userAns, "wrong");
+              const box2Y = box1Y + 75;
+              drawOptionBox(box2Y, "CORRECT ANSWER", qObj.answer, "correct");
+            }
+          } else {
+            drawOptionBox(box1Y, "CORRECT ANSWER (YOU SKIPPED)", qObj.answer, "correct");
+          }
+
+          ctx.fillStyle = textMutedColor;
+          ctx.font = "14px system-ui, -apple-system, sans-serif";
+          ctx.fillText("Challenge your knowledge on uhc-learning.com", 130, 545);
+        }
+
+        resolve(canvas);
+      });
+    });
+  };
+
+  const handleNativeShare = () => {
+    generateShareCanvas(shareType, selectedQuestionIndex).then((canvas) => {
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        const file = new File([blob], "uhc_quiz_achievement.png", { type: "image/png" });
+        const shareText = shareType === "score" 
+          ? `I just scored ${pct}% in the ${selCourse} quiz on Universal Health Campus!`
+          : `Check out this interesting question from the ${selCourse} quiz on Universal Health Campus!`;
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({
+            files: [file],
+            title: "Universal Health Campus",
+            text: shareText,
+            url: window.location.origin
+          }).catch(err => {
+            console.log("Share failed:", err);
+            handleDownload();
+          });
+        } else {
+          handleDownload();
+        }
+      }, "image/png");
+    });
+  };
+
+  const handleDownload = () => {
+    generateShareCanvas(shareType, selectedQuestionIndex).then((canvas) => {
+      const link = document.createElement("a");
+      const cleanCourse = selCourse.replace(/[^a-zA-Z0-9]/g, "_");
+      link.download = `UHC_Quiz_${cleanCourse}_${shareType}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
+  };
+
+  const handleCopyImage = () => {
+    generateShareCanvas(shareType, selectedQuestionIndex).then((canvas) => {
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        try {
+          navigator.clipboard.write([
+            new ClipboardItem({ "image/png": blob })
+          ]).then(() => {
+            toast("Image copied to clipboard!", "success");
+          }).catch(err => {
+            console.error("Clipboard copy error:", err);
+            toast("Browser copy not supported. Try downloading instead.", "error");
+          });
+        } catch (e) {
+          toast("Browser copy not supported. Try downloading instead.", "error");
+        }
+      }, "image/png");
+    });
+  };
+
+  const getWhatsAppShareUrl = () => {
+    const text = shareType === "score"
+      ? `I scored ${pct}% in the ${selCourse} quiz! Try to beat my score:`
+      : `Check out this quiz on ${selCourse}:`;
+    return `https://api.whatsapp.com/send?text=${encodeURIComponent(text + " " + window.location.origin)}`;
+  };
+
+  const getFacebookShareUrl = () => {
+    return `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.origin)}`;
+  };
+
+  const getTwitterShareUrl = () => {
+    const text = shareType === "score"
+      ? `I scored ${pct}% in the ${selCourse} quiz on @UHC! beat my score:`
+      : `Try this medical quiz on ${selCourse}:`;
+    return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.origin)}`;
+  };
+
+  useEffect(() => {
+    if (showShareModal && done) {
+      generateShareCanvas(shareType, selectedQuestionIndex).then((canvas) => {
+        setPreviewDataUrl(canvas.toDataURL("image/png"));
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showShareModal, shareType, selectedQuestionIndex, done]);
 
   if (checkingQuizFlag) return null;
   if (quizDisabled) return <MaintenanceScreen pageName="Quiz / Questions" />;
@@ -866,6 +1305,13 @@ export default function QuizPage() {
 
             <div className="qr-actions">
               <button className="quiz-btn primary" onClick={() => handleReview(0)}>Review Answers</button>
+              <button className="quiz-btn share-btn" onClick={() => {
+                setShareType("score");
+                setSelectedQuestionIndex(0);
+                setShowShareModal(true);
+              }}>
+                <Share2 size={16} style={{ marginRight: 8, display: "inline-block", verticalAlign: "middle" }} /> Share Progress
+              </button>
               <button className="quiz-btn ghost" onClick={() => {
                 localStorage.removeItem(storeKey);
                 setStage("selectCourse"); setDone(false); setReviewMode(false);
@@ -1364,6 +1810,95 @@ export default function QuizPage() {
               <button onClick={() => setShowReportModal(false)} style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid #e2e8f0", background: "#f8fafc", cursor: "pointer", fontWeight: 600, color: "#64748b" }}>Cancel</button>
               <button onClick={submitReport} style={{ padding: "8px 16px", borderRadius: 8, border: "none", background: "#ef4444", cursor: "pointer", fontWeight: 600, color: "white" }}>Submit Report</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════ SHARE MODAL ══════════ */}
+      {showShareModal && (
+        <div className="quiz-share-overlay" onClick={() => setShowShareModal(false)}>
+          <div className="quiz-share-card" onClick={(e) => e.stopPropagation()}>
+            <div className="qsc-header">
+              <h3>Share Your Progress</h3>
+              <button className="qsc-close" onClick={() => setShowShareModal(false)}><X size={20} /></button>
+            </div>
+
+            <div className="qsc-tabs">
+              <button 
+                className={`qsc-tab ${shareType === "score" ? "active" : ""}`} 
+                onClick={() => setShareType("score")}
+              >
+                🏆 Score Card
+              </button>
+              <button 
+                className={`qsc-tab ${shareType === "question" ? "active" : ""}`} 
+                onClick={() => {
+                  setShareType("question");
+                  setSelectedQuestionIndex(0);
+                }}
+              >
+                ❓ Quiz Question
+              </button>
+            </div>
+
+            {shareType === "question" && (
+              <div className="qsc-question-selector">
+                <label>Select a question to share:</label>
+                <select 
+                  value={selectedQuestionIndex} 
+                  onChange={(e) => setSelectedQuestionIndex(parseInt(e.target.value))}
+                >
+                  {questions.map((qObj, idx) => (
+                    <option key={idx} value={idx}>
+                      Q{idx + 1}: {qObj.question.slice(0, 50)}...
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className="qsc-preview-container">
+              {previewDataUrl ? (
+                <img src={previewDataUrl} alt="Share preview" className="qsc-preview-img" />
+              ) : (
+                <div className="qsc-preview-loader">
+                  <div className="qsc-loader-spinner"></div>
+                  Generating preview...
+                </div>
+              )}
+            </div>
+
+            <div className="qsc-actions-grid">
+              <button className="quiz-btn primary" onClick={handleNativeShare}>
+                <Share2 size={16} style={{ marginRight: 8, display: "inline-block", verticalAlign: "middle" }} /> Share Card
+              </button>
+              <button className="quiz-btn ghost" onClick={handleDownload}>
+                Download PNG
+              </button>
+              <button className="quiz-btn ghost" onClick={handleCopyImage}>
+                <Copy size={16} style={{ marginRight: 8, display: "inline-block", verticalAlign: "middle" }} /> Copy Image
+              </button>
+            </div>
+
+            <div className="qsc-social-divider">
+              <span>Or share website link</span>
+            </div>
+
+            <div className="qsc-social-links">
+              <a href={getWhatsAppShareUrl()} target="_blank" rel="noopener noreferrer" className="qsc-social-btn whatsapp">
+                WhatsApp
+              </a>
+              <a href={getFacebookShareUrl()} target="_blank" rel="noopener noreferrer" className="qsc-social-btn facebook">
+                Facebook
+              </a>
+              <a href={getTwitterShareUrl()} target="_blank" rel="noopener noreferrer" className="qsc-social-btn twitter">
+                Twitter / X
+              </a>
+            </div>
+
+            <p className="qsc-ig-hint">
+              💡 <strong>Instagram/Snapchat Tip</strong>: Download the image to your gallery and upload it directly to your Stories or post!
+            </p>
           </div>
         </div>
       )}
