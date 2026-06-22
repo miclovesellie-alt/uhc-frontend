@@ -142,10 +142,10 @@ export default function AdminDashboard() {
 
   /* ── KPI cards ── */
   const kpi = [
-    { label:"Online Now",      value:presence?.onlineIds?.length||0,  icon:<Zap size={18}/>,      color:"green",  trend:"Live right now",      path:"/admin/users" },
+    { label:"Online Now",      value:presence?.onlineIds?.length||0,  icon:<Zap size={18}/>,      color:"green",  trend:"Live right now",      path:"/admin/users", state: { filter: "online" } },
     { label:"Total Users",     value:stats.totalUsers,                 icon:<Users size={18}/>,    color:"blue",   trend:"All time",            path:"/admin/users" },
     { label:"Total Questions", value:stats.totalQuestions,             icon:<BookOpen size={18}/>, color:"purple", trend:"In question bank",    path:"/admin/questions" },
-    { label:"Active (24h)",    value:stats.activeUsers,                icon:<Activity size={18}/>, color:"orange", trend:"Logged in today",     path:"/admin/users" },
+    { label:"Active (24h)",    value:stats.activeUsers,                icon:<Activity size={18}/>, color:"orange", trend:"Logged in today",     path:"/admin/users", state: { filter: "active" } },
     { label:"Library Books",   value:stats.totalBooks,                 icon:<Library size={18}/>,  color:"blue",   trend:"Total books",         path:"/admin/userlibrary" },
     { label:"Study Hub Items", value:stats.totalStudyHub,              icon:<Layers size={18}/>,   color:"green",  trend:"Cards + Notes + Links",path:"/admin/userlibrary" },
   ];
@@ -183,7 +183,7 @@ export default function AdminDashboard() {
       {/* ── KPI Cards ── */}
       <div className="admin-stats-grid">
         {kpi.map((k,i) => (
-          <div className="admin-stat-card" key={i} onClick={() => k.path && navigate(k.path)} style={{cursor:k.path?"pointer":"default"}}>
+          <div className="admin-stat-card" key={i} onClick={() => k.path && navigate(k.path, { state: k.state })} style={{cursor:k.path?"pointer":"default"}}>
             <div className={`admin-stat-icon ${k.color}`}>{k.icon}</div>
             <div className="admin-stat-value"><CountUp to={k.value}/></div>
             <div className="admin-stat-label">{k.label}</div>
@@ -369,7 +369,7 @@ export default function AdminDashboard() {
                 </div>
                 <div style={{flex:1}}>
                   <div style={{fontSize:".81rem",lineHeight:1.4}}>
-                    <strong style={{color:"var(--admin-text)"}}>{log.admin?.name||"Admin"}</strong>{" "}{log.message}
+                    <strong style={{color:"var(--admin-text)"}}>{log.admin?.name||"Admin"}</strong>{" "}{log.action?.replace(/_/g," ").toLowerCase()}
                   </div>
                   <div style={{fontSize:".68rem",color:"var(--admin-muted)",marginTop:3}}>
                     {new Date(log.createdAt).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})} · {log.action?.replace(/_/g," ")}
