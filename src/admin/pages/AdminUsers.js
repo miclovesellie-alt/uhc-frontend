@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useLocation } from "react-router-dom";
 import api from "../../api/api";
 import { Search, Shield, Ban, Key, Trash2, RefreshCw, Eye, EyeOff, Download, Clock, CheckSquare, Square, Edit, Mail, Send } from "lucide-react";
 import { UserContext } from "../../context/UserContext";
@@ -49,6 +49,7 @@ export default function AdminUsers() {
   const { presence } = useOutletContext() || {};
   const { user: currentUser } = useContext(UserContext);
   const { showToast, ToastEl } = useToast();
+  const location = useLocation();
 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -77,6 +78,12 @@ export default function AdminUsers() {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fetchUsers(); }, []);
+
+  useEffect(() => {
+    if (location.state?.filter) {
+      setFilter(location.state.filter);
+    }
+  }, [location.state]);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -186,7 +193,8 @@ export default function AdminUsers() {
       if (filter==="admins")    return u.role==="admin";
       if (filter==="banned")    return u.status==="banned";
       if (filter==="suspended") return u.status==="suspended";
-      if (filter==="active")    return u.status!=="banned"&&u.status!=="suspended";
+      if (filter==="active")    return u.lastLogin && (new Date(u.lastLogin) >= new Date(Date.now() - 24 * 60 * 60 * 1000));
+      if (filter==="online")    return presence?.onlineIds?.includes(u._id);
       return true;
     })
     .filter(u => `${u.name} ${u.email}`.toLowerCase().includes(search.toLowerCase()))
@@ -238,7 +246,8 @@ export default function AdminUsers() {
         </div>
         <select className="admin-select" value={filter} onChange={e=>{setFilter(e.target.value);setPage(1);}}>
           <option value="all">All Users</option>
-          <option value="active">Active</option>
+          <option value="active">Active (Last 24h)</option>
+          <option value="online">Online Now</option>
           <option value="admins">Admins</option>
           <option value="banned">Banned</option>
           <option value="suspended">Suspended</option>
