@@ -851,7 +851,7 @@ export default function QuizPage() {
         if (!blob) return;
         try {
           navigator.clipboard.write([
-            new ClipboardItem({ "image/png": blob })
+            new window.ClipboardItem({ "image/png": blob })
           ]).then(() => {
             toast("Image copied to clipboard!", "success");
           }).catch(err => {
