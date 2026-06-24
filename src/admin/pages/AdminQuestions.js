@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Plus, Search, Edit2, Trash2, BookOpen, ChevronDown, ChevronUp, Copy, AlertTriangle, Pencil, MoveRight, FileDown, BookmarkX, ClipboardCopy } from "lucide-react";
 import api from "../../api/api";
@@ -271,7 +271,7 @@ export default function AdminQuestions() {
     const newCourse = inlineEditCourseVal.trim();
     if (!newCourse) { setInlineEditCourse(null); return; }
     try {
-      const res = await api.put(`admin/questions/${questionId}`, { ...questions.find(q => q._id === questionId), course: newCourse });
+      await api.put(`admin/questions/${questionId}`, { ...questions.find(q => q._id === questionId), course: newCourse });
       setQuestions(prev => prev.map(q => q._id === questionId ? { ...q, course: newCourse } : q));
       showToast(`Course updated to "${newCourse}"`);
       fetchCourseCounts();

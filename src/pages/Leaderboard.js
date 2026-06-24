@@ -6,40 +6,7 @@ const medal = ["🥇", "🥈", "🥉"];
 const ROW_HEIGHT = 68;
 const VISIBLE_BUFFER = 5;
 
-/* ─── Virtual list ─── */
-function VirtualList({ items, renderItem, containerHeight }) {
-  const [scrollTop, setScrollTop] = useState(0);
-  const ref = useRef(null);
 
-  const totalHeight = items.length * ROW_HEIGHT;
-  const startIndex = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - VISIBLE_BUFFER);
-  const visibleCount = Math.ceil(containerHeight / ROW_HEIGHT) + VISIBLE_BUFFER * 2;
-  const endIndex = Math.min(items.length, startIndex + visibleCount);
-
-  const onScroll = (e) => setScrollTop(e.target.scrollTop);
-
-  return (
-    <div
-      ref={ref}
-      onScroll={onScroll}
-      style={{ height: containerHeight, overflowY: "auto", position: "relative" }}
-    >
-      <div style={{ height: totalHeight, position: "relative" }}>
-        {items.slice(startIndex, endIndex).map((item, relIdx) => {
-          const absIdx = startIndex + relIdx;
-          return (
-            <div
-              key={item._id}
-              style={{ position: "absolute", top: absIdx * ROW_HEIGHT, left: 0, right: 0, height: ROW_HEIGHT, padding: "4px 0" }}
-            >
-              {renderItem(item, absIdx)}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
 
 export default function Leaderboard() {
   const [users, setUsers] = useState([]);

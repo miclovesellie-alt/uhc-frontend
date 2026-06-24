@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../../api/api";
-import { Upload, FileText, CheckCircle, AlertCircle, X, BookOpen, Plus, ChevronRight } from "lucide-react";
+import { Upload, FileText, CheckCircle, AlertCircle, X, BookOpen, Plus } from "lucide-react";
 import "../../admin_styles/BulkUpload.css";
 
 export default function BulkUpload() {
@@ -16,7 +16,6 @@ export default function BulkUpload() {
   const [coursesFromDB, setCoursesFromDB] = useState([]);
   const [courseSearch, setCourseSearch] = useState("");
   const [creatingCourse, setCreatingCourse] = useState(false);
-  const [courseReady, setCourseReady] = useState(false); // true when a valid course is confirmed
 
   useEffect(() => {
     fetchCourses();
@@ -44,7 +43,6 @@ export default function BulkUpload() {
           setQuestions(data.questions);
           setJsonInput(JSON.stringify(data, null, 2));
           setStatus(null);
-          setCourseReady(false);
         } else {
           throw new Error("Invalid format. Expected { questions: [...] }");
         }
@@ -63,7 +61,6 @@ export default function BulkUpload() {
       if (data.questions && Array.isArray(data.questions)) {
         setQuestions(data.questions);
         setStatus(null);
-        setCourseReady(false);
       }
     } catch {
       // Don't set error while typing
