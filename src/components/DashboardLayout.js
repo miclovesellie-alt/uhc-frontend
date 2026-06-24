@@ -3,7 +3,6 @@ import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 import api from "../api/api";
 import OnboardingTour from "./OnboardingTour";
-import LoginRankPopup from "./LoginRankPopup";
 import "../styles/dashboard.css";
 import { isSoundEnabled, setSoundEnabled, playNavigate } from "../utils/sounds";
 import { io } from "socket.io-client";
@@ -43,12 +42,12 @@ function EmailVerifyBanner({ email }) {
       flexWrap: "wrap",
       boxShadow: "0 2px 8px rgba(245,158,11,0.12)",
     }}>
-      <span style={{ fontSize: "1.2rem", flexShrink: 0 }}>??</span>
+      <span style={{ fontSize: "1.2rem", flexShrink: 0 }}>⚠️</span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <strong style={{ color: "#92400e", fontSize: "0.88rem" }}>Verify your email address</strong>
         <div style={{ color: "#b45309", fontSize: "0.8rem", marginTop: 2 }}>
           {sent
-            ? `? Verification link sent to ${email}. Check your inbox.`
+            ? `✅ Verification link sent to ${email}. Check your inbox.`
             : `Your account email (${email}) is unverified. Verify it to keep full access.`
           }
         </div>
@@ -63,14 +62,14 @@ function EmailVerifyBanner({ email }) {
             cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap",
           }}
         >
-          {loading ? "Sending." : "Send Verification Email"}
+          {loading ? "Sending…" : "Send Verification Email"}
         </button>
       )}
       <button
         onClick={() => setDismissed(true)}
         style={{ background: "none", border: "none", cursor: "pointer", color: "#b45309", fontSize: "1rem", flexShrink: 0, padding: "4px" }}
         title="Dismiss"
-      >?</button>
+      >✕</button>
     </div>
   );
 }
@@ -100,7 +99,7 @@ function DashboardLayout() {
   const [msgBody,      setMsgBody]      = useState("");
   const [msgSending,   setMsgSending]   = useState(false);
 
-  // ?? Login Rank Popup ??
+  // ── Login Rank Popup ──
   const [rankPopup, setRankPopup] = useState(null); // {rank,overtook,gainedPoint,streak,points}
   const [msgSent,      setMsgSent]      = useState(false);
   const [msgError,     setMsgError]     = useState("");
@@ -115,17 +114,34 @@ function DashboardLayout() {
     } catch {}
   };
 
-  // Show rank popup once per session after login
+  // Show rank popup once per session after login, or dynamically when rank climbs
   useEffect(() => {
     const raw = sessionStorage.getItem("pendingRankData");
-    if (!raw) return;
-    try {
-      const data = JSON.parse(raw);
-      sessionStorage.removeItem("pendingRankData");
-      // Small delay so the dashboard renders first
-      setTimeout(() => setRankPopup(data), 900);
-    } catch { sessionStorage.removeItem("pendingRankData"); }
+    if (raw) {
+      try {
+        const data = JSON.parse(raw);
+        sessionStorage.removeItem("pendingRankData");
+        // Small delay so the dashboard renders first
+        setTimeout(() => setRankPopup(data), 900);
+      } catch { sessionStorage.removeItem("pendingRankData"); }
+    }
+
+    const handleRankToast = (e) => {
+      if (e.detail) {
+        setRankPopup(e.detail);
+      }
+    };
+    window.addEventListener("show-rank-toast", handleRankToast);
+    return () => window.removeEventListener("show-rank-toast", handleRankToast);
   }, []);
+
+  // Auto-dismiss the rank toast after 5 seconds
+  useEffect(() => {
+    if (rankPopup) {
+      const timer = setTimeout(() => setRankPopup(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [rankPopup]);
 
   useEffect(() => {
     if (!user?._id) return;
@@ -151,8 +167,6 @@ function DashboardLayout() {
   };
 
   const isActive = (path) => location.pathname === path;
-
-  const userObj = user || null;
 
   const avatarColor = (name = "") => {
     const cols = ["#4255ff","#8b5cf6","#ec4899","#f59e0b","#10b981","#06b6d4"];
@@ -227,7 +241,7 @@ function DashboardLayout() {
 
       {/* ===== TOP NAVBAR ===== */}
       <div className="dashboard-topbar">
-        {/* Home for mobile - replaces old logout position */}
+        {/* Home for mobile — replaces old logout position */}
         <button
           className="topbar-hamburger"
           onClick={() => navigate('/dashboard')}
@@ -322,7 +336,7 @@ function DashboardLayout() {
             )}
           </button>
 
-          {/* Settings icon - replaces letter avatar */}
+          {/* Settings icon — replaces letter avatar */}
           <button
             className="topbar-avatar-btn"
             onClick={() => navigate("/profile")}
@@ -377,8 +391,8 @@ function DashboardLayout() {
             Log out
           </button>
 
-          {/* ?? Rank / Streak / Points Mini Widget ?? */}
-          {userObj && (
+          {/* ── MY STATS Widget ── */}
+          {user && (
             <div style={{
               margin: "8px 0",
               background: "linear-gradient(135deg,rgba(66,85,255,.08),rgba(139,92,246,.06))",
@@ -398,13 +412,13 @@ function DashboardLayout() {
                 <ChevronRight size={12} style={{ color: "#939bb4" }}/>
               </div>
               <div style={{ display: "flex", gap: 6 }}>
-                <div style={{ flex: 1, background: "var(--surface)", borderRadius: 9, padding: "6px 0", textAlign: "center", border: "1px solid var(--border)" }}>
-                  <div style={{ fontSize: ".88rem", fontWeight: 900, color: "#4255ff" }}>{userObj.points || 0}</div>
+                <div style={{ flex: 1, background: "white", borderRadius: 9, padding: "6px 0", textAlign: "center", border: "1px solid var(--border)" }}>
+                  <div style={{ fontSize: ".88rem", fontWeight: 900, color: "#4255ff" }}>{user.points || 0}</div>
                   <div style={{ fontSize: ".58rem", color: "var(--text-muted)", fontWeight: 600 }}>PTS</div>
                 </div>
-                <div style={{ flex: 1, background: "var(--surface)", borderRadius: 9, padding: "6px 0", textAlign: "center", border: "1px solid var(--border)" }}>
+                <div style={{ flex: 1, background: "white", borderRadius: 9, padding: "6px 0", textAlign: "center", border: "1px solid var(--border)" }}>
                   <div style={{ fontSize: ".88rem", fontWeight: 900, color: "#f59e0b" }}>
-                    {(userObj.streak || 0) > 0 ? `??${userObj.streak}` : "-"}
+                    {(user.streak || 0) > 0 ? `🔥${user.streak}` : "—"}
                   </div>
                   <div style={{ fontSize: ".58rem", color: "var(--text-muted)", fontWeight: 600 }}>STREAK</div>
                 </div>
@@ -413,20 +427,20 @@ function DashboardLayout() {
           )}
 
           {/* Profile mini card at bottom */}
-          {userObj && (
+          {user && (
             <div className="sidebar-profile-mini" onClick={() => navigate("/profile")}>
               <div style={{
                 width: 34, height: 34, borderRadius: "50%",
-                background: avatarColor(userObj.name || ""),
+                background: avatarColor(user.name || ""),
                 display: "flex", alignItems: "center", justifyContent: "center",
                 color: "white", fontWeight: 800, fontSize: ".9rem",
                 flexShrink: 0,
               }}>
-                {(userObj.name || "U")[0].toUpperCase()}
+                {(user.name || "U")[0].toUpperCase()}
               </div>
               <div className="sidebar-profile-mini-info">
-                <div className="sidebar-profile-mini-name">{userObj.name || "User"}</div>
-                <div className="sidebar-profile-mini-role">{userObj.category || "Member"}</div>
+                <div className="sidebar-profile-mini-name">{user.name || "User"}</div>
+                <div className="sidebar-profile-mini-role">{user.category || "Member"}</div>
               </div>
               <ChevronRight size={14} style={{ color: "#939bb4", flexShrink: 0 }} />
             </div>
@@ -438,14 +452,14 @@ function DashboardLayout() {
           {/* Announcement Banner */}
           {announcement && !announcementDismissed && (
             <div className="uhc-announcement">
-              <span>??&nbsp;&nbsp;{announcement}</span>
-              <button className="uhc-announcement__close" onClick={() => setAnnouncementDismissed(true)}>?</button>
+              <span>📢&nbsp;&nbsp;{announcement}</span>
+              <button className="uhc-announcement__close" onClick={() => setAnnouncementDismissed(true)}>✕</button>
             </div>
           )}
 
-          {/* ?? Email Verification Caution Banner ?? */}
-          {userObj && !userObj.isEmailVerified && (
-            <EmailVerifyBanner email={userObj.email} />
+          {/* ── Email Verification Caution Banner ── */}
+          {user && !user.isEmailVerified && (
+            <EmailVerifyBanner email={user.email} />
           )}
 
           <Outlet context={{ searchQuery }} />
@@ -616,7 +630,7 @@ function DashboardLayout() {
                             {m.adminReply ? (
                               <div style={{ background: "rgba(66,85,255,0.06)", padding: 12, borderRadius: 10, border: "1px solid rgba(66,85,255,0.15)", marginBottom: 12 }}>
                                 <div style={{ fontWeight: 700, fontSize: "0.78rem", color: "var(--accent)", display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
-                                  <span>?? Admin Reply:</span>
+                                  <span>👤 Admin Reply:</span>
                                 </div>
                                 <div style={{ fontSize: "0.82rem", color: "var(--text-heading)", lineHeight: 1.4 }}>
                                   {m.adminReply}
@@ -627,7 +641,7 @@ function DashboardLayout() {
                               </div>
                             ) : (
                               <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", fontStyle: "italic", marginBottom: 12 }}>
-                                Waiting for admin reply.
+                                Waiting for admin reply…
                               </div>
                             )}
                             
@@ -661,7 +675,7 @@ function DashboardLayout() {
 
       {/* ===== MOBILE BOTTOM NAV ===== */}
       <nav className="uhc-bottom-nav" aria-label="Main navigation">
-        {/* Skip Home (now in topbar), show Study Hub ? Ranks */}
+        {/* Skip Home (now in topbar), show Study Hub → Ranks */}
         {navItems.slice(1, 5).map((item) => (
           <button
             key={item.path}
@@ -718,7 +732,7 @@ function DashboardLayout() {
             </div>
             {msgSent ? (
               <div style={{ textAlign:"center", padding:"20px 0" }}>
-                <div style={{ fontSize:"2rem", marginBottom:8 }}>?</div>
+                <div style={{ fontSize:"2rem", marginBottom:8 }}>✅</div>
                 <div style={{ fontWeight:800, color:"#16a34a" }}>Message Sent!</div>
                 <div style={{ fontSize:".8rem", color:"var(--text-muted)", marginTop:4 }}>Admin will reply via email and notification.</div>
               </div>
@@ -763,7 +777,7 @@ function DashboardLayout() {
                 />
 
                 <textarea
-                  placeholder={msgCategory ? "Your message." : "Please select a category first..."}
+                  placeholder={msgCategory ? "Your message…" : "Please select a category first..."}
                   value={msgBody}
                   rows={4}
                   disabled={!msgCategory}
@@ -791,7 +805,7 @@ function DashboardLayout() {
                     cursor: (msgSending || !msgCategory || !msgBody.trim()) ? "not-allowed" : "pointer"
                   }}
                 >
-                  {msgSending ? "Sending." : "Send Message"}
+                  {msgSending ? "Sending…" : "Send Message"}
                 </button>
               </>
             )}
@@ -799,22 +813,55 @@ function DashboardLayout() {
         </div>
       )}
 
-      <style>{`@keyframes slideUp { from { transform:translateY(100%); opacity:0; } to { transform:translateY(0); opacity:1; } }`}</style>
+      <style>{`
+        @keyframes slideUp { from { transform:translateY(100%); opacity:0; } to { transform:translateY(0); opacity:1; } }
+        @keyframes rankToastIn { from { transform:translateX(-50%) translateY(-20px); opacity:0; } to { transform:translateX(-50%) translateY(0); opacity:1; } }
+      `}</style>
 
       {/* ===== ONBOARDING TOUR ===== */}
       {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}
 
-      {/* ===== LOGIN RANK POPUP ===== */}
+      {/* ===== RANK TOAST ===== */}
       {rankPopup && (
-        <LoginRankPopup
-          rank={rankPopup.rank}
-          overtook={rankPopup.overtook}
-          gainedPoint={rankPopup.gainedPoint}
-          streak={rankPopup.streak || userObj?.streak || 0}
-          points={rankPopup.points || userObj?.points || 0}
-          onClose={() => setRankPopup(null)}
-          onLeaderboard={() => navigate("/leaderboard")}
-        />
+        <div style={{
+          position: "fixed",
+          top: 72, left: "50%",
+          zIndex: 99999,
+          animation: "rankToastIn .4s cubic-bezier(.34,1.56,.64,1)",
+          transform: "translateX(-50%)",
+          whiteSpace: "nowrap",
+        }}>
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 10,
+            background: rankPopup.overtook > 0
+              ? "linear-gradient(135deg,#f59e0b,#ef4444)"
+              : "linear-gradient(135deg,#4255ff,#8b5cf6)",
+            color: "white",
+            padding: "11px 20px 11px 16px",
+            borderRadius: 40,
+            fontWeight: 700, fontSize: ".88rem",
+            boxShadow: "0 8px 32px rgba(0,0,0,.2), 0 0 0 1.5px rgba(255,255,255,.15)",
+            fontFamily: "var(--font)",
+          }}>
+            <span style={{ fontSize: "1.1rem" }}>
+              {rankPopup.overtook > 0 ? "⚡" : "🏆"}
+            </span>
+            {rankPopup.overtook > 0
+              ? `You climbed to #${rankPopup.rank}! Overtook ${rankPopup.overtook} ${rankPopup.overtook === 1 ? "person" : "people"}`
+              : `You're ranked #${rankPopup.rank} on the leaderboard`
+            }
+            {rankPopup.gainedPoint && (
+              <span style={{ background: "rgba(255,255,255,.25)", borderRadius: 20, padding: "2px 8px", fontSize: ".75rem" }}>
+                +1 pt
+              </span>
+            )}
+            <button
+              onClick={() => setRankPopup(null)}
+              style={{ background: "none", border: "none", color: "white", cursor: "pointer",
+                fontWeight: 900, fontSize: "1rem", lineHeight: 1, padding: 0, opacity: .7 }}
+            >×</button>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -1322,7 +1322,7 @@
 .uhc-bottom-nav__item.active { color: var(--accent); }
 .uhc-bottom-nav__item svg { width: 20px; height: 20px; }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .uhc-bottom-nav { display: flex; }
   .dashboard-sidebar { display: none !important; }
   .dashboard-content { padding: 20px 16px 80px; }
@@ -1330,6 +1330,7 @@
   .uhc-stats-bar__item { min-width: 50%; border-bottom: 1px solid var(--border); }
   .uhc-stats-bar__item:nth-child(odd) { border-right: 1px solid var(--border); }
   .uhc-stats-bar__item:nth-last-child(-n+2) { border-bottom: none; }
+  .topbar-hamburger { display: flex; }
 }
 
 /* ── Bookmarked Post Button ── */

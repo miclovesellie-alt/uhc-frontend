@@ -54,6 +54,18 @@ export default function FYP({ refresh }) {
       const res = await api.post("points/add", { amount, reason });
       // Update local user context so profile shows new points
       if (user) setUser({ ...user, points: res.data.totalPoints });
+
+      // Dispatch rank toast event if rank changed (climbed)
+      if (res.data.rankAfter && res.data.rankBefore && res.data.rankAfter < res.data.rankBefore) {
+        const event = new CustomEvent("show-rank-toast", {
+          detail: {
+            rank: res.data.rankAfter,
+            overtook: res.data.overtook || 0,
+            gainedPoint: false
+          }
+        });
+        window.dispatchEvent(event);
+      }
     } catch (err) {
       console.error("Failed to award points", err);
     }

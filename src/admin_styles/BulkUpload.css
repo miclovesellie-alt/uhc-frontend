@@ -77,6 +77,186 @@
   border-color: var(--admin-accent);
 }
 
+/* ══════════════════════════════════════════
+   Course Assignment Panel
+══════════════════════════════════════════ */
+.course-assignment-panel {
+  background: var(--admin-card-bg);
+  border: 2px solid rgba(66, 85, 255, 0.25);
+  border-radius: 18px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: panelSlideIn 0.3s ease;
+}
+
+@keyframes panelSlideIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.course-assignment-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.course-assignment-header svg {
+  color: #4255ff;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.course-assignment-header h3 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  color: var(--admin-text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.course-assignment-header p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--admin-muted);
+}
+
+/* Mode toggle */
+.course-mode-toggle {
+  display: flex;
+  gap: 8px;
+  background: var(--admin-bg, #f1f5f9);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid var(--admin-border);
+}
+
+.course-mode-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 16px;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  color: var(--admin-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.course-mode-btn.active {
+  background: var(--admin-card-bg, #ffffff);
+  color: #4255ff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Course picker */
+.course-picker-area {
+  display: flex;
+  flex-direction: column;
+}
+
+.course-picker-list {
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-right: 2px;
+}
+
+.course-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--admin-border);
+  background: var(--admin-bg, #f8fafc);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 0.875rem;
+  color: var(--admin-text);
+  font-weight: 500;
+}
+
+.course-picker-row:hover {
+  border-color: #4255ff;
+  background: rgba(66, 85, 255, 0.04);
+}
+
+.course-picker-row.selected {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.06);
+  color: #065f46;
+  font-weight: 600;
+}
+
+.course-radio {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--admin-border);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s;
+}
+
+.course-picker-row.selected .course-radio {
+  border-color: #10b981;
+  background: #10b981;
+}
+
+.course-radio-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: white;
+}
+
+/* New course input */
+.new-course-input-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Confirmed / warning bars */
+.course-confirmed-bar,
+.course-warning-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 16px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.course-confirmed-bar {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #065f46;
+}
+
+.course-warning-bar {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: #92400e;
+}
+
+/* ══════════════════════════════════════════
+   Status Banner
+══════════════════════════════════════════ */
 .status-banner {
   display: flex;
   align-items: center;
@@ -113,6 +293,9 @@
   opacity: 1;
 }
 
+/* ══════════════════════════════════════════
+   Preview Table
+══════════════════════════════════════════ */
 .preview-section {
   margin-top: 12px;
 }
@@ -122,6 +305,12 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+}
+
+.preview-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--admin-text);
 }
 
 .preview-table-wrapper {
@@ -175,6 +364,9 @@
   background: rgba(255, 255, 255, 0.01);
 }
 
+/* ══════════════════════════════════════════
+   Responsive
+══════════════════════════════════════════ */
 @media (max-width: 768px) {
   .upload-options {
     grid-template-columns: 1fr;
@@ -188,6 +380,9 @@
     width: 100%;
   }
   .preview-table th:nth-child(4), .preview-table td:nth-child(4) {
-    display: none; /* Hide options on mobile preview to save space */
+    display: none;
+  }
+  .course-mode-toggle {
+    flex-direction: column;
   }
 }

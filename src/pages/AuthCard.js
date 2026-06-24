@@ -51,14 +51,14 @@ function AuthCard() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const HealthSplash = () => {
-    const icons = ["??","??","??","??","??","??","??","??","??","??"];
+    const icons = ["🩺","📚","💊","🏥","🧬","📖","❤️","🔬","🩻","🎓"];
     const [iconIdx, setIconIdx] = React.useState(0);
     const [tipIdx, setTipIdx]   = React.useState(0);
     const tips = [
-      "Preparing your dashboard.",
-      "Loading study resources.",
-      "Syncing your progress.",
-      "Almost there! ??",
+      "Preparing your dashboard…",
+      "Loading study resources…",
+      "Syncing your progress…",
+      "Almost there! 🎓",
     ];
     React.useEffect(() => {
       const i = setInterval(() => setIconIdx(p => (p + 1) % icons.length), 400);
@@ -143,7 +143,7 @@ function AuthCard() {
       setTimeout(() => navigate(dest), 2000);
     } catch (err) {
       const data = err.response?.data;
-      // Unverified email - show the verify-pending screen
+      // Unverified email — show the verify-pending screen
       if (data?.requiresVerification) {
         setPendingEmail(data.email || formData.email);
         setActivePage("verify-pending");
@@ -238,7 +238,7 @@ function AuthCard() {
           {activePage === "login" && (
             <>
               <button className="auth-back-btn" onClick={() => navigate("/")}>
-                <span className="back-circle">?</span>
+                <span className="back-circle">←</span>
                 <span className="back-label">Back to Home</span>
               </button>
 
@@ -327,18 +327,18 @@ function AuthCard() {
                   <input
                     type={showPassword ? "text" : "password"}
                     name="password"
-                    placeholder="........"
+                    placeholder="••••••••"
                     value={formData.password}
                     onChange={handleChange}
                     required
                   />
                   <span className="eye-icon" onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? "??" : "???"}
+                    {showPassword ? "🙈" : "👁️"}
                   </span>
                 </div>
 
                 <button type="submit" className="auth-button">
-                  Sign In &nbsp;?
+                  Sign In &nbsp;→
                 </button>
               </form>
 
@@ -355,7 +355,7 @@ function AuthCard() {
           {activePage === "signup" && (
             <>
               <button className="auth-back-btn" onClick={() => { if (signupStep > 1) prevStep(); else setActivePage("login"); }}>
-                <span className="back-circle">?</span>
+                <span className="back-circle">←</span>
                 <span className="back-label">{signupStep > 1 ? "Back" : "Back to Login"}</span>
               </button>
 
@@ -448,7 +448,7 @@ function AuthCard() {
                   )}
 
                   <button type="button" className="auth-button" onClick={nextStep}>
-                    Continue &nbsp;?
+                    Continue &nbsp;→
                   </button>
 
                   <p className="auth-link">
@@ -495,10 +495,10 @@ function AuthCard() {
                   )}
 
                   <button type="button" className="auth-button" onClick={nextStep}>
-                    Continue &nbsp;?
+                    Continue &nbsp;→
                   </button>
                   <button type="button" className="auth-button-secondary" onClick={prevStep}>
-                    ? Back
+                    ← Back
                   </button>
                 </>
               )}
@@ -521,7 +521,7 @@ function AuthCard() {
                       required
                     />
                     <span className="eye-icon" onClick={() => setShowPassword(!showPassword)}>
-                      {showPassword ? "??" : "???"}
+                      {showPassword ? "🙈" : "👁️"}
                     </span>
                   </div>
 
@@ -536,15 +536,15 @@ function AuthCard() {
                       required
                     />
                     <span className="eye-icon" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                      {showConfirmPassword ? "??" : "???"}
+                      {showConfirmPassword ? "🙈" : "👁️"}
                     </span>
                   </div>
 
                   <button type="submit" className="auth-button">
-                    Create Account &nbsp;?
+                    Create Account &nbsp;→
                   </button>
                   <button type="button" className="auth-button-secondary" onClick={prevStep}>
-                    ? Back
+                    ← Back
                   </button>
                 </form>
               )}
@@ -559,7 +559,7 @@ function AuthCard() {
                   background: "linear-gradient(135deg,rgba(16,185,129,0.12),rgba(14,165,233,0.12))",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: "2rem", margin: "0 auto 20px"
-                }}>??</div>
+                }}>📧</div>
                 <h1 className="auth-title">Check Your Email</h1>
                 <p className="auth-subtitle" style={{ marginBottom: 0 }}>
                   We sent a verification link to<br />
@@ -596,7 +596,7 @@ function AuthCard() {
                   finally { setResendLoading(false); }
                 }}
               >
-                {resendLoading ? "Sending." : "Resend Verification Email"}
+                {resendLoading ? "Sending…" : "Resend Verification Email"}
               </button>
 
               <button
@@ -604,7 +604,7 @@ function AuthCard() {
                 style={{ marginTop: 10 }}
                 onClick={() => { setActivePage("login"); setError(""); setSuccess(""); }}
               >
-                ? Back to Login
+                ← Back to Login
               </button>
             </>
           )}
@@ -612,7 +612,7 @@ function AuthCard() {
           {activePage === "reset" && (
             <>
               <button className="auth-back-btn" onClick={() => { setActivePage("login"); setResetSubmitted(false); setError(""); setSuccess(""); }}>
-                <span className="back-circle">?</span>
+                <span className="back-circle">←</span>
                 <span className="back-label">Back to Login</span>
               </button>
 
