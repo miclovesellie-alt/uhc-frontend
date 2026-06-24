@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Plus, Search, Edit2, Trash2, BookOpen, ChevronDown, ChevronUp, Copy, AlertTriangle, Pencil, MoveRight, FileDown } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, BookOpen, ChevronDown, ChevronUp, Copy, AlertTriangle, Pencil, MoveRight, FileDown, BookmarkX, ClipboardCopy } from "lucide-react";
 import api from "../../api/api";
 import { useToast } from "../../hooks/useToast";
 
@@ -16,6 +16,11 @@ export default function AdminQuestions() {
   const [sortBy, setSortBy] = useState("newest"); // newest | oldest | az | difficulty
   const [selectedIds, setSelectedIds] = useState(new Set()); // bulk select
   const [showBulkConfirm, setShowBulkConfirm] = useState(false);
+  const [filterNoCourse, setFilterNoCourse] = useState(false); // filter questions with no course
+  const [inlineEditCourse, setInlineEditCourse] = useState(null); // question._id being inline-edited
+  const [inlineEditCourseVal, setInlineEditCourseVal] = useState("");
+  const [addValidationErrors, setAddValidationErrors] = useState({}); // field-level errors for Add panel
+  const [duplicateWarning, setDuplicateWarning] = useState(""); // duplicate question warning
 
   // Parse initial filter from URL
   const queryParams = new URLSearchParams(location.search);
@@ -134,6 +139,8 @@ export default function AdminQuestions() {
 
   const difficultyOrder = { Easy: 0, Medium: 1, Hard: 2 };
 
+  const noCourseCount = questions.filter(q => !q.course || !q.course.trim()).length;
+
   const filtered = questions
     .filter(q => {
       const txt = search.toLowerCase();
@@ -141,7 +148,8 @@ export default function AdminQuestions() {
         q.options?.some(o => o?.toLowerCase().includes(txt));
       const matchCourse = selectedCourse === "All" || q.course === selectedCourse;
       const matchReported = filterReported ? q.isReported === true : true;
-      return matchSearch && matchCourse && matchReported;
+      const matchNoCourse = filterNoCourse ? (!q.course || !q.course.trim()) : true;
+      return matchSearch && matchCourse && matchReported && matchNoCourse;
     })
     .sort((a, b) => {
       if (sortBy === "oldest") return a._id > b._id ? 1 : -1;
@@ -202,16 +210,77 @@ export default function AdminQuestions() {
 
   /* ── Add question ── */
   const handleAddQuestion = async () => {
-    if (!newQ.question || newQ.answer === null || !newQ.course) {
-      showToast("Fill all fields and select the correct answer", "error"); return;
+    // Live validation
+    const errors = {};
+    if (!newQ.question.trim()) errors.question = true;
+    if (!newQ.course) errors.course = true;
+    if (newQ.answer === null) errors.answer = true;
+    if (newQ.options.some(o => !o.trim())) errors.options = true;
+    if (Object.keys(errors).length > 0) {
+      setAddValidationErrors(errors);
+      showToast("Please fill all required fields", "error");
+      return;
     }
+    setAddValidationErrors({});
     try {
       const res = await api.post("admin/questions", newQ);
       setQuestions(prev => [res.data, ...prev]);
+      setTotalCount(prev => prev + 1);
       showToast("Question added!");
       setShowAddModal(false);
       setNewQ({ question: "", options: ["","","",""], answer: null, course: "", difficulty: "Medium", explanation: "" });
+      setAddValidationErrors({});
+      setDuplicateWarning("");
+      fetchCourseCounts();
     } catch (err) { showToast("Add failed", "error"); }
+  };
+
+  /* ── Duplicate detection ── */
+  const checkDuplicate = (text) => {
+    if (!text || text.length < 15) { setDuplicateWarning(""); return; }
+    const lower = text.toLowerCase();
+    const match = questions.find(q => {
+      const qLower = q.question?.toLowerCase() || "";
+      return qLower.includes(lower.slice(0, 30)) || lower.includes(qLower.slice(0, 30));
+    });
+    if (match) {
+      setDuplicateWarning(`⚠️ Possible duplicate: "${match.question.slice(0, 60)}..."`);
+    } else {
+      setDuplicateWarning("");
+    }
+  };
+
+  /* ── Copy question into Add panel ── */
+  const handleCopyQuestion = (q) => {
+    setNewQ({
+      question: q.question + " (copy)",
+      options: [...(q.options || ["","","",""])],
+      answer: q.answer,
+      course: q.course || "",
+      difficulty: q.difficulty || "Medium",
+      explanation: q.explanation || "",
+    });
+    setDuplicateWarning("");
+    setAddValidationErrors({});
+    setShowAddModal(true);
+    showToast("Question copied into editor");
+  };
+
+  /* ── Inline course update from table badge ── */
+  const handleInlineCourseUpdate = async (questionId) => {
+    const newCourse = inlineEditCourseVal.trim();
+    if (!newCourse) { setInlineEditCourse(null); return; }
+    try {
+      const res = await api.put(`admin/questions/${questionId}`, { ...questions.find(q => q._id === questionId), course: newCourse });
+      setQuestions(prev => prev.map(q => q._id === questionId ? { ...q, course: newCourse } : q));
+      showToast(`Course updated to "${newCourse}"`);
+      fetchCourseCounts();
+    } catch (err) {
+      showToast("Course update failed", "error");
+    } finally {
+      setInlineEditCourse(null);
+      setInlineEditCourseVal("");
+    }
   };
 
   /* ── Rename course ── */
@@ -420,11 +489,11 @@ export default function AdminQuestions() {
       {/* Stats pills bar */}
       <div style={{ display: "flex", gap: 8, marginBottom: 18, flexWrap: "wrap" }}>
         {[
-          { label: "Total",    val: totalCount,                                                color: "#4255ff",  bg: "rgba(66,85,255,0.08)" },
-          { label: "Easy",     val: questions.filter(q => q.difficulty === "Easy").length,     color: "#16a34a",  bg: "rgba(22,163,74,0.08)" },
-          { label: "Medium",   val: questions.filter(q => q.difficulty === "Medium" || !q.difficulty).length, color: "#d97706", bg: "rgba(217,119,6,0.08)" },
-          { label: "Hard",     val: questions.filter(q => q.difficulty === "Hard").length,     color: "#dc2626",  bg: "rgba(220,38,38,0.08)" },
-          { label: "Reported", val: questions.filter(q => q.isReported).length,               color: "#8b5cf6",  bg: "rgba(139,92,246,0.08)" },
+          { label: "Total",    val: totalCount,                                                color: "#4255ff",  bg: "rgba(66,85,255,0.08)",   onClick: null },
+          { label: "Easy",     val: questions.filter(q => q.difficulty === "Easy").length,     color: "#16a34a",  bg: "rgba(22,163,74,0.08)",   onClick: null },
+          { label: "Medium",   val: questions.filter(q => q.difficulty === "Medium" || !q.difficulty).length, color: "#d97706", bg: "rgba(217,119,6,0.08)", onClick: null },
+          { label: "Hard",     val: questions.filter(q => q.difficulty === "Hard").length,     color: "#dc2626",  bg: "rgba(220,38,38,0.08)",   onClick: null },
+          { label: "Reported", val: questions.filter(q => q.isReported).length,               color: "#8b5cf6",  bg: "rgba(139,92,246,0.08)",  onClick: null },
         ].map(pill => (
           <div key={pill.label} style={{
             padding: "5px 12px", borderRadius: 20,
@@ -435,6 +504,25 @@ export default function AdminQuestions() {
             <span style={{ fontSize: ".9rem", fontWeight: 800 }}>{pill.val}</span> {pill.label}
           </div>
         ))}
+        {/* No Course pill — clickable filter shortcut */}
+        {noCourseCount > 0 && (
+          <div
+            onClick={() => setFilterNoCourse(f => !f)}
+            title="Filter questions with no course assigned"
+            style={{
+              padding: "5px 12px", borderRadius: 20,
+              background: filterNoCourse ? "rgba(245,158,11,0.18)" : "rgba(245,158,11,0.08)",
+              color: "#b45309",
+              fontSize: ".78rem", fontWeight: 700, display: "flex", alignItems: "center", gap: 5,
+              border: `1.5px solid ${filterNoCourse ? "#f59e0b" : "rgba(245,158,11,0.3)"}`,
+              cursor: "pointer",
+              transition: "all .15s",
+            }}
+          >
+            <BookmarkX size={13} />
+            <span style={{ fontSize: ".9rem", fontWeight: 800 }}>{noCourseCount}</span> No Course
+          </div>
+        )}
       </div>
 
       {/* Search + filter + sort */}
@@ -464,7 +552,29 @@ export default function AdminQuestions() {
           style={{ padding: "8px 12px", border: filterReported ? "none" : "" }}
         >
           <AlertTriangle size={15} />
-          {filterReported ? "Clear Reported Filter" : "Reported Questions"}
+          {filterReported ? "Clear Reported" : "Reported"}
+        </button>
+        <button
+          className={`admin-btn`}
+          onClick={() => setFilterNoCourse(f => !f)}
+          style={{
+            padding: "8px 12px",
+            background: filterNoCourse ? "rgba(245,158,11,0.15)" : undefined,
+            color: filterNoCourse ? "#b45309" : undefined,
+            border: filterNoCourse ? "1.5px solid #f59e0b" : undefined,
+            fontWeight: filterNoCourse ? 700 : undefined,
+          }}
+          title="Show only questions with no course assigned"
+        >
+          <BookmarkX size={15} />
+          {filterNoCourse ? "Clear Unassigned" : "Unassigned"}
+          {noCourseCount > 0 && !filterNoCourse && (
+            <span style={{
+              background: "#f59e0b", color: "white",
+              borderRadius: 99, fontSize: ".68rem",
+              padding: "1px 6px", marginLeft: 4, fontWeight: 800,
+            }}>{noCourseCount}</span>
+          )}
         </button>
       </div>
 
@@ -546,7 +656,35 @@ export default function AdminQuestions() {
                           {q.isReported && <span className="admin-badge red" title={`Reported: ${q.reportReason}`} style={{ padding: "2px 6px", fontSize: "0.65rem", flexShrink: 0 }}><AlertTriangle size={10} style={{ marginRight: 3 }}/> Reported</span>}
                         </div>
                       </td>
-                      <td><span className="admin-badge blue">{q.course || "—"}</span></td>
+                      <td onClick={e => e.stopPropagation()}>
+                        {inlineEditCourse === q._id ? (
+                          <div style={{ display: "flex", gap: 4, alignItems: "center", minWidth: 160 }}>
+                            <select
+                              className="admin-select"
+                              style={{ flex: 1, padding: "4px 8px", fontSize: ".8rem" }}
+                              value={inlineEditCourseVal}
+                              onChange={e => setInlineEditCourseVal(e.target.value)}
+                              autoFocus
+                            >
+                              <option value="">— pick course —</option>
+                              {coursesFromDB.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                            </select>
+                            <button className="admin-btn primary sm" style={{ padding: "4px 8px", fontSize: ".75rem" }}
+                              onClick={() => handleInlineCourseUpdate(q._id)}>✓</button>
+                            <button className="admin-btn secondary sm" style={{ padding: "4px 8px", fontSize: ".75rem" }}
+                              onClick={() => { setInlineEditCourse(null); setInlineEditCourseVal(""); }}>✕</button>
+                          </div>
+                        ) : (
+                          <span
+                            className={`admin-badge ${q.course ? 'blue' : 'red'}`}
+                            title={q.course ? "Click to change course" : "⚠ No course assigned — click to fix"}
+                            onClick={() => { setInlineEditCourse(q._id); setInlineEditCourseVal(q.course || ""); }}
+                            style={{ cursor: "pointer", userSelect: "none" }}
+                          >
+                            {q.course || "⚠ Unassigned"}
+                          </span>
+                        )}
+                      </td>
                       <td>
                         <span style={{
                           padding: "3px 8px", borderRadius: 6, fontSize: ".72rem",
@@ -596,6 +734,33 @@ export default function AdminQuestions() {
                               <AlertTriangle size={14} /> <strong>Report Reason:</strong> {q.reportReason || "Not specified"}
                             </div>
                           )}
+                          {/* Copy & quick-edit actions in expanded row */}
+                          <div style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap" }}>
+                            <button
+                              className="admin-btn secondary sm"
+                              style={{ display: "flex", alignItems: "center", gap: 5, fontSize: ".78rem" }}
+                              onClick={() => handleCopyQuestion(q)}
+                              title="Duplicate this question into the editor"
+                            >
+                              <ClipboardCopy size={13} /> Copy Question
+                            </button>
+                            <button
+                              className="admin-btn secondary sm"
+                              style={{ display: "flex", alignItems: "center", gap: 5, fontSize: ".78rem" }}
+                              onClick={() => { setEditData({ ...q }); setEditModal(true); }}
+                            >
+                              <Edit2 size={13} /> Edit Full
+                            </button>
+                            {!q.course && (
+                              <button
+                                className="admin-btn sm"
+                                style={{ display: "flex", alignItems: "center", gap: 5, fontSize: ".78rem", background: "rgba(245,158,11,0.12)", color: "#b45309", border: "1px solid rgba(245,158,11,0.3)" }}
+                                onClick={() => { setInlineEditCourse(q._id); setInlineEditCourseVal(""); }}
+                              >
+                                <BookmarkX size={13} /> Assign Course
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     )}
@@ -611,7 +776,7 @@ export default function AdminQuestions() {
       {showAddModal && (
         <div style={{ position:"fixed", inset:0, zIndex:1000, display:"flex" }}>
           {/* Backdrop */}
-          <div style={{ flex:1, background:"rgba(0,0,0,0.35)", backdropFilter:"blur(4px)" }} onClick={() => setShowAddModal(false)} />
+          <div style={{ flex:1, background:"rgba(0,0,0,0.35)", backdropFilter:"blur(4px)" }} onClick={() => { setShowAddModal(false); setAddValidationErrors({}); setDuplicateWarning(""); }} />
           {/* Panel */}
           <div style={{
             width:"min(540px, 100vw)", background:"white", height:"100%", overflowY:"auto",
@@ -625,7 +790,7 @@ export default function AdminQuestions() {
                 <h2 style={{ margin:0, fontSize: window.innerWidth < 600 ? "1rem" : "1.1rem", fontWeight:800, color:"#0f172a" }}>➕ Add New Question</h2>
                 <p style={{ margin:"2px 0 0", fontSize:".78rem", color:"#64748b" }}>Fill all fields and pick the correct option</p>
               </div>
-              <button className="admin-btn secondary sm" onClick={() => setShowAddModal(false)}>✕</button>
+              <button className="admin-btn secondary sm" onClick={() => { setShowAddModal(false); setAddValidationErrors({}); setDuplicateWarning(""); }}>✕</button>
             </div>
 
             {/* Panel body */}
@@ -633,12 +798,15 @@ export default function AdminQuestions() {
 
               {/* Course */}
               <div>
-                <label style={{ fontSize:".78rem", fontWeight:700, color:"#64748b", display:"block", marginBottom:6, textTransform:"uppercase", letterSpacing:".06em" }}>Course *</label>
-                <select className="admin-select" style={{ width:"100%" }}
-                  value={newQ.course} onChange={e => setNewQ(p => ({ ...p, course: e.target.value }))}>
+                <label style={{ fontSize:".78rem", fontWeight:700, color: addValidationErrors.course ? "#ef4444" : "#64748b", display:"block", marginBottom:6, textTransform:"uppercase", letterSpacing:".06em" }}>Course *</label>
+                <select className="admin-select" style={{ width:"100%", borderColor: addValidationErrors.course ? "#ef4444" : undefined }}
+                  value={newQ.course} onChange={e => { setNewQ(p => ({ ...p, course: e.target.value })); setAddValidationErrors(p => ({ ...p, course: false })); }}>
                   <option value="">— Select a course —</option>
                   {coursesFromDB.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
                 </select>
+                {addValidationErrors.course && (
+                  <div style={{ fontSize: ".73rem", color: "#ef4444", marginTop: 4, fontWeight: 500 }}>⚠ Course is required</div>
+                )}
                 {/* Inline: create a new course without leaving this panel */}
                 <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
                   <input
@@ -687,30 +855,39 @@ export default function AdminQuestions() {
 
               {/* Question text */}
               <div>
-                <label style={{ fontSize:".78rem", fontWeight:700, color:"#64748b", display:"block", marginBottom:6, textTransform:"uppercase", letterSpacing:".06em" }}>
-                  Question Text * <span style={{ textTransform:"none", fontWeight:400, color:"#94a3b8" }}>({newQ.question.length} chars)</span>
+                <label style={{ fontSize:".78rem", fontWeight:700, color: addValidationErrors.question ? "#ef4444" : "#64748b", display:"block", marginBottom:6, textTransform:"uppercase", letterSpacing:".06em" }}>
+                  Question Text * <span style={{ textTransform:"none", fontWeight:400, color: newQ.question.length > 500 ? "#ef4444" : "#94a3b8" }}>({newQ.question.length} chars{newQ.question.length > 500 ? " — very long!" : ""})</span>
                 </label>
                 <textarea
                   className="admin-input"
-                  style={{ width:"100%", minHeight:100, resize:"vertical", boxSizing:"border-box", lineHeight:1.6 }}
+                  style={{ width:"100%", minHeight:100, resize:"vertical", boxSizing:"border-box", lineHeight:1.6, borderColor: addValidationErrors.question ? "#ef4444" : undefined }}
                   placeholder="Type your question here…"
                   value={newQ.question}
-                  onChange={e => setNewQ(p => ({ ...p, question: e.target.value }))}
+                  onChange={e => { setNewQ(p => ({ ...p, question: e.target.value })); setAddValidationErrors(p => ({ ...p, question: false })); }}
+                  onBlur={e => checkDuplicate(e.target.value)}
                 />
+                {duplicateWarning && (
+                  <div style={{ marginTop: 6, padding: "7px 10px", borderRadius: 8, background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.3)", color: "#92400e", fontSize: ".75rem", fontWeight: 500 }}>
+                    {duplicateWarning}
+                  </div>
+                )}
+                {addValidationErrors.question && (
+                  <div style={{ fontSize: ".73rem", color: "#ef4444", marginTop: 4, fontWeight: 500 }}>⚠ Question text is required</div>
+                )}
               </div>
 
               {/* Options */}
               <div>
-                <label style={{ fontSize:".78rem", fontWeight:700, color:"#64748b", display:"block", marginBottom:8, textTransform:"uppercase", letterSpacing:".06em" }}>
+                <label style={{ fontSize:".78rem", fontWeight:700, color: (addValidationErrors.options || addValidationErrors.answer) ? "#ef4444" : "#64748b", display:"block", marginBottom:8, textTransform:"uppercase", letterSpacing:".06em" }}>
                   Options * <span style={{ textTransform:"none", fontWeight:500, color:"#16a34a" }}>— click the letter to mark correct answer</span>
                 </label>
                 {newQ.options.map((opt, i) => (
                   <div key={i} style={{ display:"flex", gap:8, marginBottom:10, alignItems:"center" }}>
                     <button
-                      onClick={() => setNewQ(p => ({ ...p, answer: i }))}
+                      onClick={() => { setNewQ(p => ({ ...p, answer: i })); setAddValidationErrors(p => ({ ...p, answer: false })); }}
                       style={{
                         width:32, height:32, borderRadius:10, border:"2px solid",
-                        borderColor: newQ.answer===i ? "#16a34a" : "#e2e8f0",
+                        borderColor: newQ.answer===i ? "#16a34a" : addValidationErrors.answer ? "#ef4444" : "#e2e8f0",
                         background: newQ.answer===i ? "#16a34a" : "white",
                         color: newQ.answer===i ? "white" : "#64748b",
                         fontSize:".8rem", cursor:"pointer", flexShrink:0,
@@ -722,7 +899,7 @@ export default function AdminQuestions() {
                     </button>
                     <input
                       className="admin-input"
-                      style={{ flex:1, borderColor: newQ.answer===i ? "rgba(22,163,74,.4)" : undefined, background: newQ.answer===i ? "rgba(22,163,74,.04)" : undefined }}
+                      style={{ flex:1, borderColor: newQ.answer===i ? "rgba(22,163,74,.4)" : addValidationErrors.options && !opt.trim() ? "#ef4444" : undefined, background: newQ.answer===i ? "rgba(22,163,74,.04)" : undefined }}
                       placeholder={`Option ${String.fromCharCode(65+i)}…`}
                       value={opt}
                       onChange={e => {
@@ -795,6 +972,24 @@ export default function AdminQuestions() {
                 </select>
               </div>
               <div>
+                <label style={{ fontSize: ".8rem", color: "var(--admin-muted)", fontWeight: 600, display: "block", marginBottom: 6 }}>DIFFICULTY</label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  {["Easy", "Medium", "Hard"].map(d => {
+                    const dColor = d === "Easy" ? "#16a34a" : d === "Hard" ? "#dc2626" : "#d97706";
+                    const active = (editData.difficulty || "Medium") === d;
+                    return (
+                      <button key={d} onClick={() => setEditData(p => ({ ...p, difficulty: d }))}
+                        style={{
+                          flex: 1, padding: "8px", borderRadius: 10, border: `2px solid ${active ? dColor : "var(--admin-border)"}`,
+                          background: active ? `${dColor}15` : "transparent",
+                          color: active ? dColor : "var(--admin-muted)",
+                          fontWeight: 700, fontSize: ".82rem", cursor: "pointer", transition: "all .15s",
+                        }}>{d}</button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div>
                 <label style={{ fontSize: ".8rem", color: "var(--admin-muted)", fontWeight: 600, display: "block", marginBottom: 6 }}>QUESTION</label>
                 <textarea className="admin-input"
                   style={{ width: "100%", minHeight: 90, resize: "vertical", boxSizing: "border-box" }}
@@ -803,22 +998,26 @@ export default function AdminQuestions() {
               </div>
               <div>
                 <label style={{ fontSize: ".8rem", color: "var(--admin-muted)", fontWeight: 600, display: "block", marginBottom: 6 }}>
-                  OPTIONS <span style={{ color: "var(--admin-green)", fontWeight: 400 }}>(click letter to set correct)</span>
+                  OPTIONS <span style={{ color: "#16a34a", fontWeight: 400 }}>(click letter to set correct)</span>
                 </label>
                 {editData.options?.map((opt, i) => (
                   <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8, alignItems: "center" }}>
                     <button
                       onClick={() => setEditData(p => ({ ...p, answer: i }))}
                       style={{
-                        width: 28, height: 28, borderRadius: "50%", border: "2px solid",
+                        width: 32, height: 32, borderRadius: 10, border: "2px solid",
                         borderColor: editData.answer === i ? "#16a34a" : "var(--admin-border)",
                         background: editData.answer === i ? "#16a34a" : "transparent",
-                        color: "white", fontSize: ".75rem", cursor: "pointer", flexShrink: 0,
-                        display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700,
+                        color: editData.answer === i ? "white" : "var(--admin-muted)",
+                        fontSize: ".8rem", cursor: "pointer", flexShrink: 0,
+                        display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800,
+                        boxShadow: editData.answer === i ? "0 2px 8px rgba(22,163,74,.3)" : "none",
+                        transition: "all .15s",
                       }}>
                       {String.fromCharCode(65 + i)}
                     </button>
-                    <input className="admin-input" style={{ flex: 1 }}
+                    <input className="admin-input"
+                      style={{ flex: 1, borderColor: editData.answer === i ? "rgba(22,163,74,.4)" : undefined, background: editData.answer === i ? "rgba(22,163,74,.04)" : undefined }}
                       value={opt}
                       onChange={e => {
                         const opts = [...editData.options]; opts[i] = e.target.value;
@@ -828,7 +1027,7 @@ export default function AdminQuestions() {
                 ))}
               </div>
               <div>
-                <label style={{ fontSize: ".8rem", color: "var(--admin-muted)", fontWeight: 600, display: "block", marginBottom: 6 }}>EXPLANATION (optional)</label>
+                <label style={{ fontSize: ".8rem", color: "var(--admin-muted)", fontWeight: 600, display: "block", marginBottom: 6 }}>EXPLANATION <span style={{ fontWeight: 400, color: "var(--admin-muted)" }}>(optional — {(editData.explanation || "").length} chars)</span></label>
                 <textarea className="admin-input"
                   style={{ width: "100%", minHeight: 70, resize: "vertical", boxSizing: "border-box" }}
                   placeholder="Why is this answer correct?"
@@ -837,7 +1036,7 @@ export default function AdminQuestions() {
               </div>
               <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
                 <button className="admin-btn secondary" onClick={() => setEditModal(false)}>Cancel</button>
-                <button className="admin-btn primary" onClick={handleSave}>Save Changes</button>
+                <button className="admin-btn primary" onClick={handleSave}>✓ Save Changes</button>
               </div>
             </div>
           </div>
@@ -884,13 +1083,32 @@ export default function AdminQuestions() {
                   ) : (
                     /* ── Normal row ── */
                     <>
-                      <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
                         <span style={{ fontSize: ".875rem", color: "var(--admin-text)", fontWeight: 600 }}>{c.name}</span>
-                        <span style={{ fontSize: ".72rem", color: 'var(--admin-muted)' }}>
-                          {courseQuestionCounts[c.name] ?? questions.filter(q => q.course === c.name).length} Questions
-                        </span>
+                        {/* Mini count bar */}
+                        {(() => {
+                          const count = courseQuestionCounts[c.name] ?? questions.filter(q => q.course === c.name).length;
+                          const maxCount = Math.max(...Object.values(courseQuestionCounts), 1);
+                          const pct = Math.max(4, Math.round((count / maxCount) * 100));
+                          return (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
+                              <div style={{ flex: 1, height: 4, borderRadius: 99, background: 'var(--admin-border)', overflow: 'hidden' }}>
+                                <div style={{ width: `${pct}%`, height: '100%', borderRadius: 99, background: 'linear-gradient(90deg, #4255ff, #8b5cf6)', transition: 'width .3s' }} />
+                              </div>
+                              <span style={{ fontSize: ".7rem", color: 'var(--admin-muted)', fontWeight: 600, flexShrink: 0 }}>{count}</span>
+                            </div>
+                          );
+                        })()}
                       </div>
-                      <div style={{ display: "flex", gap: 6 }}>
+                      <div style={{ display: "flex", gap: 6, alignItems: 'center' }}>
+                        <button
+                          className="admin-btn secondary sm"
+                          style={{ padding: '5px 9px', borderRadius: '8px', fontSize: '.72rem' }}
+                          title="Filter to this course"
+                          onClick={() => { setSelectedCourse(c.name); setShowCourseModal(false); setEditingCourseName(null); }}
+                        >
+                          <Search size={11} /> View
+                        </button>
                         <button
                           className="admin-btn secondary sm"
                           style={{ padding: '6px', borderRadius: '8px' }}
