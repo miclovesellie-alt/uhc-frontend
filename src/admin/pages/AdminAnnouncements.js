@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import api from "../../api/api";
-import { Plus, Trash2, ToggleLeft, ToggleRight, Send, Users, Mail, Layers } from "lucide-react";
+import { Trash2, ToggleLeft, ToggleRight, Send, Users, Mail, Layers } from "lucide-react";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 const TYPE_COLORS = { info:"#4255ff", warning:"#d97706", success:"#16a34a", danger:"#dc2626" };
