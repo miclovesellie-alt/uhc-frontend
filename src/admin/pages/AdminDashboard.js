@@ -6,7 +6,8 @@ import {
 } from "recharts";
 import api from "../../api/api";
 import { UserContext } from "../../context/UserContext";
-import { RefreshCw, TrendingUp, Users, BookOpen, Zap, Activity, Library, Layers, UserPlus, Calendar, CalendarDays, LogIn, Key, Flag } from "lucide-react";
+import { RefreshCw, TrendingUp, Users, BookOpen, Zap, Activity, Library, Layers, UserPlus, Calendar, CalendarDays, LogIn, Key, Flag, X } from "lucide-react";
+import AdminAnnouncements from "./AdminAnnouncements";
 import "../admin_styles/AdminDashboard.css";
 
 const COLORS = ["#4255ff","#16a34a","#d97706","#dc2626","#8b5cf6"];
@@ -80,6 +81,7 @@ export default function AdminDashboard() {
   const [loading, setLoading]         = useState(false);
   const [lastRefresh, setLastRefresh] = useState(new Date());
   const [todaySummary, setTodaySummary] = useState(null);
+  const [announcementModal, setAnnouncementModal] = useState(false);
 
   /* ── Fetch main stats ── */
   const fetchAll = async () => {
@@ -420,7 +422,6 @@ export default function AdminDashboard() {
           {label:"Bulk Upload",    emoji:"📤",color:"#16a34a",bg:"rgba(22,163,74,0.08)",   path:"/admin/uploads"},
           {label:"View Reported",  emoji:"🚩",color:"#dc2626",bg:"rgba(220,38,38,0.08)",   path:"/admin/questions?filter=reported"},
           {label:"Manage Library", emoji:"📚",color:"#8b5cf6",bg:"rgba(139,92,246,0.08)",  path:"/admin/userlibrary"},
-          {label:"Send Notif",     emoji:"🔔",color:"#d97706",bg:"rgba(217,119,6,0.08)",   path:"/admin/notifications"},
           {label:"View Logs",      emoji:"📋",color:"#06b6d4",bg:"rgba(6,182,212,0.08)",   path:"/admin/logs"},
         ].map(action => (
           <div key={action.label} onClick={()=>navigate(action.path)}
@@ -432,7 +433,59 @@ export default function AdminDashboard() {
             <span style={{fontSize:".82rem",fontWeight:700,color:action.color}}>{action.label}</span>
           </div>
         ))}
+        {/* ── Announcement quick-action ── */}
+        <div
+          onClick={()=>setAnnouncementModal(true)}
+          style={{padding:"16px 14px",borderRadius:14,cursor:"pointer",background:"rgba(217,119,6,0.08)",border:"1px solid rgba(217,119,6,0.25)",display:"flex",flexDirection:"column",alignItems:"flex-start",gap:8,transition:"transform .15s,box-shadow .15s"}}
+          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 6px 20px rgba(217,119,6,0.2)";}}
+          onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow="none";}}
+        >
+          <span style={{fontSize:"1.5rem"}}>📢</span>
+          <span style={{fontSize:".82rem",fontWeight:700,color:"#d97706"}}>Announcement</span>
+        </div>
       </div>
+
+      {/* ── Announcement Modal ── */}
+      {announcementModal && (
+        <div
+          onClick={e=>{if(e.target===e.currentTarget)setAnnouncementModal(false);}}
+          style={{
+            position:"fixed",inset:0,zIndex:10000,
+            background:"rgba(0,0,0,0.55)",
+            backdropFilter:"blur(4px)",
+            display:"flex",alignItems:"flex-start",justifyContent:"center",
+            padding:"40px 16px",overflowY:"auto",
+          }}
+        >
+          <div style={{
+            background:"var(--admin-bg,#f8fafc)",
+            borderRadius:20,
+            width:"100%",maxWidth:700,
+            boxShadow:"0 24px 80px rgba(0,0,0,0.35)",
+            position:"relative",
+            animation:"modalIn .2s ease",
+          }}>
+            {/* Modal header */}
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"18px 24px",borderBottom:"1px solid var(--admin-border,#e2e8f0)"}}>
+              <div>
+                <div style={{fontWeight:900,fontSize:"1.05rem"}}>📢 Send Announcement</div>
+                <div style={{fontSize:".75rem",color:"var(--admin-muted)",marginTop:2}}>Compose and broadcast a message to your users</div>
+              </div>
+              <button
+                onClick={()=>setAnnouncementModal(false)}
+                style={{background:"none",border:"none",cursor:"pointer",color:"var(--admin-muted)",padding:4,borderRadius:8,display:"flex",alignItems:"center"}}
+              >
+                <X size={20}/>
+              </button>
+            </div>
+            {/* Embedded compose panel */}
+            <div style={{padding:"0 4px 4px"}}>
+              <AdminAnnouncements onModalClose={()=>setAnnouncementModal(false)}/>
+            </div>
+          </div>
+          <style>{`@keyframes modalIn{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}`}</style>
+        </div>
+      )}
 
       <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
     </div>
