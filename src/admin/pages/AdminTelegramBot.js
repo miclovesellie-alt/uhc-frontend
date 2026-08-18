@@ -159,7 +159,7 @@ export default function AdminTelegramBot() {
   async function handleSave(e) {
     e.preventDefault();
     const tokenToSave = token.trim();
-    if (!tokenToSave && enabled && !status.token) {
+    if (!tokenToSave && !status.token) {
       setSaveMsg({ type: "error", text: "Please enter your Telegram bot token before saving." });
       return;
     }
@@ -168,9 +168,10 @@ export default function AdminTelegramBot() {
     try {
       const { data } = await api.post("admin/telegram-bot/token", {
         token: tokenToSave || null,
-        enabled,
+        enabled: true,
       });
-      setSaveMsg({ type: "success", text: data.message || "Bot settings saved!" });
+      setEnabled(true);
+      setSaveMsg({ type: "success", text: data.message || "Bot started & ONLINE!" });
       await fetchStatus();
       await fetchStats();
     } catch (err) {
