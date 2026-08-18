@@ -151,19 +151,22 @@ export default function AdminTelegramBot() {
   // ── Save token ─────────────────────────────────────────────────────────────
   async function handleSave(e) {
     e.preventDefault();
-    if (!token.trim() && enabled) {
+    // Only block if there's no existing token AND no new token entered AND trying to enable
+    const hasExistingToken = !!status.maskedToken;
+    if (!token.trim() && !hasExistingToken && enabled) {
       setSaveMsg({ type: "error", text: "Please enter a bot token before enabling." });
       return;
     }
     setSaving(true);
     setSaveMsg(null);
     try {
+      // If token field is empty, send null so the backend keeps the existing token
       const { data } = await api.post("admin/telegram-bot/token", {
-        token: token.trim(),
+        token: token.trim() || null,
         enabled,
       });
       setSaveMsg({ type: "success", text: data.message || "Saved!" });
-      setToken(""); // clear field — token is now masked in DB
+      setToken(""); // clear field for security
       await fetchStatus();
       await fetchStats();
     } catch (err) {
