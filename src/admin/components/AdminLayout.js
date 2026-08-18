@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Users, HelpCircle, Upload, Bell, Settings, LogOut,
   Menu, X, FileText, Shield, Library, Mail, Layout, Trash2, Megaphone,
   Clock, ChevronLeft, ChevronRight, Search, Check, ExternalLink,
-  Sun, Moon, ArrowRight, CalendarDays
+  Sun, Moon, ArrowRight, CalendarDays, Bot
 } from "lucide-react";
 import CommandPalette from "./CommandPalette";
 import AdminQuickDock from "./AdminQuickDock";
@@ -47,11 +47,12 @@ const baseNavItems = [
   { icon: <Trash2 size={17}/>,          label: "Recycle Bin",     path: "/admin/recycle-bin"     },
   { icon: <Mail size={17}/>,            label: "Messages",        path: "/admin/messages"        },
   { icon: <Settings size={17}/>,        label: "Settings",        path: "/admin/settings"        },
+  { icon: <Bot size={17}/>,             label: "Telegram Bot",    path: "/admin/telegram-bot"   },
 ];
 
 const MAIN       = ["/admin","/admin/users","/admin/admins","/admin/questions","/admin/userlibrary","/admin/feed","/admin/uploads","/admin/pending"];
 const MONITORING = ["/admin/logs","/admin/daily-summary","/admin/notifications","/admin/messages","/admin/recycle-bin","/admin/announcements"];
-const SYSTEM     = ["/admin/settings"];
+const SYSTEM     = ["/admin/settings", "/admin/telegram-bot"];
 
 /* ── Live Clock ── */
 function LiveClock() {
