@@ -421,6 +421,10 @@
 .tgb-page-btn.active   { background: #229ed9; color: #fff; border-color: #229ed9; }
 .tgb-page-info { font-size: 0.78rem; color: var(--admin-muted); }
 
+.tgb-spin {
+  animation: tgbSpin 0.7s linear infinite;
+}
+
 /* ── Spinner ──────────────────────────────────────────────────── */
 .tgb-spinner {
   width: 20px; height: 20px;
