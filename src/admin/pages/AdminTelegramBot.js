@@ -84,10 +84,11 @@ export default function AdminTelegramBot() {
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState(null); // { type: 'success'|'error', text }
 
-  // ── Loading ────────────────────────────────────────────────────────────────
+  // ── Loading & Refresh states ─────────────────────────────────────────────
   const [loadingStatus, setLoadingStatus] = useState(true);
-  const [loadingUsers, setLoadingUsers] = useState(false);
-  const [loadingLogs, setLoadingLogs] = useState(false);
+  const [loadingUsers, setLoadingUsers]   = useState(false);
+  const [loadingLogs, setLoadingLogs]     = useState(false);
+  const [refreshing, setRefreshing]       = useState(false);
 
   const uptime = useUptime(status.startedAt, status.running);
   const pollRef = useRef(null);
@@ -98,9 +99,12 @@ export default function AdminTelegramBot() {
       const { data } = await api.get("admin/telegram-bot/status");
       setStatus(data);
       setEnabled(data.enabled);
+      if (data.token && !token) {
+        setToken(data.token);
+      }
     } catch (_) { }
     finally { setLoadingStatus(false); }
-  }, []);
+  }, [token]);
 
   const fetchStats = useCallback(async () => {
     try {
@@ -130,47 +134,47 @@ export default function AdminTelegramBot() {
     finally { setLoadingUsers(false); }
   }, []);
 
-  const refreshAll = useCallback(() => {
-    fetchStatus();
-    fetchStats();
-    fetchLogs();
-    fetchUsers(usersPage);
+  const refreshAll = useCallback(async () => {
+    setRefreshing(true);
+    await Promise.all([
+      fetchStatus(),
+      fetchStats(),
+      fetchLogs(),
+      fetchUsers(usersPage)
+    ]);
+    setRefreshing(false);
   }, [fetchStatus, fetchStats, fetchLogs, fetchUsers, usersPage]);
 
   // ── Initial load + polling ─────────────────────────────────────────────────
   useEffect(() => {
     refreshAll();
-    // Poll status every 10 s
     pollRef.current = setInterval(() => {
       fetchStatus();
       fetchStats();
-    }, 10000);
+    }, 8000);
     return () => clearInterval(pollRef.current);
   }, []); // eslint-disable-line
 
   // ── Save token ─────────────────────────────────────────────────────────────
   async function handleSave(e) {
     e.preventDefault();
-    // Only block if there's no existing token AND no new token entered AND trying to enable
-    const hasExistingToken = !!status.maskedToken;
-    if (!token.trim() && !hasExistingToken && enabled) {
-      setSaveMsg({ type: "error", text: "Please enter a bot token before enabling." });
+    const tokenToSave = token.trim();
+    if (!tokenToSave && enabled && !status.token) {
+      setSaveMsg({ type: "error", text: "Please enter your Telegram bot token before saving." });
       return;
     }
     setSaving(true);
     setSaveMsg(null);
     try {
-      // If token field is empty, send null so the backend keeps the existing token
       const { data } = await api.post("admin/telegram-bot/token", {
-        token: token.trim() || null,
+        token: tokenToSave || null,
         enabled,
       });
-      setSaveMsg({ type: "success", text: data.message || "Saved!" });
-      setToken(""); // clear field for security
+      setSaveMsg({ type: "success", text: data.message || "Bot settings saved!" });
       await fetchStatus();
       await fetchStats();
     } catch (err) {
-      setSaveMsg({ type: "error", text: err?.response?.data?.message || "Failed to save." });
+      setSaveMsg({ type: "error", text: err?.response?.data?.message || "Failed to save settings." });
     } finally {
       setSaving(false);
       setTimeout(() => setSaveMsg(null), 5000);
@@ -203,8 +207,8 @@ export default function AdminTelegramBot() {
           {status.running && uptime && (
             <span className="tgb-uptime">⏱ {uptime}</span>
           )}
-          <button className="tgb-btn ghost" onClick={refreshAll} title="Refresh">
-            <RefreshCw size={14} /> Refresh
+          <button className="tgb-btn ghost" onClick={refreshAll} disabled={refreshing} title="Refresh Dashboard">
+            <RefreshCw size={14} className={refreshing ? "tgb-spin" : ""} /> {refreshing ? "Refreshing..." : "Refresh"}
           </button>
         </div>
       </div>
@@ -223,35 +227,28 @@ export default function AdminTelegramBot() {
 
         {/* Token config */}
         <div className="tgb-card">
-          <p className="tgb-card-title">🔑 Bot Token Configuration</p>
-
-          {status.maskedToken && (
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: "0.73rem", color: "var(--admin-muted)", marginBottom: 4 }}>Current token:</div>
-              <div className="tgb-masked-token">{status.maskedToken}</div>
-            </div>
-          )}
+          <p className="tgb-card-title">🔑 Telegram Bot Token</p>
 
           <form className="tgb-token-form" onSubmit={handleSave}>
             <div className="tgb-input-row">
-              <Bot size={15} color="var(--admin-muted)" style={{ flexShrink: 0 }} />
+              <Bot size={16} color="var(--admin-muted)" style={{ flexShrink: 0 }} />
               <input
                 type={showToken ? "text" : "password"}
-                placeholder={status.maskedToken ? "Enter new token to replace…" : "Paste your @BotFather token…"}
+                placeholder="Paste Telegram Bot Token (from @BotFather)..."
                 value={token}
                 onChange={e => setToken(e.target.value)}
                 autoComplete="off"
                 spellCheck={false}
               />
-              <button type="button" className="tgb-eye-btn" onClick={() => setShowToken(v => !v)}>
+              <button type="button" className="tgb-eye-btn" onClick={() => setShowToken(v => !v)} title={showToken ? "Hide token" : "Show token"}>
                 {showToken ? <EyeOff size={15} /> : <Eye size={15} />}
               </button>
             </div>
 
             <div className="tgb-toggle-row">
               <div>
-                <div className="tgb-toggle-label">Enable Bot</div>
-                <div className="tgb-toggle-sub">Turns polling on/off without removing the token</div>
+                <div className="tgb-toggle-label">Bot Service Enabled</div>
+                <div className="tgb-toggle-sub">Turns Telegram long-polling on/off</div>
               </div>
               <label className="tgb-switch">
                 <input type="checkbox" checked={enabled} onChange={e => setEnabled(e.target.checked)} />
