@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useCallback, useContext, useRef } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Eye, EyeOff, Send, StopCircle, RefreshCw, Users, Download, CheckCircle, XCircle, AlertTriangle, Bot } from "lucide-react";
-import { UserContext } from "../../context/UserContext";
+
 import api from "../../api/api";
 import "../admin_styles/AdminTelegramBot.css";
 
@@ -67,7 +67,6 @@ function StatCard({ icon, color, value, label }) {
 
 // ─── Main Page ───────────────────────────────────────────────────────────────
 export default function AdminTelegramBot() {
-  const { adminTheme } = useContext(UserContext);
 
   // ── Bot status ─────────────────────────────────────────────────────────────
   const [status, setStatus] = useState({ running: false, startedAt: null, enabled: false, maskedToken: "" });
