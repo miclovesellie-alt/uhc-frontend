@@ -99,12 +99,12 @@ export default function AdminTelegramBot() {
       const { data } = await api.get("admin/telegram-bot/status");
       setStatus(data);
       setEnabled(data.enabled);
-      if (data.token && !token) {
+      if (data.token) {
         setToken(data.token);
       }
     } catch (_) { }
     finally { setLoadingStatus(false); }
-  }, [token]);
+  }, []);
 
   const fetchStats = useCallback(async () => {
     try {
@@ -151,7 +151,7 @@ export default function AdminTelegramBot() {
     pollRef.current = setInterval(() => {
       fetchStatus();
       fetchStats();
-    }, 8000);
+    }, 20000);
     return () => clearInterval(pollRef.current);
   }, []); // eslint-disable-line
 
