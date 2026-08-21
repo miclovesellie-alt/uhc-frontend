@@ -60,6 +60,9 @@ export default function AdminSettings() {
   const [disableQuiz, setDisableQuiz] = useState(false);
   const [disableLibrary, setDisableLibrary] = useState(false);
   const [heroImageUrl, setHeroImageUrl] = useState("");
+  // AI Controls
+  const [enableAI, setEnableAI] = useState(true);
+  const [geminiApiKey, setGeminiApiKey] = useState("");
 
   // Contact & Social
   const [contactInfo, setContactInfo] = useState({ email:"",phone:"",whatsapp:"",facebook:"",tiktok:"",instagram:"",twitter:"",youtube:"" });
@@ -212,6 +215,33 @@ export default function AdminSettings() {
             style={{width:46,height:26,borderRadius:13,border:"none",cursor:"pointer",background:adminTheme==="dark"?"var(--admin-accent)":"#cbd5e1",position:"relative",transition:"background .2s",flexShrink:0}}>
             <div style={{width:18,height:18,borderRadius:"50%",background:"white",position:"absolute",top:4,left:adminTheme==="dark"?24:4,transition:"left .2s",boxShadow:"0 1px 4px rgba(0,0,0,0.2)"}}/>
           </button>
+        </div>
+      </Section>
+
+      {/* AI Engine Controls */}
+      <Section icon="🤖" title="AI Engine & API Settings">
+        <Toggle
+          checked={enableAI}
+          onChange={setEnableAI}
+          icon="⚡"
+          label="Enable AI Study Assistant & Quiz Tutor"
+          desc="Master toggle for floating AI assistant, quiz explanations, and option balancer"
+        />
+        <div style={{ padding: "14px 16px", background: "var(--admin-card)", border: "1px solid var(--admin-border)", borderRadius: 12, marginTop: 8 }}>
+          <div style={{ fontWeight: 600, fontSize: ".875rem", color: "var(--admin-text)", marginBottom: 4 }}>
+            Google Gemini API Key (Free Tier)
+          </div>
+          <div style={{ fontSize: ".75rem", color: "var(--admin-muted)", marginBottom: 8 }}>
+            Get your free API key from <a href="https://aistudio.google.com/" target="_blank" rel="noreferrer" style={{ color: "var(--admin-accent)" }}>Google AI Studio</a> and paste it into <code style={{ background: "rgba(0,0,0,0.06)", padding: "2px 6px", borderRadius: 4 }}>.env</code> or set it here.
+          </div>
+          <input
+            className="admin-input"
+            type="password"
+            placeholder="AIzaSy..."
+            style={{ width: "100%", boxSizing: "border-box" }}
+            value={geminiApiKey}
+            onChange={e => setGeminiApiKey(e.target.value)}
+          />
         </div>
       </Section>
 

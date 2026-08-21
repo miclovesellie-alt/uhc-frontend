@@ -54,9 +54,58 @@ export default function AdminQuestions() {
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportCourse, setExportCourse] = useState("__ALL__");
 
+  // AI Admin features
+  const [showNotesModal, setShowNotesModal] = useState(false);
+  const [notesText, setNotesText] = useState("");
+  const [notesCourse, setNotesCourse] = useState("General Health");
+  const [notesCount, setNotesCount] = useState(3);
+  const [notesLoading, setNotesLoading] = useState(false);
+  const [shorteningId, setShorteningId] = useState(null);
+
   const [newQ, setNewQ] = useState({ question: "", options: ["","","",""], answer: null, course: "", difficulty: "Medium", explanation: "" });
 
   const { showToast, ToastEl } = useToast();
+
+  const handleShortenOptions = async (questionId) => {
+    setShorteningId(questionId);
+    try {
+      const res = await api.post("ai/admin/shorten-options", { questionId, autoSave: true });
+      if (res.data && res.data.success) {
+        showToast("✨ Question options shortened and balanced!", "success");
+        fetchQuestions();
+      }
+    } catch (err) {
+      showToast(err.response?.data?.message || "Failed to shorten options with AI", "error");
+    } finally {
+      setShorteningId(null);
+    }
+  };
+
+  const handleGenerateFromNotes = async () => {
+    if (!notesText || notesText.length < 20) {
+      showToast("Please enter at least 20 characters of study notes", "error");
+      return;
+    }
+    setNotesLoading(true);
+    try {
+      const res = await api.post("ai/admin/generate-from-notes", {
+        notesText,
+        count: notesCount || 3,
+        course: notesCourse || "General Health",
+        autoSave: true
+      });
+      if (res.data && res.data.success) {
+        showToast(`✨ Generated & saved ${res.data.savedCount || res.data.questions?.length || 0} AI questions!`, "success");
+        setShowNotesModal(false);
+        setNotesText("");
+        fetchQuestions();
+      }
+    } catch (err) {
+      showToast(err.response?.data?.message || "Failed to generate questions from notes", "error");
+    } finally {
+      setNotesLoading(false);
+    }
+  };
 
   useEffect(() => { fetchQuestions(); fetchCourses(); fetchCourseCounts(); }, []);
 
@@ -480,6 +529,13 @@ export default function AdminQuestions() {
           >
             <FileDown size={14} /> Export
           </button>
+          <button
+            className="admin-btn secondary sm"
+            onClick={() => setShowNotesModal(true)}
+            style={{ background: "linear-gradient(135deg, #4f46e5, #7c3aed)", color: "white", border: "none" }}
+          >
+            ✨ AI Notes to Quiz
+          </button>
           <button className="admin-btn primary" onClick={() => setShowAddModal(true)}>
             <Plus size={15} /> Add Question
           </button>
@@ -736,6 +792,15 @@ export default function AdminQuestions() {
                           )}
                           {/* Copy & quick-edit actions in expanded row */}
                           <div style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap" }}>
+                            <button
+                              className="admin-btn secondary sm"
+                              style={{ display: "flex", alignItems: "center", gap: 5, fontSize: ".78rem", background: "linear-gradient(135deg, #4f46e5, #7c3aed)", color: "white", border: "none" }}
+                              onClick={() => handleShortenOptions(q._id)}
+                              disabled={shorteningId === q._id}
+                              title="AI will rewrite all 4 options to be concise and balanced in length"
+                            >
+                              {shorteningId === q._id ? "Shortening..." : "✨ AI Shorten Options"}
+                            </button>
                             <button
                               className="admin-btn secondary sm"
                               style={{ display: "flex", alignItems: "center", gap: 5, fontSize: ".78rem" }}
@@ -1329,6 +1394,72 @@ export default function AdminQuestions() {
               >
                 <FileDown size={16} />
                 Download .txt
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== AI NOTES TO QUIZ MODAL ===== */}
+      {showNotesModal && (
+        <div className="admin-modal-overlay" style={{ zIndex: 10000, position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+          <div className="admin-modal" style={{ background: "var(--admin-card)", width: "100%", maxWidth: 540, borderRadius: 20, padding: 24, boxShadow: "0 20px 40px rgba(0,0,0,0.2)", border: "1px solid var(--admin-border)" }}>
+            <h3 style={{ margin: "0 0 8px", fontSize: "1.1rem", fontWeight: 700, color: "var(--admin-text)" }}>
+              ✨ AI Notes-to-Quiz Generator
+            </h3>
+            <p style={{ fontSize: ".83rem", color: "var(--admin-muted)", marginBottom: 16 }}>
+              Paste study notes, lecture content, or medical textbook excerpts below. The AI will automatically extract key concepts and create balanced 4-option multiple choice questions for your target course.
+            </p>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ display: "block", fontSize: ".8rem", fontWeight: 600, color: "var(--admin-text)", marginBottom: 4 }}>Target Course</label>
+              <select
+                value={notesCourse}
+                onChange={e => setNotesCourse(e.target.value)}
+                style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid var(--admin-border)", background: "var(--admin-bg)", color: "var(--admin-text)", fontSize: ".88rem" }}
+              >
+                {courses.filter(c => c !== "All").map(c => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ display: "block", fontSize: ".8rem", fontWeight: 600, color: "var(--admin-text)", marginBottom: 4 }}>Number of Questions</label>
+              <select
+                value={notesCount}
+                onChange={e => setNotesCount(Number(e.target.value))}
+                style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid var(--admin-border)", background: "var(--admin-bg)", color: "var(--admin-text)", fontSize: ".88rem" }}
+              >
+                <option value={1}>1 Question</option>
+                <option value={3}>3 Questions</option>
+                <option value={5}>5 Questions</option>
+                <option value={10}>10 Questions</option>
+              </select>
+            </div>
+
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ display: "block", fontSize: ".8rem", fontWeight: 600, color: "var(--admin-text)", marginBottom: 4 }}>Paste Study Notes / Material</label>
+              <textarea
+                rows={6}
+                placeholder="Paste notes or study text here..."
+                value={notesText}
+                onChange={e => setNotesText(e.target.value)}
+                style={{ width: "100%", padding: "12px", borderRadius: 12, border: "1px solid var(--admin-border)", background: "var(--admin-bg)", color: "var(--admin-text)", fontSize: ".85rem", resize: "vertical", outline: "none" }}
+              />
+            </div>
+
+            <div style={{ display: "flex", gap: 10 }}>
+              <button className="admin-btn secondary" style={{ flex: 1 }} onClick={() => setShowNotesModal(false)} disabled={notesLoading}>
+                Cancel
+              </button>
+              <button
+                className="admin-btn primary"
+                style={{ flex: 2, background: "linear-gradient(135deg, #4f46e5, #7c3aed)", border: "none" }}
+                onClick={handleGenerateFromNotes}
+                disabled={notesLoading || !notesText.trim()}
+              >
+                {notesLoading ? "AI Generating Questions..." : "✨ Generate & Add to Database"}
               </button>
             </div>
           </div>

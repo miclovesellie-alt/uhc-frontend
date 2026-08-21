@@ -3,6 +3,7 @@ import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 import api from "../api/api";
 import OnboardingTour from "./OnboardingTour";
+import AIAssistantWidget from "./AIAssistantWidget";
 import "../styles/dashboard.css";
 import { isSoundEnabled, setSoundEnabled, playNavigate } from "../utils/sounds";
 import { io } from "socket.io-client";
@@ -863,6 +864,8 @@ function DashboardLayout() {
           </div>
         </div>
       )}
+      {/* ===== AI ASSISTANT FLOATING WIDGET ===== */}
+      <AIAssistantWidget />
     </div>
   );
 }

@@ -134,6 +134,8 @@ export default function QuizPage() {
   const [shareType, setShareType] = useState("score"); // "score" | "question"
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
   const [previewDataUrl, setPreviewDataUrl] = useState("");
+  const [aiExplMap, setAiExplMap] = useState({});
+  const [aiExplLoading, setAiExplLoading] = useState({});
 
   // ── Always-fresh refs for functions used in closures/effects ──
   const confirmAnswerRef = useRef(null);
@@ -1229,6 +1231,70 @@ export default function QuizPage() {
               <motion.div className="quiz-explanation" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
                 💡 <strong>Explanation:</strong> {q.explanation}
               </motion.div>
+            )}
+
+            {/* AI Explanation Request */}
+            {(locked || reviewMode) && (
+              <div style={{ marginTop: 12 }}>
+                {!aiExplMap[idx] ? (
+                  <button
+                    onClick={async () => {
+                      const effectiveSel = reviewMode ? answers[idx] : selAns;
+                      setAiExplLoading(prev => ({ ...prev, [idx]: true }));
+                      try {
+                        const res = await api.post("/ai/explain-question", {
+                          questionText: q.question,
+                          options: q.options,
+                          selectedIndex: effectiveSel !== null ? effectiveSel : -1,
+                          correctIndex: q.answer
+                        });
+                        if (res.data && res.data.explanation) {
+                          setAiExplMap(prev => ({ ...prev, [idx]: res.data.explanation }));
+                        }
+                      } catch (err) {
+                        const msg = err.response?.data?.message || "Failed to fetch AI explanation.";
+                        setAiExplMap(prev => ({ ...prev, [idx]: `⚠️ ${msg}` }));
+                      } finally {
+                        setAiExplLoading(prev => ({ ...prev, [idx]: false }));
+                      }
+                    }}
+                    disabled={aiExplLoading[idx]}
+                    style={{
+                      background: "linear-gradient(135deg, #4f46e5, #7c3aed)",
+                      color: "white",
+                      border: "none",
+                      padding: "8px 16px",
+                      borderRadius: 12,
+                      fontSize: "0.85rem",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                      boxShadow: "0 2px 8px rgba(79,70,229,0.2)"
+                    }}
+                  >
+                    {aiExplLoading[idx] ? "AI is Analyzing..." : "✨ Ask AI to Explain Answer"}
+                  </button>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    style={{
+                      background: "#f0fdf4",
+                      border: "1px solid #bbf7d0",
+                      borderRadius: 14,
+                      padding: "14px 16px",
+                      fontSize: "0.88rem",
+                      lineHeight: "1.5",
+                      color: "#166534",
+                      whiteSpace: "pre-wrap"
+                    }}
+                  >
+                    {aiExplMap[idx]}
+                  </motion.div>
+                )}
+              </div>
             )}
 
             {/* Actions */}
