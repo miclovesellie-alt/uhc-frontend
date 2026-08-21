@@ -63,6 +63,9 @@ export default function AdminSettings() {
   // AI Controls
   const [enableAI, setEnableAI] = useState(true);
   const [geminiApiKey, setGeminiApiKey] = useState("");
+  const [groqApiKey, setGroqApiKey] = useState("");
+  const [mistralApiKey, setMistralApiKey] = useState("");
+  const [huggingfaceApiKey, setHuggingfaceApiKey] = useState("");
 
   // Contact & Social
   const [contactInfo, setContactInfo] = useState({ email:"",phone:"",whatsapp:"",facebook:"",tiktok:"",instagram:"",twitter:"",youtube:"" });
@@ -79,7 +82,7 @@ export default function AdminSettings() {
   useEffect(() => {
     const load = async () => {
       try {
-        const keys = ["noScreenshot","maintenanceMode","quizTimer","registrationOpen","globalAnnouncement","allowGuestAccess","disableFeed","disableQuiz","disableLibrary","heroImageUrl","contactInfo","enableAI","geminiApiKey"];
+        const keys = ["noScreenshot","maintenanceMode","quizTimer","registrationOpen","globalAnnouncement","allowGuestAccess","disableFeed","disableQuiz","disableLibrary","heroImageUrl","contactInfo","enableAI","geminiApiKey","groqApiKey","mistralApiKey","huggingfaceApiKey"];
         const results = await Promise.allSettled(keys.map(k => api.get(`settings/${k}`)));
         const map = {};
         results.forEach((r, i) => { if (r.status==="fulfilled" && r.value.data?.value != null) map[keys[i]] = r.value.data.value; });
@@ -96,6 +99,9 @@ export default function AdminSettings() {
         if (map.contactInfo) setContactInfo(prev => ({ ...prev, ...map.contactInfo }));
         if (map.enableAI != null) setEnableAI(map.enableAI);
         if (map.geminiApiKey != null) setGeminiApiKey(map.geminiApiKey);
+        if (map.groqApiKey != null) setGroqApiKey(map.groqApiKey);
+        if (map.mistralApiKey != null) setMistralApiKey(map.mistralApiKey);
+        if (map.huggingfaceApiKey != null) setHuggingfaceApiKey(map.huggingfaceApiKey);
       } catch {}
     };
     load();
@@ -157,8 +163,11 @@ export default function AdminSettings() {
       await Promise.all([
         api.post("settings", { key: "enableAI", value: enableAI }),
         api.post("settings", { key: "geminiApiKey", value: geminiApiKey }),
+        api.post("settings", { key: "groqApiKey", value: groqApiKey }),
+        api.post("settings", { key: "mistralApiKey", value: mistralApiKey }),
+        api.post("settings", { key: "huggingfaceApiKey", value: huggingfaceApiKey }),
       ]);
-      showToast("AI Engine settings & API key saved successfully!");
+      showToast("Multi-AI Failover settings & keys saved successfully!");
     } catch {
       showToast("Failed to save AI settings", "error");
     }
@@ -243,10 +252,10 @@ export default function AdminSettings() {
         />
         <div style={{ padding: "14px 16px", background: "var(--admin-card)", border: "1px solid var(--admin-border)", borderRadius: 12, marginTop: 8 }}>
           <div style={{ fontWeight: 600, fontSize: ".875rem", color: "var(--admin-text)", marginBottom: 4 }}>
-            Google Gemini API Key (Free Tier)
+            1. Google Gemini API Key (Primary Free Engine)
           </div>
           <div style={{ fontSize: ".75rem", color: "var(--admin-muted)", marginBottom: 8 }}>
-            Get your free API key from <a href="https://aistudio.google.com/" target="_blank" rel="noreferrer" style={{ color: "var(--admin-accent)" }}>Google AI Studio</a> and paste it into <code style={{ background: "rgba(0,0,0,0.06)", padding: "2px 6px", borderRadius: 4 }}>.env</code> or set it here.
+            Free API key from <a href="https://aistudio.google.com/" target="_blank" rel="noreferrer" style={{ color: "var(--admin-accent)" }}>Google AI Studio</a>.
           </div>
           <input
             className="admin-input"
@@ -255,6 +264,57 @@ export default function AdminSettings() {
             style={{ width: "100%", boxSizing: "border-box" }}
             value={geminiApiKey}
             onChange={e => setGeminiApiKey(e.target.value)}
+          />
+        </div>
+
+        <div style={{ padding: "14px 16px", background: "var(--admin-card)", border: "1px solid var(--admin-border)", borderRadius: 12, marginTop: 8 }}>
+          <div style={{ fontWeight: 600, fontSize: ".875rem", color: "var(--admin-text)", marginBottom: 4 }}>
+            2. Groq API Key (Llama 3.1 Fallback)
+          </div>
+          <div style={{ fontSize: ".75rem", color: "var(--admin-muted)", marginBottom: 8 }}>
+            Free API key from <a href="https://console.groq.com/" target="_blank" rel="noreferrer" style={{ color: "var(--admin-accent)" }}>Groq Console</a> (Ultra-fast Llama 3).
+          </div>
+          <input
+            className="admin-input"
+            type="password"
+            placeholder="gsk_..."
+            style={{ width: "100%", boxSizing: "border-box" }}
+            value={groqApiKey}
+            onChange={e => setGroqApiKey(e.target.value)}
+          />
+        </div>
+
+        <div style={{ padding: "14px 16px", background: "var(--admin-card)", border: "1px solid var(--admin-border)", borderRadius: 12, marginTop: 8 }}>
+          <div style={{ fontWeight: 600, fontSize: ".875rem", color: "var(--admin-text)", marginBottom: 4 }}>
+            3. Mistral AI API Key (Backup Engine)
+          </div>
+          <div style={{ fontSize: ".75rem", color: "var(--admin-muted)", marginBottom: 8 }}>
+            Free API key from <a href="https://console.mistral.ai/" target="_blank" rel="noreferrer" style={{ color: "var(--admin-accent)" }}>Mistral Console</a>.
+          </div>
+          <input
+            className="admin-input"
+            type="password"
+            placeholder="mistral_..."
+            style={{ width: "100%", boxSizing: "border-box" }}
+            value={mistralApiKey}
+            onChange={e => setMistralApiKey(e.target.value)}
+          />
+        </div>
+
+        <div style={{ padding: "14px 16px", background: "var(--admin-card)", border: "1px solid var(--admin-border)", borderRadius: 12, marginTop: 8 }}>
+          <div style={{ fontWeight: 600, fontSize: ".875rem", color: "var(--admin-text)", marginBottom: 4 }}>
+            4. Hugging Face Inference Key (Backup Engine)
+          </div>
+          <div style={{ fontSize: ".75rem", color: "var(--admin-muted)", marginBottom: 8 }}>
+            Free Access Token from <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noreferrer" style={{ color: "var(--admin-accent)" }}>Hugging Face Tokens</a>.
+          </div>
+          <input
+            className="admin-input"
+            type="password"
+            placeholder="hf_..."
+            style={{ width: "100%", boxSizing: "border-box" }}
+            value={huggingfaceApiKey}
+            onChange={e => setHuggingfaceApiKey(e.target.value)}
           />
         </div>
         <button

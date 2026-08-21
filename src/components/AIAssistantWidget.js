@@ -16,6 +16,7 @@ export default function AIAssistantWidget() {
   const [loading, setLoading] = useState(false);
   const [credits, setCredits] = useState(10);
   const [userPoints, setUserPoints] = useState(0);
+  const [activeProvider, setActiveProvider] = useState("Multi-AI Failover Active");
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [purchasing, setPurchasing] = useState(false);
   const [statusMsg, setStatusMsg] = useState("");
@@ -67,6 +68,9 @@ export default function AIAssistantWidget() {
       const res = await api.post("ai/question", { question: query });
       if (res.data && res.data.success) {
         const botResponse = res.data.data.response;
+        if (res.data.provider) {
+          setActiveProvider(res.data.provider);
+        }
         setMessages((prev) => [
           ...prev,
           { id: Date.now() + 1, sender: "bot", text: botResponse }
@@ -142,7 +146,7 @@ export default function AIAssistantWidget() {
                 <Sparkles size={18} color="#a5b4fc" />
                 <span>UHC AI Tutor</span>
               </div>
-              <div className="ai-header-sub">Medical Study Companion</div>
+              <div className="ai-header-sub">⚡ Engine: {activeProvider}</div>
             </div>
 
             <div
