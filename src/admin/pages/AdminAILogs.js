@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Sparkles, Bot, Zap, MessageSquare, BookOpen, RefreshCw, Search, ShieldAlert, CheckCircle2 } from "lucide-react";
+import { Sparkles, Bot, Zap, MessageSquare, BookOpen, RefreshCw, Search } from "lucide-react";
 import api from "../../api/api";
 
 export default function AdminAILogs() {
