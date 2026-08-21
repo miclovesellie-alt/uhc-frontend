@@ -31,12 +31,12 @@ function renderMarkdown(text) {
     // Horizontal rule
     .replace(/^---$/gm, "<hr/>")
     // Numbered list items
-    .replace(/^(\d+)\. (.+)$/gm, "<li class=\"md-ol\">$2</li>")
+    .replace(/^(\d+)\. (.+)$/gm, '<li class="md-ol">$2</li>')
     // Bullet list items (* or -)
-    .replace(/^[\*\-] (.+)$/gm, "<li class=\"md-ul\">$2</li>")
+    .replace(/^[-*] (.+)$/gm, '<li class="md-ul">$2</li>')
     // Wrap consecutive <li> into proper lists (simple pass)
-    .replace(/(<li class=\"md-ol\">.*?<\/li>)/gs, (m) => `<ol>${m}</ol>`)
-    .replace(/(<li class=\"md-ul\">.*?<\/li>)/gs, (m) => `<ul>${m}</ul>`)
+    .replace(/(<li class="md-ol">.*?<\/li>)/gs, (m) => `<ol>${m}</ol>`)
+    .replace(/(<li class="md-ul">.*?<\/li>)/gs, (m) => `<ul>${m}</ul>`)
     // Line breaks (double newline → paragraph break)
     .replace(/\n\n/g, "</p><p>")
     .replace(/\n/g,   "<br/>");
