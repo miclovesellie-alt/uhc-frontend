@@ -79,7 +79,7 @@ export default function AdminSettings() {
   useEffect(() => {
     const load = async () => {
       try {
-        const keys = ["noScreenshot","maintenanceMode","quizTimer","registrationOpen","globalAnnouncement","allowGuestAccess","disableFeed","disableQuiz","disableLibrary","heroImageUrl","contactInfo"];
+        const keys = ["noScreenshot","maintenanceMode","quizTimer","registrationOpen","globalAnnouncement","allowGuestAccess","disableFeed","disableQuiz","disableLibrary","heroImageUrl","contactInfo","enableAI","geminiApiKey"];
         const results = await Promise.allSettled(keys.map(k => api.get(`settings/${k}`)));
         const map = {};
         results.forEach((r, i) => { if (r.status==="fulfilled" && r.value.data?.value != null) map[keys[i]] = r.value.data.value; });
@@ -94,6 +94,8 @@ export default function AdminSettings() {
         if (map.disableLibrary != null) setDisableLibrary(map.disableLibrary);
         if (map.heroImageUrl) setHeroImageUrl(map.heroImageUrl);
         if (map.contactInfo) setContactInfo(prev => ({ ...prev, ...map.contactInfo }));
+        if (map.enableAI != null) setEnableAI(map.enableAI);
+        if (map.geminiApiKey != null) setGeminiApiKey(map.geminiApiKey);
       } catch {}
     };
     load();
@@ -148,6 +150,18 @@ export default function AdminSettings() {
       await api.post("settings", { key:"contactInfo", value:contactInfo });
       showToast("Contact information saved");
     } catch { showToast("Failed to save contact info", "error"); }
+  };
+
+  const saveAISettings = async () => {
+    try {
+      await Promise.all([
+        api.post("settings", { key: "enableAI", value: enableAI }),
+        api.post("settings", { key: "geminiApiKey", value: geminiApiKey }),
+      ]);
+      showToast("AI Engine settings & API key saved successfully!");
+    } catch {
+      showToast("Failed to save AI settings", "error");
+    }
   };
 
   const clearLogsFromDB = async () => {
@@ -243,6 +257,13 @@ export default function AdminSettings() {
             onChange={e => setGeminiApiKey(e.target.value)}
           />
         </div>
+        <button
+          className="admin-btn primary"
+          style={{ marginTop: 12, background: "linear-gradient(135deg, #4f46e5, #7c3aed)", border: "none" }}
+          onClick={saveAISettings}
+        >
+          <Save size={14} /> Save AI Settings
+        </button>
       </Section>
 
       {/* Admin Profile */}
