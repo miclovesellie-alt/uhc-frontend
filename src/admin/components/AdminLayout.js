@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import CommandPalette from "./CommandPalette";
 import AdminQuickDock from "./AdminQuickDock";
+import AIAssistantWidget from "../../components/AIAssistantWidget";
 import { playToastSound, unlockAudio } from "../../utils/sounds";
 
 const Crumb = ChevronRight;
@@ -41,6 +42,7 @@ const baseNavItems = [
   { icon: <Upload size={17}/>,          label: "Bulk Upload",     path: "/admin/uploads"          },
   { icon: <Clock size={17}/>,           label: "Pending Review",  path: "/admin/pending"          },
   { icon: <FileText size={17}/>,        label: "Activity Logs",   path: "/admin/logs"             },
+  { icon: <Bot size={17}/>,             label: "AI Activity Logs",path: "/admin/ai-logs"          },
   { icon: <CalendarDays size={17}/>,    label: "Daily Summary",   path: "/admin/daily-summary"   },
   { icon: <Bell size={17}/>,            label: "Notifications",   path: "/admin/notifications"   },
   { icon: <Megaphone size={17}/>,       label: "Announcements",   path: "/admin/announcements"   },
@@ -51,7 +53,7 @@ const baseNavItems = [
 ];
 
 const MAIN       = ["/admin","/admin/users","/admin/admins","/admin/questions","/admin/userlibrary","/admin/feed","/admin/uploads","/admin/pending"];
-const MONITORING = ["/admin/logs","/admin/daily-summary","/admin/notifications","/admin/messages","/admin/recycle-bin","/admin/announcements"];
+const MONITORING = ["/admin/logs","/admin/ai-logs","/admin/daily-summary","/admin/notifications","/admin/messages","/admin/recycle-bin","/admin/announcements"];
 const SYSTEM     = ["/admin/settings", "/admin/telegram-bot"];
 
 /* ── Live Clock ── */
@@ -762,6 +764,7 @@ export default function AdminLayout() {
           to   { opacity: 1; transform: translateY(0); }
         }
       `}</style>
+      <AIAssistantWidget />
     </div>
   );
 }
