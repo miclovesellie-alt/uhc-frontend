@@ -64,8 +64,7 @@ export default function AdminSettings() {
   const [enableAI, setEnableAI] = useState(true);
   const [geminiApiKey, setGeminiApiKey] = useState("");
   const [groqApiKey, setGroqApiKey] = useState("");
-  const [mistralApiKey, setMistralApiKey] = useState("");
-  const [huggingfaceApiKey, setHuggingfaceApiKey] = useState("");
+  const [claudeApiKey, setClaudeApiKey] = useState("");
 
   // Contact & Social
   const [contactInfo, setContactInfo] = useState({ email:"",phone:"",whatsapp:"",facebook:"",tiktok:"",instagram:"",twitter:"",youtube:"" });
@@ -82,7 +81,7 @@ export default function AdminSettings() {
   useEffect(() => {
     const load = async () => {
       try {
-        const keys = ["noScreenshot","maintenanceMode","quizTimer","registrationOpen","globalAnnouncement","allowGuestAccess","disableFeed","disableQuiz","disableLibrary","heroImageUrl","contactInfo","enableAI","geminiApiKey","groqApiKey","mistralApiKey","huggingfaceApiKey"];
+        const keys = ["noScreenshot","maintenanceMode","quizTimer","registrationOpen","globalAnnouncement","allowGuestAccess","disableFeed","disableQuiz","disableLibrary","heroImageUrl","contactInfo","enableAI","geminiApiKey","groqApiKey","claudeApiKey"];
         const results = await Promise.allSettled(keys.map(k => api.get(`settings/${k}`)));
         const map = {};
         results.forEach((r, i) => { if (r.status==="fulfilled" && r.value.data?.value != null) map[keys[i]] = r.value.data.value; });
@@ -100,8 +99,7 @@ export default function AdminSettings() {
         if (map.enableAI != null) setEnableAI(map.enableAI);
         if (map.geminiApiKey != null) setGeminiApiKey(map.geminiApiKey);
         if (map.groqApiKey != null) setGroqApiKey(map.groqApiKey);
-        if (map.mistralApiKey != null) setMistralApiKey(map.mistralApiKey);
-        if (map.huggingfaceApiKey != null) setHuggingfaceApiKey(map.huggingfaceApiKey);
+        if (map.claudeApiKey != null) setClaudeApiKey(map.claudeApiKey);
       } catch {}
     };
     load();
@@ -164,10 +162,9 @@ export default function AdminSettings() {
         api.post("settings", { key: "enableAI", value: enableAI }),
         api.post("settings", { key: "geminiApiKey", value: geminiApiKey }),
         api.post("settings", { key: "groqApiKey", value: groqApiKey }),
-        api.post("settings", { key: "mistralApiKey", value: mistralApiKey }),
-        api.post("settings", { key: "huggingfaceApiKey", value: huggingfaceApiKey }),
+        api.post("settings", { key: "claudeApiKey", value: claudeApiKey }),
       ]);
-      showToast("Multi-AI Failover settings & keys saved successfully!");
+      showToast("AI Engine keys saved! Cascade order: Gemini → Groq → Claude");
     } catch {
       showToast("Failed to save AI settings", "error");
     }
@@ -242,87 +239,73 @@ export default function AdminSettings() {
       </Section>
 
       {/* AI Engine Controls */}
-      <Section icon="🤖" title="AI Engine & API Settings">
+      <Section icon="🤖" title="AI Engine & Failover Settings">
+        {/* Cascade info banner */}
+        <div style={{ background: "linear-gradient(135deg,#1e1b4b,#312e81)", borderRadius: 12, padding: "12px 16px", marginBottom: 12, color: "white" }}>
+          <div style={{ fontWeight: 700, fontSize: ".85rem", marginBottom: 4 }}>⚡ 3-Provider Cascade Active</div>
+          <div style={{ fontSize: ".75rem", opacity: 0.8, lineHeight: 1.5 }}>
+            When one AI hits its quota, the system silently switches to the next — users see a friendly notification and keep going without interruption. After all three are exhausted, users are shown a Premium upgrade prompt.
+          </div>
+          <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {["🔵 1. Google Gemini", "⚡ 2. Groq (Llama 3.1)", "🟣 3. Claude (Haiku)"].map(p => (
+              <span key={p} style={{ background: "rgba(255,255,255,0.15)", padding: "3px 10px", borderRadius: 20, fontSize: ".72rem", fontWeight: 600 }}>{p}</span>
+            ))}
+          </div>
+        </div>
+
         <Toggle
           checked={enableAI}
           onChange={setEnableAI}
           icon="⚡"
           label="Enable AI Study Assistant & Quiz Tutor"
-          desc="Master toggle for floating AI assistant, quiz explanations, and option balancer"
+          desc="Master toggle for all AI features — floating assistant, quiz explainer, question generator"
         />
-        <div style={{ padding: "14px 16px", background: "var(--admin-card)", border: "1px solid var(--admin-border)", borderRadius: 12, marginTop: 8 }}>
-          <div style={{ fontWeight: 600, fontSize: ".875rem", color: "var(--admin-text)", marginBottom: 4 }}>
-            1. Google Gemini API Key (Primary Free Engine)
+
+        {/* Gemini */}
+        <div style={{ padding: "14px 16px", background: "var(--admin-card)", border: "1px solid var(--admin-border)", borderRadius: 12, marginTop: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+            <span>🔵</span>
+            <div style={{ fontWeight: 700, fontSize: ".875rem", color: "var(--admin-text)" }}>1. Google Gemini — Primary Engine</div>
           </div>
           <div style={{ fontSize: ".75rem", color: "var(--admin-muted)", marginBottom: 8 }}>
-            Free API key from <a href="https://aistudio.google.com/" target="_blank" rel="noreferrer" style={{ color: "var(--admin-accent)" }}>Google AI Studio</a>.
+            Free key from <a href="https://aistudio.google.com/" target="_blank" rel="noreferrer" style={{ color: "var(--admin-accent)" }}>Google AI Studio</a> · Used first on every request.
           </div>
-          <input
-            className="admin-input"
-            type="password"
-            placeholder="AIzaSy..."
-            style={{ width: "100%", boxSizing: "border-box" }}
-            value={geminiApiKey}
-            onChange={e => setGeminiApiKey(e.target.value)}
-          />
+          <input className="admin-input" type="password" placeholder="AIzaSy..." style={{ width: "100%", boxSizing: "border-box" }}
+            value={geminiApiKey} onChange={e => setGeminiApiKey(e.target.value)} />
         </div>
 
+        {/* Groq */}
         <div style={{ padding: "14px 16px", background: "var(--admin-card)", border: "1px solid var(--admin-border)", borderRadius: 12, marginTop: 8 }}>
-          <div style={{ fontWeight: 600, fontSize: ".875rem", color: "var(--admin-text)", marginBottom: 4 }}>
-            2. Groq API Key (Llama 3.1 Fallback)
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+            <span>⚡</span>
+            <div style={{ fontWeight: 700, fontSize: ".875rem", color: "var(--admin-text)" }}>2. Groq (Llama 3.1) — Auto Failover</div>
           </div>
           <div style={{ fontSize: ".75rem", color: "var(--admin-muted)", marginBottom: 8 }}>
-            Free API key from <a href="https://console.groq.com/" target="_blank" rel="noreferrer" style={{ color: "var(--admin-accent)" }}>Groq Console</a> (Ultra-fast Llama 3).
+            Free key from <a href="https://console.groq.com/" target="_blank" rel="noreferrer" style={{ color: "var(--admin-accent)" }}>Groq Console</a> · Ultra-fast. Activates when Gemini quota runs out.
           </div>
-          <input
-            className="admin-input"
-            type="password"
-            placeholder="gsk_..."
-            style={{ width: "100%", boxSizing: "border-box" }}
-            value={groqApiKey}
-            onChange={e => setGroqApiKey(e.target.value)}
-          />
+          <input className="admin-input" type="password" placeholder="gsk_..." style={{ width: "100%", boxSizing: "border-box" }}
+            value={groqApiKey} onChange={e => setGroqApiKey(e.target.value)} />
         </div>
 
+        {/* Claude */}
         <div style={{ padding: "14px 16px", background: "var(--admin-card)", border: "1px solid var(--admin-border)", borderRadius: 12, marginTop: 8 }}>
-          <div style={{ fontWeight: 600, fontSize: ".875rem", color: "var(--admin-text)", marginBottom: 4 }}>
-            3. Mistral AI API Key (Backup Engine)
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+            <span>🟣</span>
+            <div style={{ fontWeight: 700, fontSize: ".875rem", color: "var(--admin-text)" }}>3. Claude AI (Haiku) — Final Failover</div>
           </div>
           <div style={{ fontSize: ".75rem", color: "var(--admin-muted)", marginBottom: 8 }}>
-            Free API key from <a href="https://console.mistral.ai/" target="_blank" rel="noreferrer" style={{ color: "var(--admin-accent)" }}>Mistral Console</a>.
+            API key from <a href="https://console.anthropic.com/" target="_blank" rel="noreferrer" style={{ color: "var(--admin-accent)" }}>Anthropic Console</a> · Activates when both Gemini & Groq are exhausted.
           </div>
-          <input
-            className="admin-input"
-            type="password"
-            placeholder="mistral_..."
-            style={{ width: "100%", boxSizing: "border-box" }}
-            value={mistralApiKey}
-            onChange={e => setMistralApiKey(e.target.value)}
-          />
+          <input className="admin-input" type="password" placeholder="sk-ant-..." style={{ width: "100%", boxSizing: "border-box" }}
+            value={claudeApiKey} onChange={e => setClaudeApiKey(e.target.value)} />
         </div>
 
-        <div style={{ padding: "14px 16px", background: "var(--admin-card)", border: "1px solid var(--admin-border)", borderRadius: 12, marginTop: 8 }}>
-          <div style={{ fontWeight: 600, fontSize: ".875rem", color: "var(--admin-text)", marginBottom: 4 }}>
-            4. Hugging Face Inference Key (Backup Engine)
-          </div>
-          <div style={{ fontSize: ".75rem", color: "var(--admin-muted)", marginBottom: 8 }}>
-            Free Access Token from <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noreferrer" style={{ color: "var(--admin-accent)" }}>Hugging Face Tokens</a>.
-          </div>
-          <input
-            className="admin-input"
-            type="password"
-            placeholder="hf_..."
-            style={{ width: "100%", boxSizing: "border-box" }}
-            value={huggingfaceApiKey}
-            onChange={e => setHuggingfaceApiKey(e.target.value)}
-          />
-        </div>
         <button
           className="admin-btn primary"
-          style={{ marginTop: 12, background: "linear-gradient(135deg, #4f46e5, #7c3aed)", border: "none" }}
+          style={{ marginTop: 14, background: "linear-gradient(135deg, #4f46e5, #7c3aed)", border: "none", width: "100%", justifyContent: "center" }}
           onClick={saveAISettings}
         >
-          <Save size={14} /> Save AI Settings
+          <Save size={14} /> Save All AI Keys
         </button>
       </Section>
 
