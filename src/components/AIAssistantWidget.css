@@ -233,6 +233,45 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.04);
 }
 
+/* ── Markdown rendered inside bot messages ──────────── */
+.ai-msg-text p    { margin: 0 0 8px; }
+.ai-msg-text p:last-child { margin-bottom: 0; }
+.ai-msg-text h2   { font-size: 1rem; font-weight: 700; margin: 10px 0 4px; color: #1e1b4b; }
+.ai-msg-text h3   { font-size: 0.92rem; font-weight: 700; margin: 10px 0 4px; color: #312e81; }
+.ai-msg-text h4   { font-size: 0.87rem; font-weight: 700; margin: 8px 0 4px; color: #4338ca; }
+.ai-msg-text strong { font-weight: 700; color: #1e293b; }
+.ai-msg-text em   { font-style: italic; color: #475569; }
+.ai-msg-text code {
+  background: #f1f5f9;
+  color: #7c3aed;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  font-family: "Fira Code", "Courier New", monospace;
+}
+.ai-msg-text ul, .ai-msg-text ol {
+  margin: 6px 0 6px 4px;
+  padding-left: 18px;
+}
+.ai-msg-text ul { list-style-type: disc; }
+.ai-msg-text ol { list-style-type: decimal; }
+.ai-msg-text li { margin: 3px 0; line-height: 1.5; }
+.ai-msg-text blockquote {
+  border-left: 3px solid #6366f1;
+  margin: 8px 0;
+  padding: 6px 12px;
+  background: #f8fafc;
+  border-radius: 0 8px 8px 0;
+  color: #475569;
+  font-style: italic;
+  font-size: 0.85rem;
+}
+.ai-msg-text hr {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 10px 0;
+}
+
 /* Thinking animation */
 .ai-thinking {
   flex-direction: row;

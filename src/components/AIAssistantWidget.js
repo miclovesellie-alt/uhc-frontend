@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Bot, Send, X, Zap, Sparkles, Crown, RefreshCw, ChevronRight } from "lucide-react";
+import { Bot, Send, X, Zap, Sparkles, Crown, RefreshCw, ChevronRight, Shield } from "lucide-react";
 import api from "../api/api";
 import "./AIAssistantWidget.css";
 
@@ -10,15 +10,55 @@ const PROVIDER_ICONS = {
   "UHC Core Engine (Offline)": "🔘"
 };
 
+// ── Lightweight inline Markdown → HTML renderer ───────────────────────────────
+function renderMarkdown(text) {
+  if (!text) return "";
+  let html = text
+    // Escape HTML entities first
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    // Headers
+    .replace(/^### (.+)$/gm, "<h4>$1</h4>")
+    .replace(/^## (.+)$/gm,  "<h3>$1</h3>")
+    .replace(/^# (.+)$/gm,   "<h2>$1</h2>")
+    // Bold + italic
+    .replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>")
+    .replace(/\*\*(.+?)\*\*/g,     "<strong>$1</strong>")
+    .replace(/\*(.+?)\*/g,          "<em>$1</em>")
+    // Inline code
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    // Blockquote
+    .replace(/^&gt; (.+)$/gm, "<blockquote>$1</blockquote>")
+    // Horizontal rule
+    .replace(/^---$/gm, "<hr/>")
+    // Numbered list items
+    .replace(/^(\d+)\. (.+)$/gm, "<li class=\"md-ol\">$2</li>")
+    // Bullet list items (* or -)
+    .replace(/^[\*\-] (.+)$/gm, "<li class=\"md-ul\">$2</li>")
+    // Wrap consecutive <li> into proper lists (simple pass)
+    .replace(/(<li class=\"md-ol\">.*?<\/li>)/gs, (m) => `<ol>${m}</ol>`)
+    .replace(/(<li class=\"md-ul\">.*?<\/li>)/gs, (m) => `<ul>${m}</ul>`)
+    // Line breaks (double newline → paragraph break)
+    .replace(/\n\n/g, "</p><p>")
+    .replace(/\n/g,   "<br/>");
+
+  return `<p>${html}</p>`;
+}
+
 const WELCOME_MSG = {
   id: "welcome",
   sender: "bot",
-  text: "👋 Hi! I'm your **UHC AI Study Tutor**.\n\nAsk me anything about your medical studies, quiz topics, anatomy, pharmacology, or health concepts — I'll explain it clearly!"
+  text: "👋 Hi! I'm your **UHC AI Study Tutor**.\n\nAsk me anything about your medical studies, quiz topics, anatomy, pharmacology, or health concepts!"
 };
 
-export default function AIAssistantWidget() {
+const ADMIN_WELCOME_MSG = {
+  id: "welcome",
+  sender: "bot",
+  text: "🛡️ **Admin AI Assistant** ready.\n\nAsk me anything — generate quiz questions, explain concepts, draft announcements, or get help with UHC platform management."
+};
+
+export default function AIAssistantWidget({ isAdmin = false }) {
   const [isOpen, setIsOpen]             = useState(false);
-  const [messages, setMessages]         = useState([WELCOME_MSG]);
+  const [messages, setMessages]         = useState([isAdmin ? ADMIN_WELCOME_MSG : WELCOME_MSG]);
   const [input, setInput]               = useState("");
   const [loading, setLoading]           = useState(false);
   const [credits, setCredits]           = useState(10);
@@ -166,8 +206,9 @@ export default function AIAssistantWidget() {
           <div className="ai-header">
             <div className="ai-header-left">
               <div className="ai-header-title">
-                <Sparkles size={16} color="#a5b4fc" />
-                <span>UHC AI Tutor</span>
+                {isAdmin
+                  ? <><Shield size={15} color="#a5b4fc" /><span>Admin AI Assistant</span></>
+                  : <><Sparkles size={16} color="#a5b4fc" /><span>UHC AI Tutor</span></>}
               </div>
               {activeProvider && (
                 <div className="ai-provider-pill">
@@ -201,7 +242,13 @@ export default function AIAssistantWidget() {
                     {PROVIDER_ICONS[m.provider] || "🤖"} {m.provider}
                   </div>
                 )}
-                <div className="ai-msg-text">{m.text}</div>
+                {m.sender === "bot"
+                  ? <div
+                      className="ai-msg-text"
+                      dangerouslySetInnerHTML={{ __html: renderMarkdown(m.text) }}
+                    />
+                  : <div className="ai-msg-text">{m.text}</div>
+                }
               </div>
             ))}
 
