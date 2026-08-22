@@ -3,7 +3,7 @@ import { UserContext } from "../context/UserContext";
 import {
   FaPencilAlt, FaMedal, FaStar, FaTrophy, FaCog, FaMoon, FaSun, FaGlobe,
   FaLock, FaTimes, FaCheckCircle, FaUser, FaEnvelope, FaMapMarkerAlt,
-  FaUserGraduate, FaHospital, FaSearch, FaPlus
+  FaUserGraduate, FaHospital, FaSearch, FaPlus, FaWhatsapp
 } from "react-icons/fa";
 import "../styles/profile.css";
 import countries from "../data/countries";
@@ -194,6 +194,37 @@ function ProfilePage({ user, setUser }) {
             >
               {isEditing ? <><FaCheckCircle /> Save</> : <><FaPencilAlt /> Edit</>}
             </button>
+            <a
+              href="https://wa.me/233598173019?text=Hello%20Admin%2C%20I%20need%20assistance%20on%20UHC"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="pp-btn pp-btn-whatsapp"
+              title="Contact Admin on WhatsApp (+233 598173019)"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                background: "#25D366",
+                color: "#ffffff",
+                textDecoration: "none",
+                borderRadius: "12px",
+                padding: "8px 14px",
+                fontWeight: 700,
+                fontSize: "0.82rem",
+                boxShadow: "0 2px 10px rgba(37,211,102,0.3)",
+                transition: "transform 0.15s ease, box-shadow 0.15s ease",
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = "translateY(-1px)";
+                e.currentTarget.style.boxShadow = "0 4px 14px rgba(37,211,102,0.45)";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 2px 10px rgba(37,211,102,0.3)";
+              }}
+            >
+              <FaWhatsapp size={16} /> Contact Admin
+            </a>
             <button className="pp-btn pp-btn-settings" onClick={() => setShowSettings(true)}>
               <FaCog />
             </button>
@@ -392,23 +423,41 @@ function ProfilePage({ user, setUser }) {
       <div className="pp-section-label">💬 Contact Admin</div>
       <div className="pp-card" style={{ marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", padding: "16px 20px" }}>
         <div>
-          <div style={{ fontWeight: 700, fontSize: ".88rem", color: "var(--text-heading)", marginBottom: 3 }}>Send a Message to Admin</div>
-          <div style={{ fontSize: ".75rem", color: "var(--text-muted)" }}>Suggestions, feedback, or questions — we'd love to hear from you</div>
+          <div style={{ fontWeight: 700, fontSize: ".88rem", color: "var(--text-heading)", marginBottom: 3 }}>Need Help or Have Inquiries?</div>
+          <div style={{ fontSize: ".75rem", color: "var(--text-muted)" }}>Chat directly with the admin on WhatsApp (+233 598173019) or send an in-app message</div>
         </div>
-        <button
-          onClick={() => setShowSuggest(true)}
-          style={{
-            display: "flex", alignItems: "center", gap: 8,
-            background: "linear-gradient(135deg,#4255ff,#8b5cf6)",
-            color: "white", border: "none", borderRadius: 12, padding: "10px 18px",
-            fontWeight: 700, fontSize: ".82rem", cursor: "pointer", flexShrink: 0,
-            boxShadow: "0 4px 14px rgba(66,85,255,.3)", transition: "transform .15s, box-shadow .15s",
-          }}
-          onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 6px 20px rgba(66,85,255,.4)"; }}
-          onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 4px 14px rgba(66,85,255,.3)"; }}
-        >
-          <FaEnvelope/> Write a Message
-        </button>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+          <a
+            href="https://wa.me/233598173019?text=Hello%20Admin%2C%20I%20need%20assistance%20on%20UHC"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "flex", alignItems: "center", gap: 8,
+              background: "#25D366",
+              color: "white", textDecoration: "none", borderRadius: 12, padding: "10px 18px",
+              fontWeight: 700, fontSize: ".82rem", cursor: "pointer", flexShrink: 0,
+              boxShadow: "0 4px 14px rgba(37,211,102,.3)", transition: "transform .15s, box-shadow .15s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 6px 20px rgba(37,211,102,.4)"; }}
+            onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 4px 14px rgba(37,211,102,.3)"; }}
+          >
+            <FaWhatsapp size={18}/> WhatsApp Admin
+          </a>
+          <button
+            onClick={() => setShowSuggest(true)}
+            style={{
+              display: "flex", alignItems: "center", gap: 8,
+              background: "linear-gradient(135deg,#4255ff,#8b5cf6)",
+              color: "white", border: "none", borderRadius: 12, padding: "10px 18px",
+              fontWeight: 700, fontSize: ".82rem", cursor: "pointer", flexShrink: 0,
+              boxShadow: "0 4px 14px rgba(66,85,255,.3)", transition: "transform .15s, box-shadow .15s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 6px 20px rgba(66,85,255,.4)"; }}
+            onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 4px 14px rgba(66,85,255,.3)"; }}
+          >
+            <FaEnvelope/> Write a Message
+          </button>
+        </div>
       </div>
 
       {/* ── SUGGESTION MODAL ── */}

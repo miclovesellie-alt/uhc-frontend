@@ -13,6 +13,7 @@ import {
   Search, BarChart2, ChevronRight, X, Bell, PenSquare, Trophy, Settings,
   Volume2, VolumeX, Mail,
 } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 
 function EmailVerifyBanner({ email }) {
   const [dismissed, setDismissed] = useState(false);
@@ -336,6 +337,42 @@ function DashboardLayout() {
               </span>
             )}
           </button>
+
+          {/* Contact Admin via WhatsApp */}
+          <a
+            href="https://wa.me/233598173019?text=Hello%20Admin%2C%20I%20need%20assistance%20on%20UHC"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="topbar-avatar-btn topbar-whatsapp-btn"
+            title="Contact Admin on WhatsApp (+233 598173019)"
+            aria-label="Contact Admin on WhatsApp"
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: "50%",
+              background: "#25D366",
+              border: "1.5px solid #22c55e",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#ffffff",
+              cursor: "pointer",
+              flexShrink: 0,
+              textDecoration: "none",
+              transition: "transform 0.18s ease, box-shadow 0.18s ease",
+              boxShadow: "0 2px 8px rgba(37, 211, 102, 0.35)",
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = "translateY(-1px) scale(1.05)";
+              e.currentTarget.style.boxShadow = "0 4px 12px rgba(37, 211, 102, 0.5)";
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = "translateY(0) scale(1)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(37, 211, 102, 0.35)";
+            }}
+          >
+            <FaWhatsapp size={19} />
+          </a>
 
           {/* Settings icon — replaces letter avatar */}
           <button
