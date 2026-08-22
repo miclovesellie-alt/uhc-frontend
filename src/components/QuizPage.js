@@ -998,14 +998,14 @@ export default function QuizPage() {
             />
 
             <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
-              <span style={{ fontSize: "1.35rem", flexShrink: 0 }}>🌱</span>
+              <span style={{ fontSize: "1.35rem", flexShrink: 0 }}>{questions?.length >= 50 ? "🏆" : "🌱"}</span>
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontWeight: 800, fontSize: "0.84rem", color: "#ecfdf5", display: "flex", alignItems: "center", gap: 6 }}>
-                  Help Us Grow!
+                  {questions?.length >= 50 ? "50 Questions Complete!" : "Help Us Grow!"}
                   <span style={{ fontSize: "0.68rem", background: "rgba(255,255,255,0.2)", padding: "1px 6px", borderRadius: 99, fontWeight: 600 }}>Optional</span>
                 </div>
                 <div style={{ fontSize: "0.74rem", color: "#d1fae5", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  Share with a study mate on WhatsApp &amp; earn +3 points
+                  {questions?.length >= 50 ? "Share with a study group & earn +3 points" : "Share with a study mate on WhatsApp & earn +3 points"}
                 </div>
               </div>
             </div>
