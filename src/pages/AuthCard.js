@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import api from "../api/api";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import "../styles/AuthCard.css";
 import { UserContext } from "../context/UserContext";
 import { COUNTRY_CODES, COUNTRY_CODE_MAP, COUNTRY_TO_CODE_MAP } from "../components/CompleteProfileModal";
 import countriesList from "../data/countries";
