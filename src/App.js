@@ -71,6 +71,11 @@ const ROUTE_SEO = {
     description: "Free nursing education and NMC licensing exam preparation platform for students worldwide. Practice adaptive quizzes, access study flashcards, past questions, and library resources — 100% free.",
     index: true,
   },
+  "/study-hub": {
+    title: "Nursing Study Hub | Free Flashcards, Quick Notes & NMC Prep — UHC Academy",
+    description: "Access free nursing study flashcards, concise clinical quick notes, and revision resources for pharmacology, med-surg, pediatrics, and NMC exam prep.",
+    index: true,
+  },
   "/auth": {
     title: "Sign In or Register | UHC Academy",
     description: "Log in or create your free UHC Academy account to access nursing quizzes, flashcards, and the global leaderboard.",
