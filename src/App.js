@@ -61,6 +61,7 @@ import ResetPassword from "./pages/ResetPassword";
 import AdminRecovery from "./pages/AdminRecovery";
 import VerifyEmail  from "./pages/VerifyEmail";
 import GoogleAuthCallback from "./pages/GoogleAuthCallback";
+import CompleteProfileModal from "./components/CompleteProfileModal";
 
 const BASE = "https://uhcacadamy.com";
 
@@ -140,6 +141,7 @@ function AppRoutes() {
   return (
     <>
       <PageSEO />
+      <CompleteProfileModal />
       <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         {/* ===== LANDING PAGE ===== */}

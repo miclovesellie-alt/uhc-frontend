@@ -213,9 +213,9 @@ function AuthCard() {
   const nextStep = () => {
     setError("");
     if (signupStep === 1) {
-      if (!formData.name) { setError("Please enter your name"); return; }
-      if (signupMode === "email" && !formData.email) { setError("Please enter your email"); return; }
-      if (signupMode === "phone" && !formData.phone) { setError("Please enter your phone number"); return; }
+      if (!formData.name.trim()) { setError("Please enter your full name"); return; }
+      if (!formData.email.trim()) { setError("Please enter your email address"); return; }
+      if (!formData.phone.trim() || formData.phone.trim().length < 6) { setError("Please enter your mobile / WhatsApp number"); return; }
     }
     if (signupStep === 2) {
       if (!formData.country) { setError("Please select your country"); return; }
@@ -413,41 +413,36 @@ function AuthCard() {
                     required
                   />
 
-                  {signupMode === "email" ? (
-                    <>
-                      <label className="input-label">Email Address</label>
-                      <input
-                        type="email"
-                        name="email"
-                        placeholder="user@example.com"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <label className="input-label">Mobile Number</label>
-                      <div className="phone-input-wrapper">
-                        <input
-                          className="phone-prefix"
-                          name="phonePrefix"
-                          value={formData.phonePrefix}
-                          onChange={handleChange}
-                        />
-                        <input
-                          type="tel"
-                          name="phone"
-                          placeholder="XXX XXX XXXX"
-                          value={formData.phone}
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
-                    </>
-                  )}
+                  <label className="input-label">Email Address *</label>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="user@example.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                  />
 
-                  <button type="button" className="auth-button" onClick={nextStep}>
+                  <label className="input-label">Mobile / WhatsApp Number *</label>
+                  <div className="phone-input-wrapper">
+                    <input
+                      className="phone-prefix"
+                      name="phonePrefix"
+                      value={formData.phonePrefix}
+                      onChange={handleChange}
+                      placeholder="+233"
+                    />
+                    <input
+                      type="tel"
+                      name="phone"
+                      placeholder="e.g. 59 817 3019"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  <button type="button" className="auth-button" onClick={nextStep} style={{ marginTop: 14 }}>
                     Continue &nbsp;→
                   </button>
 
