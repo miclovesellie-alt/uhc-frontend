@@ -165,15 +165,20 @@ export default function BulkUpload() {
 {`{
   "questions": [
     {
-      "question": "What is...?",
-      "options": ["A", "B", "C", "D"],
-      "answer": 0
+      "question": "What is the normal blood pH?",
+      "options": ["7.25-7.30", "7.35-7.45", "7.50-7.60"],
+      "answer": 1
+    },
+    {
+      "question": "Which medication is a cardiac glycoside?",
+      "options": ["Metoprolol", "Digoxin", "Lisinopril", "Aspirin"],
+      "answer": 1
     }
   ]
 }`}
             </pre>
             <p style={{ fontSize: '0.75rem', marginTop: 4 }}>
-              💡 <strong>Course is optional in the JSON</strong> — you assign it below.
+              💡 <strong>3 or 4 options supported:</strong> Questions can have 3 options (answer: 0, 1, 2) or 4 options (answer: 0, 1, 2, 3). Course is assigned below.
             </p>
           </div>
         </div>

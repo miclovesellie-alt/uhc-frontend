@@ -250,29 +250,42 @@ export default function AdminQuestions() {
   /* ── Edit ── */
   const handleSave = async () => {
     try {
-      const res = await api.put(`admin/questions/${editData._id}`, editData);
+      const cleanOptions = editData.options.map(o => String(o || "").trim()).filter(Boolean);
+      if (cleanOptions.length < 3 || cleanOptions.length > 4) {
+        showToast("Question must have 3 or 4 options", "error");
+        return;
+      }
+      if (editData.answer === null || editData.answer < 0 || editData.answer >= cleanOptions.length) {
+        showToast("Please select a valid correct answer (A, B, C" + (cleanOptions.length === 4 ? ", or D" : "") + ")", "error");
+        return;
+      }
+      const payload = { ...editData, options: cleanOptions };
+      const res = await api.put(`admin/questions/${editData._id}`, payload);
       setQuestions(prev => prev.map(q => q._id === res.data._id ? res.data : q));
       showToast("Question updated");
       setEditModal(false);
-    } catch (err) { showToast("Update failed", "error"); }
+    } catch (err) { showToast(err.response?.data?.error || "Update failed", "error"); }
   };
 
   /* ── Add question ── */
   const handleAddQuestion = async () => {
+    const cleanOptions = newQ.options.map(o => String(o || "").trim()).filter(Boolean);
     // Live validation
     const errors = {};
     if (!newQ.question.trim()) errors.question = true;
     if (!newQ.course) errors.course = true;
-    if (newQ.answer === null) errors.answer = true;
-    if (newQ.options.some(o => !o.trim())) errors.options = true;
+    if (cleanOptions.length < 3 || cleanOptions.length > 4) errors.options = true;
+    if (newQ.answer === null || newQ.answer < 0 || newQ.answer >= cleanOptions.length) errors.answer = true;
+    
     if (Object.keys(errors).length > 0) {
       setAddValidationErrors(errors);
-      showToast("Please fill all required fields", "error");
+      showToast("Please enter question, course, 3 or 4 options, and mark the correct answer", "error");
       return;
     }
     setAddValidationErrors({});
     try {
-      const res = await api.post("admin/questions", newQ);
+      const payload = { ...newQ, options: cleanOptions };
+      const res = await api.post("admin/questions", payload);
       setQuestions(prev => [res.data, ...prev]);
       setTotalCount(prev => prev + 1);
       showToast("Question added!");
@@ -281,7 +294,7 @@ export default function AdminQuestions() {
       setAddValidationErrors({});
       setDuplicateWarning("");
       fetchCourseCounts();
-    } catch (err) { showToast("Add failed", "error"); }
+    } catch (err) { showToast(err.response?.data?.error || "Add failed", "error"); }
   };
 
   /* ── Duplicate detection ── */
@@ -943,33 +956,53 @@ export default function AdminQuestions() {
 
               {/* Options */}
               <div>
-                <label style={{ fontSize:".78rem", fontWeight:700, color: (addValidationErrors.options || addValidationErrors.answer) ? "#ef4444" : "#64748b", display:"block", marginBottom:8, textTransform:"uppercase", letterSpacing:".06em" }}>
-                  Options * <span style={{ textTransform:"none", fontWeight:500, color:"#16a34a" }}>— click the letter to mark correct answer</span>
-                </label>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <label style={{ fontSize:".78rem", fontWeight:700, color: (addValidationErrors.options || addValidationErrors.answer) ? "#ef4444" : "#64748b", textTransform:"uppercase", letterSpacing:".06em", margin: 0 }}>
+                    Options * <span style={{ textTransform:"none", fontWeight:500, color:"#16a34a" }}>— 3 or 4 options allowed</span>
+                  </label>
+                  <span style={{ fontSize: ".72rem", color: "#64748b" }}>Click letter to mark correct</span>
+                </div>
                 {newQ.options.map((opt, i) => (
                   <div key={i} style={{ display:"flex", gap:8, marginBottom:10, alignItems:"center" }}>
                     <button
-                      onClick={() => { setNewQ(p => ({ ...p, answer: i })); setAddValidationErrors(p => ({ ...p, answer: false })); }}
+                      type="button"
+                      disabled={!opt.trim() && i === 3}
+                      onClick={() => {
+                        if (opt.trim() || i < 3) {
+                          setNewQ(p => ({ ...p, answer: i }));
+                          setAddValidationErrors(p => ({ ...p, answer: false }));
+                        }
+                      }}
                       style={{
                         width:32, height:32, borderRadius:10, border:"2px solid",
                         borderColor: newQ.answer===i ? "#16a34a" : addValidationErrors.answer ? "#ef4444" : "#e2e8f0",
                         background: newQ.answer===i ? "#16a34a" : "white",
                         color: newQ.answer===i ? "white" : "#64748b",
-                        fontSize:".8rem", cursor:"pointer", flexShrink:0,
+                        fontSize:".8rem", cursor: (!opt.trim() && i === 3) ? "not-allowed" : "pointer", flexShrink:0,
                         display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800,
                         boxShadow: newQ.answer===i ? "0 2px 8px rgba(22,163,74,.3)" : "none",
+                        opacity: (!opt.trim() && i === 3) ? 0.6 : 1,
                         transition:"all .15s",
                       }}>
                       {String.fromCharCode(65+i)}
                     </button>
                     <input
                       className="admin-input"
-                      style={{ flex:1, borderColor: newQ.answer===i ? "rgba(22,163,74,.4)" : addValidationErrors.options && !opt.trim() ? "#ef4444" : undefined, background: newQ.answer===i ? "rgba(22,163,74,.04)" : undefined }}
-                      placeholder={`Option ${String.fromCharCode(65+i)}…`}
+                      style={{
+                        flex:1,
+                        borderColor: newQ.answer===i ? "rgba(22,163,74,.4)" : (addValidationErrors.options && i < 3 && !opt.trim()) ? "#ef4444" : undefined,
+                        background: newQ.answer===i ? "rgba(22,163,74,.04)" : undefined
+                      }}
+                      placeholder={`Option ${String.fromCharCode(65+i)}${i === 3 ? " (Optional — leave empty for 3 options)" : " *"}`}
                       value={opt}
                       onChange={e => {
-                        const opts=[...newQ.options]; opts[i]=e.target.value;
-                        setNewQ(p => ({ ...p, options:opts }));
+                        const opts=[...newQ.options];
+                        opts[i]=e.target.value;
+                        if (i === 3 && !e.target.value.trim() && newQ.answer === 3) {
+                          setNewQ(p => ({ ...p, options: opts, answer: null }));
+                        } else {
+                          setNewQ(p => ({ ...p, options: opts }));
+                        }
                       }}
                     />
                   </div>
@@ -1063,33 +1096,50 @@ export default function AdminQuestions() {
               </div>
               <div>
                 <label style={{ fontSize: ".8rem", color: "var(--admin-muted)", fontWeight: 600, display: "block", marginBottom: 6 }}>
-                  OPTIONS <span style={{ color: "#16a34a", fontWeight: 400 }}>(click letter to set correct)</span>
+                  OPTIONS <span style={{ color: "#16a34a", fontWeight: 400 }}>(3 or 4 options — click letter to set correct answer)</span>
                 </label>
-                {editData.options?.map((opt, i) => (
-                  <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8, alignItems: "center" }}>
-                    <button
-                      onClick={() => setEditData(p => ({ ...p, answer: i }))}
-                      style={{
-                        width: 32, height: 32, borderRadius: 10, border: "2px solid",
-                        borderColor: editData.answer === i ? "#16a34a" : "var(--admin-border)",
-                        background: editData.answer === i ? "#16a34a" : "transparent",
-                        color: editData.answer === i ? "white" : "var(--admin-muted)",
-                        fontSize: ".8rem", cursor: "pointer", flexShrink: 0,
-                        display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800,
-                        boxShadow: editData.answer === i ? "0 2px 8px rgba(22,163,74,.3)" : "none",
-                        transition: "all .15s",
-                      }}>
-                      {String.fromCharCode(65 + i)}
-                    </button>
-                    <input className="admin-input"
-                      style={{ flex: 1, borderColor: editData.answer === i ? "rgba(22,163,74,.4)" : undefined, background: editData.answer === i ? "rgba(22,163,74,.04)" : undefined }}
-                      value={opt}
-                      onChange={e => {
-                        const opts = [...editData.options]; opts[i] = e.target.value;
-                        setEditData(p => ({ ...p, options: opts }));
-                      }} />
-                  </div>
-                ))}
+                {/* Ensure at least 4 input rows for easy editing/adding 4th option */}
+                {[0, 1, 2, 3].map((i) => {
+                  const opt = editData.options?.[i] || "";
+                  return (
+                    <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8, alignItems: "center" }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (opt.trim() || i < 3) {
+                            setEditData(p => ({ ...p, answer: i }));
+                          }
+                        }}
+                        style={{
+                          width: 32, height: 32, borderRadius: 10, border: "2px solid",
+                          borderColor: editData.answer === i ? "#16a34a" : "var(--admin-border)",
+                          background: editData.answer === i ? "#16a34a" : "transparent",
+                          color: editData.answer === i ? "white" : "var(--admin-muted)",
+                          fontSize: ".8rem", cursor: (!opt.trim() && i === 3) ? "not-allowed" : "pointer", flexShrink: 0,
+                          display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800,
+                          boxShadow: editData.answer === i ? "0 2px 8px rgba(22,163,74,.3)" : "none",
+                          opacity: (!opt.trim() && i === 3) ? 0.6 : 1,
+                          transition: "all .15s",
+                        }}>
+                        {String.fromCharCode(65 + i)}
+                      </button>
+                      <input className="admin-input"
+                        style={{ flex: 1, borderColor: editData.answer === i ? "rgba(22,163,74,.4)" : undefined, background: editData.answer === i ? "rgba(22,163,74,.04)" : undefined }}
+                        placeholder={`Option ${String.fromCharCode(65 + i)}${i === 3 ? " (Optional — leave empty for 3 options)" : " *"}`}
+                        value={opt}
+                        onChange={e => {
+                          const opts = [...(editData.options || ["", "", "", ""])];
+                          while (opts.length <= i) opts.push("");
+                          opts[i] = e.target.value;
+                          if (i === 3 && !e.target.value.trim() && editData.answer === 3) {
+                            setEditData(p => ({ ...p, options: opts, answer: null }));
+                          } else {
+                            setEditData(p => ({ ...p, options: opts }));
+                          }
+                        }} />
+                    </div>
+                  );
+                })}
               </div>
               <div>
                 <label style={{ fontSize: ".8rem", color: "var(--admin-muted)", fontWeight: 600, display: "block", marginBottom: 6 }}>EXPLANATION <span style={{ fontWeight: 400, color: "var(--admin-muted)" }}>(optional — {(editData.explanation || "").length} chars)</span></label>

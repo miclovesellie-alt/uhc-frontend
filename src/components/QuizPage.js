@@ -144,7 +144,7 @@ export default function QuizPage() {
 
   // ── State snapshot ref for keyboard handler (registered once) ──
   const kbStateRef = useRef({});
-  kbStateRef.current = { stage, done, locked, selAns, paused, mode };
+  kbStateRef.current = { stage, done, locked, selAns, paused, mode, questions, idx };
 
   const awardPoints = async (amount, reason, course, questionsAnswered, totalQuestions) => {
     try {
@@ -357,10 +357,13 @@ export default function QuizPage() {
       if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.tagName === "SELECT") return;
 
       if (!locked) {
-        // A/B/C/D → select answer option
+        // A/B/C/D → select answer option dynamically based on option count (3 or 4)
         const optMap = { a: 0, b: 1, c: 2, d: 3, A: 0, B: 1, C: 2, D: 3 };
-        if (optMap[e.key] !== undefined) {
-          setSelAns(optMap[e.key]);
+        const keyVal = optMap[e.key];
+        const currentQ = questions?.[idx];
+        const totalOpts = currentQ?.options?.length || 4;
+        if (keyVal !== undefined && keyVal < totalOpts) {
+          setSelAns(keyVal);
           playSelect();
           return;
         }
@@ -1218,7 +1221,7 @@ export default function QuizPage() {
             {/* Keyboard shortcut hints */}
             {!reviewMode && (
               <div className="quiz-kb-hints">
-                <span><kbd>A</kbd>–<kbd>D</kbd> Select</span>
+                <span><kbd>A</kbd>–<kbd>{q.options?.length === 3 ? "C" : "D"}</kbd> Select</span>
                 {!locked && selAns !== null && <span><kbd>Enter</kbd> Confirm</span>}
                 {locked && <span><kbd>→</kbd> Next</span>}
                 <span><kbd>F</kbd> Flag</span>
