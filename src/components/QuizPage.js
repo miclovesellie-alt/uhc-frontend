@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Flag, BookOpen, CheckCircle, Clock, AlertTriangle, Search, Pause, Play, ChevronDown, ChevronUp, Share2, Copy, X } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import { UserContext } from "../context/UserContext";
 import { useToast } from "./Toast";
 import "../styles/quiz.css";
@@ -136,6 +137,53 @@ export default function QuizPage() {
   const [previewDataUrl, setPreviewDataUrl] = useState("");
   const [aiExplMap, setAiExplMap] = useState({});
   const [aiExplLoading, setAiExplLoading] = useState({});
+
+  // ── Help Us Grow: Social Share & +3 Points Reward ──
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const [showTopShareBanner, setShowTopShareBanner] = useState(false);
+  const [shareCount, setShareCount] = useState(() => {
+    try { return parseInt(localStorage.getItem("uhc_grow_share_count") || "0", 10) % 5; } catch { return 0; }
+  });
+  const [sharesClaimedToday, setSharesClaimedToday] = useState(() => {
+    try { return localStorage.getItem(`uhc_grow_claimed_${todayKey}`) === "true"; } catch { return false; }
+  });
+
+  useEffect(() => {
+    if (done) {
+      setShowTopShareBanner(true);
+      const timer = setTimeout(() => setShowTopShareBanner(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [done]);
+
+  const handleGrowShare = (platform = "whatsapp") => {
+    const shareMsg = `Hey! I just completed the ${selCourse || "Nursing"} quiz on UHC Academy (Scored ${pct}%). Practice free nursing & NMC exam questions here: https://uhcacadamy.com`;
+
+    if (platform === "whatsapp") {
+      window.open(`https://wa.me/?text=${encodeURIComponent(shareMsg)}`, "_blank");
+    } else if (platform === "copy") {
+      navigator.clipboard.writeText(shareMsg);
+      toast("Invite message copied to clipboard! 📋", "success");
+    }
+
+    // Advance 5-share counter towards +3 points
+    const next = shareCount + 1;
+    if (next >= 5 && !sharesClaimedToday) {
+      setShareCount(5);
+      setSharesClaimedToday(true);
+      localStorage.setItem("uhc_grow_share_count", "0");
+      localStorage.setItem(`uhc_grow_claimed_${todayKey}`, "true");
+      awardPoints(3, "Community Share - Help Us Grow");
+      toast("🎉 +3 Leaderboard points added! Thank you for helping UHC Academy grow!", "success");
+    } else {
+      const stored = next % 5;
+      setShareCount(stored);
+      localStorage.setItem("uhc_grow_share_count", String(stored));
+      if (!sharesClaimedToday) {
+        toast(`🌱 Share recorded (${stored}/5)! Share ${5 - stored} more to earn +3 points.`, "info");
+      }
+    }
+  };
 
   // ── Always-fresh refs for functions used in closures/effects ──
   const confirmAnswerRef = useRef(null);
@@ -907,6 +955,106 @@ export default function QuizPage() {
   return (
     <div className={`quiz-page-wrap ${noSS && stage === "quiz" ? "no-screenshot-mode" : ""}`}>
 
+      {/* ── TOP SLIDE-IN NOTIFICATION (5s auto-dismiss) ── */}
+      <AnimatePresence>
+        {showTopShareBanner && done && (
+          <motion.div
+            initial={{ y: -80, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -80, opacity: 0 }}
+            transition={{ type: "spring", damping: 20, stiffness: 220 }}
+            style={{
+              position: "fixed",
+              top: 16,
+              left: "50%",
+              transform: "translateX(-50%)",
+              zIndex: 99999,
+              width: "min(92vw, 540px)",
+              background: "linear-gradient(135deg, #064e3b, #047857)",
+              color: "#ffffff",
+              borderRadius: 16,
+              padding: "12px 16px",
+              boxShadow: "0 10px 30px rgba(0, 0, 0, 0.25)",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 12,
+              overflow: "hidden",
+            }}
+          >
+            {/* 5-second countdown progress bar */}
+            <motion.div
+              initial={{ width: "100%" }}
+              animate={{ width: "0%" }}
+              transition={{ duration: 5, ease: "linear" }}
+              style={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                height: 3,
+                background: "#34d399",
+              }}
+            />
+
+            <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
+              <span style={{ fontSize: "1.35rem", flexShrink: 0 }}>🌱</span>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontWeight: 800, fontSize: "0.84rem", color: "#ecfdf5", display: "flex", alignItems: "center", gap: 6 }}>
+                  Help Us Grow!
+                  <span style={{ fontSize: "0.68rem", background: "rgba(255,255,255,0.2)", padding: "1px 6px", borderRadius: 99, fontWeight: 600 }}>Optional</span>
+                </div>
+                <div style={{ fontSize: "0.74rem", color: "#d1fae5", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  Share with a study mate on WhatsApp &amp; earn +3 points
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+              <button
+                onClick={() => {
+                  handleGrowShare("whatsapp");
+                  setShowTopShareBanner(false);
+                }}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  background: "#25D366",
+                  color: "white",
+                  border: "none",
+                  borderRadius: 10,
+                  padding: "6px 12px",
+                  fontWeight: 700,
+                  fontSize: "0.78rem",
+                  cursor: "pointer",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+                }}
+              >
+                <FaWhatsapp size={15} /> Share
+              </button>
+              <button
+                onClick={() => setShowTopShareBanner(false)}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "rgba(255,255,255,0.7)",
+                  cursor: "pointer",
+                  fontSize: "1rem",
+                  padding: "4px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+                title="Close"
+              >
+                ✕
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ── Watermark ── */}
       {noSS && stage === "quiz" && (
         <div className="quiz-watermark-overlay">
@@ -1371,6 +1519,99 @@ export default function QuizPage() {
                   <span className="qrs-lb">{lb}</span>
                 </div>
               ))}
+            </div>
+
+            {/* ── HELP US GROW & EARN POINTS CARD ── */}
+            <div style={{
+              margin: "18px 0 8px",
+              background: "linear-gradient(135deg, rgba(16,185,129,0.08), rgba(6,182,212,0.06))",
+              border: "1.5px solid rgba(16,185,129,0.25)",
+              borderRadius: 18,
+              padding: "16px 18px",
+              textAlign: "left",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: "1.3rem" }}>🌱</span>
+                  <div>
+                    <div style={{ fontWeight: 800, fontSize: "0.88rem", color: "var(--text-heading, #0f172a)" }}>
+                      Help Us Grow <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontWeight: 500 }}>(Completely Optional)</span>
+                    </div>
+                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                      Share this quiz with 5 classmates or groups to earn <strong style={{ color: "#10b981" }}>+3 Bonus Points!</strong>
+                    </div>
+                  </div>
+                </div>
+                {sharesClaimedToday && (
+                  <span style={{ background: "#d1fae5", color: "#065f46", fontSize: "0.72rem", fontWeight: 700, padding: "3px 8px", borderRadius: 99 }}>
+                    ✓ Claimed Today
+                  </span>
+                )}
+              </div>
+
+              {/* Progress bar */}
+              <div style={{ margin: "10px 0 12px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.72rem", fontWeight: 700, color: "var(--text-muted)", marginBottom: 4 }}>
+                  <span>Progress to +3 Points</span>
+                  <span>{sharesClaimedToday ? "5/5 (Points Claimed 🎉)" : `${shareCount}/5 Shared`}</span>
+                </div>
+                <div style={{ width: "100%", height: 8, background: "rgba(0,0,0,0.06)", borderRadius: 99, overflow: "hidden" }}>
+                  <div style={{
+                    width: sharesClaimedToday ? "100%" : `${(shareCount / 5) * 100}%`,
+                    height: "100%",
+                    background: "linear-gradient(90deg, #10b981, #06b6d4)",
+                    borderRadius: 99,
+                    transition: "width 0.3s ease",
+                  }} />
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button
+                  onClick={() => handleGrowShare("whatsapp")}
+                  style={{
+                    flex: 1,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 6,
+                    background: "#25D366",
+                    color: "white",
+                    border: "none",
+                    borderRadius: 10,
+                    padding: "9px 14px",
+                    fontWeight: 700,
+                    fontSize: "0.8rem",
+                    cursor: "pointer",
+                    boxShadow: "0 2px 8px rgba(37,211,102,0.25)",
+                    transition: "transform 0.15s ease",
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.transform = "translateY(-1px)"}
+                  onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
+                >
+                  <FaWhatsapp size={16} /> Share on WhatsApp
+                </button>
+                <button
+                  onClick={() => handleGrowShare("copy")}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 6,
+                    background: "var(--surface, #ffffff)",
+                    color: "var(--text-heading, #0f172a)",
+                    border: "1px solid var(--border, #e2e8f0)",
+                    borderRadius: 10,
+                    padding: "9px 14px",
+                    fontWeight: 700,
+                    fontSize: "0.8rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  <Copy size={14} /> Copy Invite Message
+                </button>
+              </div>
             </div>
 
             <div className="qr-actions">
