@@ -7,6 +7,7 @@ import axios from "axios";
 import "../styles/dashboard.css";
 import { useToast } from "./Toast";
 import { toggleBookmark, getBookmarks } from "../utils/bookmarks";
+import { FaWhatsapp } from "react-icons/fa";
 
 
 
@@ -192,6 +193,110 @@ export default function FYP({ refresh }) {
 
       {/* ── Post Feed ── */}
       <div className="dash-feed-column" style={{ display: 'flex', flexDirection: 'column', gap: '28px', maxWidth: '640px', margin: '0 auto 40px auto' }}>
+
+        {/* ── PINNED FIRST POST: OFFICIAL WHATSAPP CHANNEL ── */}
+        <a
+          href="https://whatsapp.com/channel/0029VbD5x07CcW4tQ4Ox0142"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ textDecoration: "none", color: "inherit", display: "block" }}
+        >
+          <div
+            className="dash-post-card"
+            style={{
+              borderRadius: "18px",
+              border: "2px solid rgba(37,211,102,0.35)",
+              background: "linear-gradient(180deg, rgba(37,211,102,0.06) 0%, #ffffff 100%)",
+              overflow: "hidden",
+              boxShadow: "0 6px 20px rgba(37,211,102,0.12)",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              cursor: "pointer",
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = "translateY(-3px)";
+              e.currentTarget.style.boxShadow = "0 10px 28px rgba(37,211,102,0.2)";
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 6px 20px rgba(37,211,102,0.12)";
+            }}
+          >
+            {/* Header: Author & Meta */}
+            <div className="dash-post-header" style={{ display: "flex", alignItems: "center", padding: "16px 20px", gap: "12px" }}>
+              <div style={{
+                width: 44,
+                height: 44,
+                borderRadius: "50%",
+                background: "#25D366",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 2px 10px rgba(37,211,102,0.35)",
+                flexShrink: 0,
+              }}>
+                <FaWhatsapp size={24} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                  <span style={{ fontWeight: 800, fontSize: "0.98rem", color: "var(--text-heading, #0f172a)" }}>
+                    UHC Official Academy
+                  </span>
+                  <span style={{
+                    background: "#25D366",
+                    color: "white",
+                    fontSize: "0.68rem",
+                    fontWeight: 800,
+                    padding: "2px 7px",
+                    borderRadius: 99,
+                  }}>
+                    ✓ OFFICIAL CHANNEL
+                  </span>
+                </div>
+                <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: 2 }}>
+                  Pinned Announcement • <span style={{ color: "#25D366", fontWeight: 700 }}>WhatsApp Community</span>
+                </div>
+              </div>
+              <span style={{
+                fontSize: "0.75rem",
+                color: "#16a34a",
+                fontWeight: 700,
+                background: "rgba(37,211,102,0.12)",
+                padding: "4px 10px",
+                borderRadius: 8,
+              }}>
+                📌 Pinned
+              </span>
+            </div>
+
+            {/* Body */}
+            <div className="dash-post-content" style={{ padding: "0 20px 16px" }}>
+              <div style={{ fontWeight: 800, fontSize: "1.12rem", marginBottom: 8, color: "var(--text-heading, #0f172a)", lineHeight: 1.35 }}>
+                📢 Join Our Official WhatsApp Channel for Daily NMC Past Questions &amp; Study Materials!
+              </div>
+              <div style={{ fontSize: "0.92rem", color: "var(--text-body, #334155)", lineHeight: 1.6, marginBottom: 14 }}>
+                Stay ahead in your nursing &amp; healthcare exams. Tap here to follow our official WhatsApp channel for daily quizzes, flashcards, NMC licensure updates, and clinical mnemonics.
+              </div>
+
+              {/* Call to action button */}
+              <div style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                background: "#25D366",
+                color: "#ffffff",
+                padding: "10px 20px",
+                borderRadius: 12,
+                fontWeight: 800,
+                fontSize: "0.88rem",
+                boxShadow: "0 3px 12px rgba(37,211,102,0.35)",
+              }}>
+                <FaWhatsapp size={18} /> Tap to Open WhatsApp Channel ➔
+              </div>
+            </div>
+          </div>
+        </a>
+
         {posts.filter(p => 
           p.title?.toLowerCase().includes(searchQuery?.toLowerCase() || "") ||
           p.content?.toLowerCase().includes(searchQuery?.toLowerCase() || "")
