@@ -362,8 +362,34 @@ export default function AdminUsers() {
               <div style={{display:"flex",alignItems:"center",gap:12}}>
                 <div style={{width:48,height:48,borderRadius:"50%",background:"var(--admin-accent-pale)",color:"var(--admin-accent)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:"1.1rem"}}>{selectedUser.name?.[0]}</div>
                 <div>
-                  <div style={{fontWeight:700,color:"var(--admin-text)"}}>{selectedUser.name}</div>
+                  <div style={{fontWeight:700,color:"var(--admin-text)",fontSize:"1rem"}}>{selectedUser.name}</div>
                   <div style={{fontSize:".8rem",color:"var(--admin-muted)"}}>{selectedUser.email}</div>
+                  {selectedUser.phone && (
+                    <div style={{fontSize:".8rem",color:"var(--admin-text)",marginTop:4,display:"flex",alignItems:"center",gap:8}}>
+                      <span style={{fontWeight:600}}>📱 {selectedUser.phone}</span>
+                      <a
+                        href={getWhatsAppUrl(selectedUser.phone, selectedUser.name)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display:"inline-flex",
+                          alignItems:"center",
+                          gap:5,
+                          background:"#25D366",
+                          color:"white",
+                          padding:"2px 8px",
+                          borderRadius:6,
+                          fontSize:".74rem",
+                          fontWeight:700,
+                          textDecoration:"none",
+                          boxShadow:"0 2px 6px rgba(37,211,102,0.3)",
+                        }}
+                        title={`Open WhatsApp chat with ${selectedUser.name}`}
+                      >
+                        <FaWhatsapp size={13} /> WhatsApp
+                      </a>
+                    </div>
+                  )}
                   <div style={{fontSize:".72rem",color:"var(--admin-muted)",marginTop:2}}>Joined: {selectedUser.createdAt?new Date(selectedUser.createdAt).toLocaleDateString():"—"}</div>
                 </div>
               </div>
