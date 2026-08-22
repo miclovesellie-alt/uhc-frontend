@@ -62,8 +62,12 @@ export default function AdminUsers() {
   const getWhatsAppUrl = (phone, targetUserName) => {
     if (!phone) return "";
     let clean = String(phone).replace(/[^0-9]/g, "");
-    if (clean.startsWith("0") && clean.length === 10) {
+    if (clean.startsWith("2330") && clean.length === 13) {
+      clean = "233" + clean.slice(4);
+    } else if (clean.startsWith("0") && clean.length === 10) {
       clean = "233" + clean.slice(1);
+    } else if (clean.length === 9) {
+      clean = "233" + clean;
     }
     const adminName = currentUser?.name?.trim() || "Admin";
     const message = `Hi ${targetUserName || "there"}, this is admin ${adminName} from UHC`;

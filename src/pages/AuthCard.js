@@ -1,7 +1,9 @@
 import React, { useState, useContext, useEffect } from "react";
 import api from "../api/api";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import "../styles/AuthCard.css";
 import { UserContext } from "../context/UserContext";
+import { COUNTRY_CODES, COUNTRY_CODE_MAP, COUNTRY_TO_CODE_MAP } from "../components/CompleteProfileModal";
 import countriesList from "../data/countries";
 import "../styles/auth.css";
 
@@ -49,6 +51,36 @@ function AuthCard() {
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const handlePhonePrefixChange = (newPrefix) => {
+    let clean = formData.phone.replace(/\D/g, "");
+    if (newPrefix === "+233") {
+      if (clean.startsWith("0")) clean = clean.slice(1);
+      if (clean.length > 9) clean = clean.slice(0, 9);
+    }
+    const mappedCountry = COUNTRY_CODE_MAP[newPrefix] || formData.country;
+    setFormData(prev => ({ ...prev, phonePrefix: newPrefix, phone: clean, country: mappedCountry }));
+  };
+
+  const handleCountrySelectChange = (newCountry) => {
+    const mappedPrefix = COUNTRY_TO_CODE_MAP[newCountry] || formData.phonePrefix;
+    let clean = formData.phone.replace(/\D/g, "");
+    if (mappedPrefix === "+233") {
+      if (clean.startsWith("0")) clean = clean.slice(1);
+      if (clean.length > 9) clean = clean.slice(0, 9);
+    }
+    setFormData(prev => ({ ...prev, country: newCountry, phonePrefix: mappedPrefix, phone: clean }));
+  };
+
+  const handlePhoneInputChange = (e) => {
+    let clean = e.target.value.replace(/\D/g, "");
+    if (formData.phonePrefix === "+233") {
+      if (clean.startsWith("0")) clean = clean.slice(1);
+      if (clean.length > 9) clean = clean.slice(0, 9);
+    }
+    setFormData(prev => ({ ...prev, phone: clean }));
+    setError("");
+  };
 
   const HealthSplash = () => {
     const icons = ["🩺","📚","💊","🏥","🧬","📖","❤️","🔬","🩻","🎓"];
@@ -215,7 +247,21 @@ function AuthCard() {
     if (signupStep === 1) {
       if (!formData.name.trim()) { setError("Please enter your full name"); return; }
       if (!formData.email.trim()) { setError("Please enter your email address"); return; }
-      if (!formData.phone.trim() || formData.phone.trim().length < 6) { setError("Please enter your mobile / WhatsApp number"); return; }
+      const cleanPhone = formData.phone.trim().replace(/\D/g, "");
+      if (!cleanPhone) { setError("Please enter your mobile / WhatsApp number"); return; }
+      if (formData.phonePrefix === "+233") {
+        if (cleanPhone.startsWith("0")) {
+          setError("For Ghana (+233), the number cannot begin with 0. Please enter 9 digits (e.g. 598173019)");
+          return;
+        }
+        if (cleanPhone.length !== 9) {
+          setError(`Ghana (+233) phone number must be exactly 9 digits. You entered ${cleanPhone.length} digits.`);
+          return;
+        }
+      } else if (cleanPhone.length < 7 || cleanPhone.length > 15) {
+        setError("Please enter a valid phone number (7-15 digits)");
+        return;
+      }
     }
     if (signupStep === 2) {
       if (!formData.country) { setError("Please select your country"); return; }
@@ -425,22 +471,35 @@ function AuthCard() {
 
                   <label className="input-label">Mobile / WhatsApp Number *</label>
                   <div className="phone-input-wrapper">
-                    <input
+                    <select
                       className="phone-prefix"
                       name="phonePrefix"
                       value={formData.phonePrefix}
-                      onChange={handleChange}
-                      placeholder="+233"
-                    />
+                      onChange={e => handlePhonePrefixChange(e.target.value)}
+                      style={{ cursor: "pointer", outline: "none", minWidth: 90 }}
+                    >
+                      {COUNTRY_CODES.map(c => (
+                        <option key={c.code} value={c.code}>
+                          {c.flag} {c.code}
+                        </option>
+                      ))}
+                    </select>
                     <input
                       type="tel"
                       name="phone"
-                      placeholder="e.g. 59 817 3019"
+                      placeholder={formData.phonePrefix === "+233" ? "e.g. 598173019 (9 digits)" : "XXX XXX XXXX"}
                       value={formData.phone}
-                      onChange={handleChange}
+                      onChange={handlePhoneInputChange}
                       required
                     />
                   </div>
+                  {formData.phonePrefix === "+233" && (
+                    <div style={{ fontSize: "0.72rem", color: formData.phone.length === 9 ? "#16a34a" : "#64748b", marginTop: 4, fontWeight: 600 }}>
+                      {formData.phone.length === 9
+                        ? `✅ Valid: +233 ${formData.phone.slice(0,2)} ${formData.phone.slice(2,5)} ${formData.phone.slice(5)}`
+                        : `🇬🇭 9 digits without leading 0 (${formData.phone.length}/9 entered)`}
+                    </div>
+                  )}
 
                   <button type="button" className="auth-button" onClick={nextStep} style={{ marginTop: 14 }}>
                     Continue &nbsp;→
@@ -461,7 +520,7 @@ function AuthCard() {
                   <p className="auth-subtitle">Help us personalize your learning experience</p>
 
                   <label className="input-label">Country</label>
-                  <select name="country" value={formData.country} onChange={handleChange} required>
+                  <select name="country" value={formData.country} onChange={e => handleCountrySelectChange(e.target.value)} required>
                     <option value="">Select Country</option>
                     {countriesList.map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
