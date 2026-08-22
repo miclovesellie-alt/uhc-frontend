@@ -337,8 +337,7 @@ export default function LandingPage() {
               </span>
             </h1>
             <p style={{ color:"var(--text-secondary)", fontSize:"1.05rem", lineHeight:1.75, margin:"20px 0 32px", maxWidth:480 }}>
-              UHC Academy gives nursing students worldwide access to adaptive quizzes,
-              a Study Hub with flashcards and notes, and a live leaderboard — completely free.
+              UHC Academy gives nursing students worldwide complete preparation for <strong>NMC licensure exams</strong>, adaptive practice quizzes, a comprehensive Study Hub with flashcards and notes, and a live leaderboard — completely free.
             </p>
             <div className="hero-actions">
               <button className="hero-btn" onClick={() => navigate("/auth")}>

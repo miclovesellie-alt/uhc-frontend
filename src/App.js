@@ -67,8 +67,8 @@ const BASE = "https://uhcacadamy.com";
 // Per-route SEO config — canonical + title + description + indexing
 const ROUTE_SEO = {
   "/": {
-    title: "UHC Academy | Free Nursing Exam Prep — Quizzes, Library & Leaderboard",
-    description: "Free nursing education platform for students worldwide. Practice adaptive quizzes, access study flashcards and library resources, and compete on the global leaderboard.",
+    title: "UHC Academy | Free Nursing & NMC Exam Prep — Quizzes, Study Hub & Leaderboard",
+    description: "Free nursing education and NMC licensing exam preparation platform for students worldwide. Practice adaptive quizzes, access study flashcards, past questions, and library resources — 100% free.",
     index: true,
   },
   "/auth": {
