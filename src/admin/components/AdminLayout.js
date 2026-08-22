@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Users, HelpCircle, Upload, Bell, Settings, LogOut,
   Menu, X, FileText, Shield, Library, Mail, Layout, Trash2, Megaphone,
   Clock, ChevronLeft, ChevronRight, Search, Check, ExternalLink,
-  Sun, Moon, ArrowRight, CalendarDays, Bot
+  Sun, Moon, ArrowRight, CalendarDays, Bot, CreditCard
 } from "lucide-react";
 import CommandPalette from "./CommandPalette";
 import AdminQuickDock from "./AdminQuickDock";
@@ -23,6 +23,7 @@ function resolveNotifPath(n) {
   const type = (n.type || "").toUpperCase();
   if (type === "DANGER" || n.color === "red") return "/admin/logs";
   if (msg.includes("question reported") || msg.includes("reported question")) return "/admin/questions?filter=reported";
+  if (msg.includes("payment") || msg.includes("subscription") || msg.includes("revenue") || msg.includes("momo")) return "/admin/payments";
   if (msg.includes("question") || msg.includes("quiz") || type === "WARNING") return "/admin/questions";
   if (msg.includes("user") || msg.includes("signup") || msg.includes("register")) return "/admin/users";
   if (msg.includes("library") || msg.includes("book")) return "/admin/userlibrary";
@@ -35,6 +36,7 @@ function resolveNotifPath(n) {
 
 const baseNavItems = [
   { icon: <LayoutDashboard size={17}/>, label: "Dashboard",      path: "/admin"                  },
+  { icon: <CreditCard size={17}/>,      label: "Revenue & MoMo", path: "/admin/payments"         },
   { icon: <Users size={17}/>,           label: "Users",           path: "/admin/users"            },
   { icon: <HelpCircle size={17}/>,      label: "Questions",       path: "/admin/questions"        },
   { icon: <Library size={17}/>,         label: "Library",         path: "/admin/userlibrary"      },
@@ -52,7 +54,7 @@ const baseNavItems = [
   { icon: <Bot size={17}/>,             label: "Telegram Bot",    path: "/admin/telegram-bot"   },
 ];
 
-const MAIN       = ["/admin","/admin/users","/admin/admins","/admin/questions","/admin/userlibrary","/admin/feed","/admin/uploads","/admin/pending"];
+const MAIN       = ["/admin","/admin/payments","/admin/users","/admin/admins","/admin/questions","/admin/userlibrary","/admin/feed","/admin/uploads","/admin/pending"];
 const MONITORING = ["/admin/logs","/admin/ai-logs","/admin/daily-summary","/admin/notifications","/admin/messages","/admin/recycle-bin","/admin/announcements"];
 const SYSTEM     = ["/admin/settings", "/admin/telegram-bot"];
 

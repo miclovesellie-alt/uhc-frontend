@@ -46,6 +46,7 @@ import AdminInstitutions from "./admin/pages/AdminInstitutions";
 import AdminDailySummary from "./admin/pages/AdminDailySummary";
 import AdminTelegramBot from "./admin/pages/AdminTelegramBot";
 import AdminAILogs from "./admin/pages/AdminAILogs";
+import AdminPayments from "./admin/pages/AdminPayments";
 
 // ===== USER PAGES =====
 import Leaderboard from "./pages/Leaderboard";
@@ -218,6 +219,7 @@ function AppRoutes() {
           <Route path="daily-summary"   element={<AdminDailySummary />} />
           <Route path="telegram-bot"    element={<AdminTelegramBot />} />
           <Route path="ai-logs"         element={<AdminAILogs />} />
+          <Route path="payments"        element={<AdminPayments />} />
         </Route>
 
         {/* ===== PUBLIC STUDY HUB (GUEST ACCESS — static, no conditionals) ===== */}

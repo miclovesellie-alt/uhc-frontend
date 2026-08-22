@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Bot, Send, X, Zap, Sparkles, Crown, RefreshCw, ChevronRight, Shield } from "lucide-react";
+import { Bot, Send, X, Zap, Sparkles, Crown, RefreshCw, Shield } from "lucide-react";
 import api from "../api/api";
+import PremiumModal from "./PremiumModal";
 import "./AIAssistantWidget.css";
 
 const PROVIDER_ICONS = {
@@ -62,12 +63,13 @@ export default function AIAssistantWidget({ isAdmin = false }) {
   const [input, setInput]               = useState("");
   const [loading, setLoading]           = useState(false);
   const [credits, setCredits]           = useState(10);
+  const [isPremium, setIsPremium]       = useState(false);
   const [userPoints, setUserPoints]     = useState(0);
   const [activeProvider, setActiveProvider] = useState(null);
 
   // Modals
   const [showBuyModal, setShowBuyModal]   = useState(false);
-  const [showSubModal, setShowSubModal]   = useState(false); // all providers exhausted
+  const [showSubModal, setShowSubModal]   = useState(false); // Premium subscription modal
   const [purchasing, setPurchasing]       = useState(false);
   const [purchaseMsg, setPurchaseMsg]     = useState("");
 
@@ -88,7 +90,8 @@ export default function AIAssistantWidget({ isAdmin = false }) {
     try {
       const res = await api.get("ai/credits");
       if (res.data?.success) {
-        setCredits(res.data.credits);
+        setIsPremium(Boolean(res.data.isPremium));
+        setCredits(res.data.isPremium ? 9999 : res.data.credits);
         setUserPoints(res.data.points);
       }
     } catch { /* silent */ }
@@ -104,7 +107,7 @@ export default function AIAssistantWidget({ isAdmin = false }) {
     const query = (textToSend || input).trim();
     if (!query || loading) return;
 
-    if (credits <= 0) { setShowBuyModal(true); return; }
+    if (!isPremium && credits <= 0) { setShowBuyModal(true); return; }
 
     setMessages(prev => [...prev, { id: Date.now(), sender: "user", text: query }]);
     if (!textToSend) setInput("");
@@ -188,13 +191,13 @@ export default function AIAssistantWidget({ isAdmin = false }) {
 
       {/* ── Floating Toggle Button ── */}
       <button
-        className={`ai-toggle-btn ${credits <= 0 ? "depleted" : ""}`}
+        className={`ai-toggle-btn ${!isPremium && credits <= 0 ? "depleted" : ""}`}
         onClick={() => setIsOpen(o => !o)}
         title="UHC AI Study Assistant"
       >
         {isOpen ? <X size={22} /> : <Bot size={24} />}
-        <span className={`ai-badge ${credits <= 0 ? "zero" : credits <= 3 ? "low" : ""}`}>
-          {credits}
+        <span className={`ai-badge ${isPremium ? "premium" : credits <= 0 ? "zero" : credits <= 3 ? "low" : ""}`}>
+          {isPremium ? "👑" : credits}
         </span>
       </button>
 
@@ -220,12 +223,13 @@ export default function AIAssistantWidget({ isAdmin = false }) {
 
             <div className="ai-header-right">
               <button
-                className={`ai-credits-tag ${credits <= 3 ? "low" : ""}`}
-                onClick={() => setShowBuyModal(true)}
-                title="Buy more AI credits"
+                className={`ai-credits-tag ${isPremium ? "premium" : credits <= 3 ? "low" : ""}`}
+                onClick={() => setShowSubModal(true)}
+                title={isPremium ? "UHC Premium Member (Unlimited Access)" : "Upgrade to UHC Premium"}
+                style={isPremium ? { background: "linear-gradient(135deg, #f59e0b, #d97706)", color: "white", border: "none", fontWeight: 800 } : undefined}
               >
-                <Zap size={12} fill="#fbbf24" color="#fbbf24" />
-                <span>{credits} Credits</span>
+                {isPremium ? <Crown size={12} fill="#ffffff" color="#ffffff" /> : <Zap size={12} fill="#fbbf24" color="#fbbf24" />}
+                <span>{isPremium ? "👑 Premium" : `${credits} Credits`}</span>
               </button>
               <button className="ai-close-btn" onClick={() => setIsOpen(false)}>
                 <X size={16} />
@@ -279,11 +283,11 @@ export default function AIAssistantWidget({ isAdmin = false }) {
             </div>
           )}
 
-          {/* Credits Low Warning */}
-          {credits > 0 && credits <= 3 && (
+          {/* Credits Low Warning (Free users only) */}
+          {!isPremium && credits > 0 && credits <= 3 && (
             <div className="ai-credit-warning">
               ⚡ Only <strong>{credits}</strong> credit{credits !== 1 ? "s" : ""} left today.{" "}
-              <button onClick={() => setShowBuyModal(true)}>Top up</button>
+              <button onClick={() => setShowSubModal(true)}>Upgrade to Unlimited</button>
             </div>
           )}
 
@@ -292,19 +296,19 @@ export default function AIAssistantWidget({ isAdmin = false }) {
             <input
               ref={inputRef}
               type="text"
-              placeholder={credits <= 0 ? "Credits exhausted — buy more below" : "Ask anything about your studies..."}
+              placeholder={(!isPremium && credits <= 0) ? "Daily credits exhausted — upgrade below" : "Ask anything about your studies..."}
               value={input}
               onChange={e => setInput(e.target.value)}
-              disabled={loading || credits <= 0}
+              disabled={loading || (!isPremium && credits <= 0)}
             />
-            <button type="submit" className="ai-send-btn" disabled={loading || !input.trim() || credits <= 0}>
+            <button type="submit" className="ai-send-btn" disabled={loading || !input.trim() || (!isPremium && credits <= 0)}>
               {loading ? <RefreshCw size={16} className="ai-spin" /> : <Send size={16} />}
             </button>
           </form>
         </div>
       )}
 
-      {/* ── Buy Credits Modal ── */}
+      {/* ── Buy Credits Modal (Point redemption) ── */}
       {showBuyModal && (
         <div className="ai-modal-overlay" onClick={e => e.target === e.currentTarget && setShowBuyModal(false)}>
           <div className="ai-modal-card">
@@ -337,45 +341,21 @@ export default function AIAssistantWidget({ isAdmin = false }) {
 
             <div className="ai-modal-divider">or</div>
             <button className="ai-modal-upgrade-btn" onClick={() => { setShowBuyModal(false); setShowSubModal(true); }}>
-              <Crown size={15} /> Upgrade to Premium
+              <Crown size={15} /> Upgrade to Unlimited Premium
             </button>
           </div>
         </div>
       )}
 
-      {/* ── All Providers Exhausted / Subscription Wall ── */}
-      {showSubModal && (
-        <div className="ai-modal-overlay" onClick={e => e.target === e.currentTarget && setShowSubModal(false)}>
-          <div className="ai-modal-card premium">
-            <button className="ai-modal-x" onClick={() => setShowSubModal(false)}><X size={18} /></button>
-            <div className="ai-modal-icon crown"><Crown size={30} /></div>
-            <h2 className="ai-modal-title">All AI Engines Exhausted</h2>
-            <p className="ai-modal-desc">
-              You've used up today's free quota across <strong>Google Gemini</strong>, <strong>Groq (Llama 3.1)</strong>, and <strong>Claude AI</strong>.<br /><br />
-              Upgrade to <strong>UHC Premium</strong> for unlimited daily access across all AI engines!
-            </p>
-
-            <div className="ai-sub-perks">
-              {[
-                "♾️ Unlimited AI study sessions daily",
-                "⚡ Priority access across all 3 AI engines",
-                "📚 AI-generated personalised quizzes",
-                "🧠 Full quiz explanations on every question",
-                "🏆 Early access to new UHC features"
-              ].map(p => (
-                <div key={p} className="ai-perk-item">
-                  <ChevronRight size={14} /> {p}
-                </div>
-              ))}
-            </div>
-
-            <button className="ai-modal-btn premium-btn">
-              <Crown size={15} /> Upgrade to Premium — Coming Soon
-            </button>
-            <p className="ai-sub-note">Free quota resets every 24 hours. Come back tomorrow for more free credits!</p>
-          </div>
-        </div>
-      )}
+      {/* ── Full Premium Payment & Subscription Modal ── */}
+      <PremiumModal
+        isOpen={showSubModal}
+        onClose={() => setShowSubModal(false)}
+        onPaymentSuccess={() => {
+          setShowSubModal(false);
+          fetchCredits();
+        }}
+      />
 
     </div>
   );
