@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../api/api";
 import { motion } from "framer-motion";
 import { BookOpen, Zap, TrendingUp, Trophy, ArrowRight, Lock, Star, CheckCircle2, Menu, X, RotateCcw, Layers } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import "../styles/landingpage.css";
 import graduation from "../assets/graduation.jpeg";
 import favIconImg from "../assets/fav icon.jpeg";
@@ -314,8 +315,42 @@ export default function LandingPage() {
           <span className="nav-link" onClick={() => { navigate("/auth"); setMobileOpen(false); }}>Quizzes</span>
           <span className="nav-link" onClick={() => { navigate("/study-hub"); setMobileOpen(false); }}>Study Hub</span>
           <span className="nav-link" onClick={() => { navigate("/auth"); setMobileOpen(false); }}>Leaderboard</span>
+          <a
+            href="https://whatsapp.com/channel/0029VbD5x07CcW4tQ4Ox0142"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="nav-link"
+            style={{ color: "#25D366", fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}
+            onClick={() => setMobileOpen(false)}
+          >
+            <FaWhatsapp size={16} /> WhatsApp Channel
+          </a>
         </div>
         <div className="landing-nav-right">
+          <a
+            href="https://whatsapp.com/channel/0029VbD5x07CcW4tQ4Ox0142"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="desktop-only"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              background: "#25D366",
+              color: "#ffffff",
+              padding: "7px 14px",
+              borderRadius: 20,
+              fontSize: "0.82rem",
+              fontWeight: 700,
+              textDecoration: "none",
+              boxShadow: "0 2px 10px rgba(37,211,102,0.3)",
+              transition: "transform 0.15s ease",
+            }}
+            onMouseEnter={e => e.currentTarget.style.transform = "scale(1.04)"}
+            onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
+          >
+            <FaWhatsapp size={16} /> WhatsApp Channel
+          </a>
           <span className="landing-login desktop-only" onClick={() => navigate("/auth")}>Log In</span>
           <button className="landing-signup desktop-only" onClick={() => navigate("/auth")}>Get Started Free</button>
           <button className="mobile-menu-btn" onClick={() => setMobileOpen(o => !o)}>

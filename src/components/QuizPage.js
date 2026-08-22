@@ -1614,6 +1614,70 @@ export default function QuizPage() {
               </div>
             </div>
 
+            {/* ── OFFICIAL WHATSAPP CHANNEL TILE ── */}
+            <div style={{
+              margin: "10px 0 14px",
+              background: "linear-gradient(135deg, rgba(37,211,102,0.12), rgba(16,185,129,0.06))",
+              border: "1.5px solid rgba(37,211,102,0.3)",
+              borderRadius: 16,
+              padding: "12px 16px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 12,
+              flexWrap: "wrap",
+              textAlign: "left",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 200 }}>
+                <div style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: "50%",
+                  background: "#25D366",
+                  color: "#ffffff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                  boxShadow: "0 2px 8px rgba(37,211,102,0.3)",
+                }}>
+                  <FaWhatsapp size={20} />
+                </div>
+                <div>
+                  <div style={{ fontWeight: 800, fontSize: "0.86rem", color: "var(--text-heading, #0f172a)" }}>
+                    Join UHC WhatsApp Channel 🌟
+                  </div>
+                  <div style={{ fontSize: "0.74rem", color: "var(--text-muted)", lineHeight: 1.35 }}>
+                    Daily NMC exam questions, past papers &amp; flashcards directly on WhatsApp!
+                  </div>
+                </div>
+              </div>
+              <a
+                href="https://whatsapp.com/channel/0029VbD5x07CcW4tQ4Ox0142"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  background: "#25D366",
+                  color: "#ffffff",
+                  textDecoration: "none",
+                  borderRadius: 10,
+                  padding: "8px 14px",
+                  fontWeight: 800,
+                  fontSize: "0.78rem",
+                  boxShadow: "0 2px 8px rgba(37,211,102,0.3)",
+                  transition: "transform 0.15s ease",
+                  flexShrink: 0,
+                }}
+                onMouseEnter={e => e.currentTarget.style.transform = "translateY(-1px)"}
+                onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
+              >
+                <FaWhatsapp size={15} /> Follow Channel
+              </a>
+            </div>
+
             <div className="qr-actions">
               <button className="quiz-btn primary" onClick={() => handleReview(0)}>Review Answers</button>
               <button className="quiz-btn share-btn" onClick={() => {

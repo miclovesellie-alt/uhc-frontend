@@ -232,6 +232,71 @@ function ProfilePage({ user, setUser }) {
         </div>
       </div>
 
+      {/* ── OFFICIAL WHATSAPP CHANNEL CARD ── */}
+      <div className="pp-section-label">📢 Official Community</div>
+      <div className="pp-card" style={{
+        marginBottom: 16,
+        background: "linear-gradient(135deg, rgba(37,211,102,0.08) 0%, rgba(16,185,129,0.06) 100%)",
+        border: "1.5px solid rgba(37,211,102,0.25)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 16,
+        flexWrap: "wrap",
+        padding: "18px 22px",
+        borderRadius: 16,
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <div style={{
+            width: 48,
+            height: 48,
+            borderRadius: "50%",
+            background: "#25D366",
+            color: "#ffffff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 4px 14px rgba(37,211,102,0.35)",
+            flexShrink: 0,
+          }}>
+            <FaWhatsapp size={26} />
+          </div>
+          <div>
+            <div style={{ fontWeight: 800, fontSize: ".95rem", color: "var(--text-heading)", marginBottom: 3 }}>
+              Join the UHC Academy WhatsApp Channel 🌟
+            </div>
+            <div style={{ fontSize: ".78rem", color: "var(--text-muted)", lineHeight: 1.4 }}>
+              Get daily NMC exam practice questions, flashcards, past papers, and study updates directly on WhatsApp!
+            </div>
+          </div>
+        </div>
+
+        <a
+          href="https://whatsapp.com/channel/0029VbD5x07CcW4tQ4Ox0142"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            background: "#25D366",
+            color: "white",
+            textDecoration: "none",
+            borderRadius: 12,
+            padding: "11px 20px",
+            fontWeight: 800,
+            fontSize: ".85rem",
+            boxShadow: "0 4px 14px rgba(37,211,102,0.35)",
+            transition: "transform 0.15s ease, box-shadow 0.15s ease",
+            flexShrink: 0,
+          }}
+          onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 6px 20px rgba(37,211,102,0.5)"; }}
+          onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 4px 14px rgba(37,211,102,0.35)"; }}
+        >
+          <FaWhatsapp size={18} /> Join Channel ➔
+        </a>
+      </div>
+
       {/* ── INFO CARDS ── */}
       <div className="pp-section-label">Profile Info</div>
       <div className="pp-info-grid">
