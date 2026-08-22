@@ -58,6 +58,17 @@ export default function AdminUsers() {
   const [filter, setFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState(null);
+
+  const getWhatsAppUrl = (phone, targetUserName) => {
+    if (!phone) return "";
+    let clean = String(phone).replace(/[^0-9]/g, "");
+    if (clean.startsWith("0") && clean.length === 10) {
+      clean = "233" + clean.slice(1);
+    }
+    const adminName = currentUser?.name?.trim() || "Admin";
+    const message = `Hi ${targetUserName || "there"}, this is admin ${adminName} from UHC`;
+    return `https://wa.me/${clean}?text=${encodeURIComponent(message)}`;
+  };
   const [userTab, setUserTab] = useState("info");
   const [confirmAction, setConfirmAction] = useState(null);
   const [resetModal, setResetModal] = useState(false);
@@ -301,7 +312,7 @@ export default function AdminUsers() {
                   <td onClick={e=>e.stopPropagation()} style={{whiteSpace:"nowrap", display:"flex", alignItems:"center", gap: 6}}>
                     {u.phone && (
                       <a
-                        href={`https://wa.me/${u.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hello ${u.name}, this is UHC Academy Admin.`)}`}
+                        href={getWhatsAppUrl(u.phone, u.name)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="admin-btn sm"
@@ -317,7 +328,7 @@ export default function AdminUsers() {
                           fontWeight: 700,
                           fontSize: ".75rem",
                         }}
-                        title={`Chat on WhatsApp (${u.phone})`}
+                        title={`WhatsApp ${u.name}`}
                       >
                         <FaWhatsapp size={14} /> WhatsApp
                       </a>
@@ -395,12 +406,56 @@ export default function AdminUsers() {
                 ) : (
                   <>
                     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
-                      {[["Role",selectedUser.role||"user"],["Status",selectedUser.status||"active"],["Country",selectedUser.country||"—"],["Category",selectedUser.category||"—"],["Points",selectedUser.points||0],["Phone",selectedUser.phone||"—"]].map(([label,val])=>(
+                      {[
+                        ["Role", selectedUser.role || "user"],
+                        ["Status", selectedUser.status || "active"],
+                        ["Country", selectedUser.country || "—"],
+                        ["Category", selectedUser.category || "—"],
+                        ["Points", selectedUser.points || 0],
+                      ].map(([label, val]) => (
                         <div key={label} style={{padding:"10px 12px",background:"rgba(255,255,255,0.04)",borderRadius:10,border:"1px solid var(--admin-border)"}}>
                           <div style={{fontSize:".7rem",color:"var(--admin-muted)",fontWeight:600,textTransform:"uppercase",letterSpacing:".08em",marginBottom:4}}>{label}</div>
                           <div style={{fontSize:".875rem",color:"var(--admin-text)",fontWeight:600}}>{String(val)}</div>
                         </div>
                       ))}
+
+                      {/* Phone card with clickable WhatsApp logo and badge */}
+                      <div style={{padding:"10px 12px",background:"rgba(255,255,255,0.04)",borderRadius:10,border:"1px solid var(--admin-border)",display:"flex",flexDirection:"column",justifyContent:"space-between"}}>
+                        <div style={{fontSize:".7rem",color:"var(--admin-muted)",fontWeight:600,textTransform:"uppercase",letterSpacing:".08em",marginBottom:4}}>
+                          Phone / WhatsApp
+                        </div>
+                        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6,flexWrap:"wrap"}}>
+                          <span style={{fontSize:".875rem",color:"var(--admin-text)",fontWeight:600}}>
+                            {selectedUser.phone || "—"}
+                          </span>
+                          {selectedUser.phone && (
+                            <a
+                              href={getWhatsAppUrl(selectedUser.phone, selectedUser.name)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{
+                                display:"inline-flex",
+                                alignItems:"center",
+                                gap:4,
+                                background:"#25D366",
+                                color:"white",
+                                padding:"3px 8px",
+                                borderRadius:8,
+                                fontSize:".72rem",
+                                fontWeight:700,
+                                textDecoration:"none",
+                                boxShadow:"0 2px 6px rgba(37,211,102,0.3)",
+                                transition:"transform 0.15s ease",
+                              }}
+                              title={`Chat with ${selectedUser.name} on WhatsApp`}
+                              onMouseEnter={e=>e.currentTarget.style.transform="scale(1.05)"}
+                              onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}
+                            >
+                              <FaWhatsapp size={14} /> Chat
+                            </a>
+                          )}
+                        </div>
+                      </div>
                     </div>
 
                     {/* Registration & Login Timestamps */}
@@ -418,7 +473,7 @@ export default function AdminUsers() {
                     <div style={{display:"flex",flexDirection:"column",gap:8}}>
                       {selectedUser.phone && (
                         <a
-                          href={`https://wa.me/${selectedUser.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hello ${selectedUser.name}, this is UHC Academy Admin.`)}`}
+                          href={getWhatsAppUrl(selectedUser.phone, selectedUser.name)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="admin-btn"
