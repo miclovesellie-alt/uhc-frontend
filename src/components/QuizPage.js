@@ -352,7 +352,7 @@ export default function QuizPage() {
   ───────────────────────────────────────── */
   useEffect(() => {
     const handleKey = (e) => {
-      const { stage, done, locked, selAns, paused, mode } = kbStateRef.current;
+      const { stage, done, locked, selAns, paused, mode, questions: kbQuestions, idx: kbIdx } = kbStateRef.current;
       if (stage !== "quiz" || done || paused) return;
       if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.tagName === "SELECT") return;
 
@@ -360,7 +360,7 @@ export default function QuizPage() {
         // A/B/C/D → select answer option dynamically based on option count (3 or 4)
         const optMap = { a: 0, b: 1, c: 2, d: 3, A: 0, B: 1, C: 2, D: 3 };
         const keyVal = optMap[e.key];
-        const currentQ = questions?.[idx];
+        const currentQ = kbQuestions?.[kbIdx];
         const totalOpts = currentQ?.options?.length || 4;
         if (keyVal !== undefined && keyVal < totalOpts) {
           setSelAns(keyVal);
@@ -395,6 +395,7 @@ export default function QuizPage() {
 
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Intentionally register once — state accessed via kbStateRef
 
   /* ─────────────────────────────────────────
