@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { useOutletContext, useLocation } from "react-router-dom";
 import api from "../../api/api";
 import { Search, Shield, Ban, Key, Trash2, RefreshCw, Eye, EyeOff, Download, Clock, CheckSquare, Square, Edit, Mail, Send } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import { UserContext } from "../../context/UserContext";
 import { useToast } from "../../hooks/useToast";
 
@@ -297,7 +298,30 @@ export default function AdminUsers() {
                     {presence?.onlineIds?.includes(u._id)?"Live":u.status==="banned"?"Banned":u.status==="suspended"?"Suspended":"Offline"}
                   </span></td>
                   <td><span className={`admin-badge ${roleColor(u.role)}`}>{u.role||"user"}</span></td>
-                  <td onClick={e=>e.stopPropagation()} style={{whiteSpace:"nowrap"}}>
+                  <td onClick={e=>e.stopPropagation()} style={{whiteSpace:"nowrap", display:"flex", alignItems:"center", gap: 6}}>
+                    {u.phone && (
+                      <a
+                        href={`https://wa.me/${u.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hello ${u.name}, this is UHC Academy Admin.`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="admin-btn sm"
+                        style={{
+                          background: "#25D366",
+                          color: "white",
+                          padding: "4px 8px",
+                          borderRadius: 8,
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 4,
+                          textDecoration: "none",
+                          fontWeight: 700,
+                          fontSize: ".75rem",
+                        }}
+                        title={`Chat on WhatsApp (${u.phone})`}
+                      >
+                        <FaWhatsapp size={14} /> WhatsApp
+                      </a>
+                    )}
                     <button className="admin-btn secondary sm" onClick={()=>{ setSelectedUser(u); setUserTab("info"); }}>Manage</button>
                   </td>
                 </tr>
@@ -392,6 +416,28 @@ export default function AdminUsers() {
                     </div>
 
                     <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                      {selectedUser.phone && (
+                        <a
+                          href={`https://wa.me/${selectedUser.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hello ${selectedUser.name}, this is UHC Academy Admin.`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="admin-btn"
+                          style={{
+                            justifyContent: "center",
+                            gap: 8,
+                            background: "#25D366",
+                            color: "white",
+                            fontWeight: 800,
+                            fontSize: ".88rem",
+                            textDecoration: "none",
+                            padding: "11px 16px",
+                            borderRadius: 10,
+                            boxShadow: "0 4px 12px rgba(37,211,102,0.3)",
+                          }}
+                        >
+                          <FaWhatsapp size={18} /> Chat on WhatsApp ({selectedUser.phone})
+                        </a>
+                      )}
                       <button className="admin-btn secondary" style={{justifyContent:"flex-start",gap:10,color:"#4255ff"}} onClick={()=>setMsgModal(true)}>
                         <Mail size={15}/> Message User
                       </button>

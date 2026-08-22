@@ -42,15 +42,31 @@ export default function CompleteProfileModal() {
   const { user, updateUser } = useContext(UserContext);
   const toast = useToast();
 
+  const token = localStorage.getItem("token");
+  const storedUser = (() => {
+    try { return JSON.parse(localStorage.getItem("user")); } catch { return null; }
+  })();
+
+  const activeUser = user || storedUser;
+
   const [phonePrefix, setPhonePrefix] = useState("+233");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [category, setCategory] = useState(user?.category || "Nursing Student (General/BSc)");
-  const [country, setCountry] = useState(user?.country || "Ghana");
+  const [category, setCategory] = useState(activeUser?.category || "Nursing Student (General/BSc)");
+  const [country, setCountry] = useState(activeUser?.country || "Ghana");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Only show if user is logged in AND doesn't have a valid phone number
-  const needsPhone = user && (!user.phone || !user.phone.trim());
+  // Only show if user is logged in (has token or user) AND does NOT have a valid phone number
+  const needsPhone = Boolean(
+    token &&
+    activeUser &&
+    (!activeUser.phone ||
+      typeof activeUser.phone !== "string" ||
+      activeUser.phone.trim() === "" ||
+      activeUser.phone.trim() === "+233" ||
+      activeUser.phone === "undefined" ||
+      activeUser.phone === "null")
+  );
 
   if (!needsPhone) return null;
 
@@ -69,14 +85,17 @@ export default function CompleteProfileModal() {
 
     try {
       const res = await api.put("user", {
-        name: user.name,
+        name: activeUser?.name,
         phone: fullPhone,
-        category: category || user.category || "Nursing Student (General/BSc)",
-        country: country || user.country || "Ghana",
+        category: category || activeUser?.category || "Nursing Student (General/BSc)",
+        country: country || activeUser?.country || "Ghana",
       });
 
       if (updateUser) {
         updateUser(res.data);
+      } else {
+        localStorage.setItem("user", JSON.stringify(res.data));
+        window.location.reload();
       }
       toast("🎉 Profile setup complete! Welcome to UHC Academy.", "success");
     } catch (err) {

@@ -4,6 +4,7 @@ import { UserContext } from "../context/UserContext";
 import api from "../api/api";
 import OnboardingTour from "./OnboardingTour";
 import AIAssistantWidget from "./AIAssistantWidget";
+import CompleteProfileModal from "./CompleteProfileModal";
 import "../styles/dashboard.css";
 import { isSoundEnabled, setSoundEnabled, playNavigate } from "../utils/sounds";
 import { io } from "socket.io-client";
@@ -903,6 +904,9 @@ function DashboardLayout() {
       )}
       {/* ===== AI ASSISTANT FLOATING WIDGET ===== */}
       <AIAssistantWidget />
+
+      {/* ===== COMPULSORY PROFILE SETUP MODAL ===== */}
+      <CompleteProfileModal />
     </div>
   );
 }
